@@ -58,41 +58,74 @@ function App() {
     return "💬";
   }
 
-  function getRiskBarWidth() {
-    const score = Number(result?.risk_score ?? 0);
-    const bounded = Math.max(0, Math.min(score, 100));
+  function getMeterWidth(score) {
+    const bounded = Math.max(0, Math.min(Number(score ?? 0), 100));
     return `${bounded}%`;
   }
 
-  function getRiskBarColor(score) {
-    if (score >= 70) return "linear-gradient(90deg, #ff7b7b, #ff4d6d)";
-    if (score >= 40) return "linear-gradient(90deg, #ffd166, #f4a261)";
+  function getMeterColor(score) {
+    const s = Number(score ?? 0);
+    if (s >= 70) return "linear-gradient(90deg, #ff7b7b, #ff4d6d)";
+    if (s >= 40) return "linear-gradient(90deg, #ffd166, #f4a261)";
     return "linear-gradient(90deg, #80ed99, #38bdf8)";
   }
 
-  async function copyResult() {
-    if (!result) return;
-
-    const shareText = `ToneCheck Result
+  function buildShareText() {
+    return `ToneCheck Result
 
 Message:
 "${message}"
 
 Tone: ${getToneLabel()}
-Risk Score: ${result.risk_score ?? ""}
-Risk Level: ${result.risk_level ?? ""}
-Confidence: ${result.confidence ?? ""}
-Advisory: ${result.advisory ?? ""}
+Risk Score: ${result?.risk_score ?? ""}
+Risk Level: ${result?.risk_level ?? ""}
+Regret Risk: ${result?.regret_risk ?? ""}
+Reply Likelihood: ${result?.reply_likelihood ?? ""}
+Advisory: ${result?.advisory ?? ""}
 
 Check yours at:
 https://trytonecheck.com`;
+  }
 
+  async function copyResult() {
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(buildShareText());
       alert("Result copied.");
     } catch {
       alert("Could not copy result.");
     }
+  }
+
+  function openShare(url) {
+    window.open(url, "_blank", "noopener,noreferrer");
+  }
+
+  function shareWhatsApp() {
+    openShare(
+      `https://wa.me/?text=${encodeURIComponent(buildShareText())}`
+    );
+  }
+
+  function shareFacebook() {
+    openShare(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+        "https://trytonecheck.com"
+      )}&quote=${encodeURIComponent(buildShareText())}`
+    );
+  }
+
+  function shareX() {
+    openShare(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(buildShareText())}`
+    );
+  }
+
+  function shareLinkedIn() {
+    openShare(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+        "https://trytonecheck.com"
+      )}`
+    );
   }
 
   const rewriteSuggestion =
@@ -102,7 +135,7 @@ https://trytonecheck.com`;
     result?.rewritten_text ||
     null;
 
-  const riskScore = Number(result?.risk_score ?? 0);
+  const regretRisk = Number(result?.regret_risk ?? 0);
 
   const pageStyle = {
     minHeight: "100vh",
@@ -111,11 +144,13 @@ https://trytonecheck.com`;
     padding: "40px 16px",
     fontFamily:
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    display: "flex",
+    justifyContent: "center",
   };
 
   const containerStyle = {
-    maxWidth: "960px",
-    margin: "0 auto",
+    width: "100%",
+    maxWidth: "1040px",
   };
 
   const heroCardStyle = {
@@ -123,8 +158,9 @@ https://trytonecheck.com`;
     backdropFilter: "blur(18px)",
     border: "1px solid rgba(255,255,255,0.16)",
     borderRadius: "28px",
-    padding: "32px",
+    padding: "36px",
     boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+    textAlign: "center",
   };
 
   const chipStyle = {
@@ -156,6 +192,17 @@ https://trytonecheck.com`;
     borderRadius: "20px",
     padding: "20px",
     boxShadow: "0 14px 32px rgba(15,23,42,0.12)",
+  };
+
+  const shareBtnStyle = {
+    padding: "12px 16px",
+    border: "none",
+    borderRadius: "12px",
+    cursor: "pointer",
+    fontWeight: 800,
+    fontSize: "15px",
+    color: "#111827",
+    background: "linear-gradient(135deg, #ffffff, #e5e7eb)",
   };
 
   return (
@@ -195,11 +242,11 @@ https://trytonecheck.com`;
 
           <p
             style={{
-              margin: "0 0 28px 0",
+              margin: "0 auto 28px auto",
               color: "#e9d5ff",
               fontSize: "20px",
               lineHeight: 1.5,
-              maxWidth: "700px",
+              maxWidth: "760px",
             }}
           >
             Check how your message may sound, spot communication risk, and get a better rewrite before you hit send.
@@ -208,6 +255,7 @@ https://trytonecheck.com`;
           <div
             style={{
               display: "flex",
+              justifyContent: "center",
               gap: "12px",
               flexWrap: "wrap",
               marginBottom: "18px",
@@ -232,7 +280,7 @@ https://trytonecheck.com`;
             placeholder="Paste your message, WhatsApp text, or email here..."
             style={{
               width: "100%",
-              minHeight: "220px",
+              minHeight: "240px",
               padding: "22px",
               fontSize: "22px",
               lineHeight: 1.6,
@@ -251,6 +299,7 @@ https://trytonecheck.com`;
             style={{
               marginTop: "20px",
               display: "flex",
+              justifyContent: "center",
               gap: "14px",
               alignItems: "center",
               flexWrap: "wrap",
@@ -308,14 +357,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Tone
                 </div>
-                <div
-                  style={{
-                    marginTop: "10px",
-                    fontSize: "30px",
-                    fontWeight: 900,
-                    color: "#111827",
-                  }}
-                >
+                <div style={{ marginTop: "10px", fontSize: "30px", fontWeight: 900, color: "#111827" }}>
                   {getToneEmoji()} {getToneLabel()}
                 </div>
               </div>
@@ -324,14 +366,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Risk Score
                 </div>
-                <div
-                  style={{
-                    marginTop: "10px",
-                    fontSize: "36px",
-                    fontWeight: 900,
-                    color: "#7c3aed",
-                  }}
-                >
+                <div style={{ marginTop: "10px", fontSize: "36px", fontWeight: 900, color: "#7c3aed" }}>
                   {result.risk_score}
                 </div>
               </div>
@@ -357,14 +392,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Confidence
                 </div>
-                <div
-                  style={{
-                    marginTop: "10px",
-                    fontSize: "28px",
-                    fontWeight: 900,
-                    color: "#111827",
-                  }}
-                >
+                <div style={{ marginTop: "10px", fontSize: "28px", fontWeight: 900, color: "#111827" }}>
                   {result.confidence}
                 </div>
               </div>
@@ -376,14 +404,7 @@ https://trytonecheck.com`;
                 background: "linear-gradient(135deg, #ffffff, #f5f3ff)",
               }}
             >
-              <div
-                style={{
-                  fontSize: "16px",
-                  fontWeight: 800,
-                  color: "#374151",
-                  marginBottom: "10px",
-                }}
-              >
+              <div style={{ fontSize: "16px", fontWeight: 800, color: "#374151", marginBottom: "10px" }}>
                 Regret Risk Meter
               </div>
 
@@ -398,23 +419,16 @@ https://trytonecheck.com`;
               >
                 <div
                   style={{
-                    width: getRiskBarWidth(),
+                    width: getMeterWidth(regretRisk),
                     height: "100%",
-                    background: getRiskBarColor(riskScore),
+                    background: getMeterColor(regretRisk),
                     transition: "width 0.4s ease",
                   }}
                 />
               </div>
 
-              <div
-                style={{
-                  marginTop: "10px",
-                  fontSize: "15px",
-                  fontWeight: 700,
-                  color: "#4b5563",
-                }}
-              >
-                {result.risk_score}/100
+              <div style={{ marginTop: "10px", fontSize: "15px", fontWeight: 700, color: "#4b5563" }}>
+                {result.regret_risk}% regret risk
               </div>
             </div>
 
@@ -431,14 +445,7 @@ https://trytonecheck.com`;
                     <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                       Reply Likelihood
                     </div>
-                    <div
-                      style={{
-                        marginTop: "10px",
-                        fontSize: "30px",
-                        fontWeight: 900,
-                        color: "#0f766e",
-                      }}
-                    >
+                    <div style={{ marginTop: "10px", fontSize: "30px", fontWeight: 900, color: "#0f766e" }}>
                       {result.reply_likelihood}%
                     </div>
                   </div>
@@ -449,14 +456,7 @@ https://trytonecheck.com`;
                     <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                       Regret Risk
                     </div>
-                    <div
-                      style={{
-                        marginTop: "10px",
-                        fontSize: "30px",
-                        fontWeight: 900,
-                        color: "#dc2626",
-                      }}
-                    >
+                    <div style={{ marginTop: "10px", fontSize: "30px", fontWeight: 900, color: "#dc2626" }}>
                       {result.regret_risk}%
                     </div>
                   </div>
@@ -469,14 +469,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Advisory
                 </div>
-                <div
-                  style={{
-                    marginTop: "10px",
-                    lineHeight: 1.7,
-                    fontSize: "18px",
-                    color: "#111827",
-                  }}
-                >
+                <div style={{ marginTop: "10px", lineHeight: 1.7, fontSize: "18px", color: "#111827" }}>
                   {result.advisory}
                 </div>
               </div>
@@ -493,53 +486,25 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#9a3412", fontWeight: 800 }}>
                   Suggested Rewrite
                 </div>
-                <div
-                  style={{
-                    marginTop: "12px",
-                    lineHeight: 1.8,
-                    fontSize: "20px",
-                    color: "#111827",
-                    fontWeight: 600,
-                  }}
-                >
+                <div style={{ marginTop: "12px", lineHeight: 1.8, fontSize: "20px", color: "#111827", fontWeight: 600 }}>
                   {rewriteSuggestion}
                 </div>
               </div>
             )}
 
-            <div style={{ display: "flex", gap: "14px", flexWrap: "wrap" }}>
-              <button
-                onClick={copyResult}
-                style={{
-                  padding: "14px 20px",
-                  border: "none",
-                  borderRadius: "14px",
-                  cursor: "pointer",
-                  fontWeight: 800,
-                  fontSize: "16px",
-                  color: "#ffffff",
-                  background: "linear-gradient(135deg, #2563eb, #06b6d4)",
-                  boxShadow: "0 12px 28px rgba(37,99,235,0.28)",
-                }}
-              >
-                Copy Result
-              </button>
-
-              <button
-                onClick={() => setMessage("")}
-                style={{
-                  padding: "14px 20px",
-                  border: "none",
-                  borderRadius: "14px",
-                  cursor: "pointer",
-                  fontWeight: 800,
-                  fontSize: "16px",
-                  color: "#111827",
-                  background: "linear-gradient(135deg, #ffffff, #e5e7eb)",
-                }}
-              >
-                Clear Message
-              </button>
+            <div
+              style={{
+                display: "flex",
+                gap: "14px",
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <button onClick={shareWhatsApp} style={shareBtnStyle}>WhatsApp</button>
+              <button onClick={shareFacebook} style={shareBtnStyle}>Facebook</button>
+              <button onClick={shareX} style={shareBtnStyle}>X</button>
+              <button onClick={shareLinkedIn} style={shareBtnStyle}>LinkedIn</button>
+              <button onClick={copyResult} style={shareBtnStyle}>Copy Result</button>
             </div>
           </div>
         )}
