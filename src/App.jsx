@@ -386,7 +386,12 @@ https://trytonecheck.com`;
                   gap: "10px",
                 }}
               >
-                <span className={getToneAnimation()}>{getToneEmoji()}</span>
+                <span 
+                   className={getToneAnimation()}
+                   style={{ fontSize: "40px", lineHeight: 1 }}
+                  >
+                  {getToneEmoji()}
+                </span>
                 <span>{getToneLabel()}</span>
               </div>
               </div>
