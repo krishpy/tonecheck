@@ -5,36 +5,50 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  async function analyze() {
-    try {
-      setLoading(true);
-      setResult(null);
+ async function analyze() {
+  try {
+    setLoading(true);
+    setResult(null);
 
-      const response = await fetch(
-        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "test-default-key",
-          },
-          body: JSON.stringify({
-            message_text: message,
-          }),
-        }
-      );
+    console.log("Sending request...");
 
-      const data = await response.json();
-      console.log("ToneCheck API result:", data);
-      setResult(data);
-    } catch (error) {
-      setResult({
-        error: error.message || "Request failed",
-      });
-    } finally {
-      setLoading(false);
+    const response = await fetch(
+      "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "test-default-key",
+        },
+        body: JSON.stringify({
+          message_text: message,
+        }),
+      }
+    );
+
+    console.log("Response object:", response);
+    console.log("HTTP status:", response.status);
+
+    const rawText = await response.text();
+    console.log("Raw response text:", rawText);
+
+    if (!response.ok) {
+      throw new Error(`API ${response.status}: ${rawText}`);
     }
+
+    const data = JSON.parse(rawText);
+    console.log("Parsed JSON:", data);
+
+    setResult(data);
+  } catch (error) {
+    console.error("Analyze failed:", error);
+    setResult({
+      error: error.message || "Request failed",
+    });
+  } finally {
+    setLoading(false);
   }
+}
 
   function setExample(text) {
     setMessage(text);
