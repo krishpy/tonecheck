@@ -64,11 +64,15 @@ function App() {
   }
 
   function getMeterColor(score) {
-    const s = Number(score ?? 0);
-    if (s >= 70) return "linear-gradient(90deg, #ff7b7b, #ff4d6d)";
-    if (s >= 40) return "linear-gradient(90deg, #ffd166, #f4a261)";
-    return "linear-gradient(90deg, #80ed99, #38bdf8)";
-  }
+  const s = Number(score ?? 0);
+
+  if (s >= 70)
+    return "linear-gradient(90deg,#ef4444,#dc2626)";
+  if (s >= 40)
+    return "linear-gradient(90deg,#f59e0b,#f97316)";
+
+  return "linear-gradient(90deg,#22c55e,#06b6d4)";
+}
 
   function buildShareText() {
     return `ToneCheck Result
@@ -146,11 +150,13 @@ https://trytonecheck.com`;
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     display: "flex",
     justifyContent: "center",
+    alignItems: "flex-start",
   };
 
   const containerStyle = {
     width: "100%",
     maxWidth: "1040px",
+    margin: "0 auto",
   };
 
   const heroCardStyle = {
@@ -237,7 +243,7 @@ https://trytonecheck.com`;
               letterSpacing: "-1.5px",
             }}
           >
-            💬 ToneCheck
+            💬✨ ToneCheck
           </h1>
 
           <p
@@ -280,9 +286,9 @@ https://trytonecheck.com`;
             placeholder="Paste your message, WhatsApp text, or email here..."
             style={{
               width: "100%",
-              minHeight: "240px",
+              minHeight: "260px",
               padding: "22px",
-              fontSize: "22px",
+              fontSize: "24px",
               lineHeight: 1.6,
               borderRadius: "22px",
               background: "rgba(255,255,255,0.92)",
@@ -349,7 +355,7 @@ https://trytonecheck.com`;
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
+                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
                 gap: "18px",
               }}
             >
@@ -411,8 +417,8 @@ https://trytonecheck.com`;
               <div
                 style={{
                   width: "100%",
-                  height: "18px",
-                  background: "#e5e7eb",
+                  height: "26px",
+                  background: "#d1d5db",
                   borderRadius: "999px",
                   overflow: "hidden",
                 }}
