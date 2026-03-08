@@ -137,30 +137,31 @@ https://trytonecheck.com`;
 
   const pageStyle = {
     minHeight: "100vh",
+    width: "100%",
     background:
-      "radial-gradient(circle at top left, #6d28d9 0%, #1e1b4b 35%, #0f172a 100%)",
-    padding: "40px 20px",
+      "radial-gradient(circle at top left, #7c3aed 0%, #312e81 35%, #0f172a 100%)",
     fontFamily:
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    padding: "32px 20px 56px 20px",
+    boxSizing: "border-box",
   };
 
-  const containerStyle = {
+  const shellStyle = {
     width: "100%",
-    maxWidth: "980px",
+    maxWidth: "1200px",
     margin: "0 auto",
   };
 
   const heroCardStyle = {
+    width: "100%",
     background: "rgba(255,255,255,0.12)",
     backdropFilter: "blur(18px)",
     border: "1px solid rgba(255,255,255,0.16)",
-    borderRadius: "28px",
-    padding: "36px",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+    borderRadius: "30px",
+    padding: "38px",
+    boxShadow: "0 24px 70px rgba(0,0,0,0.28)",
     textAlign: "center",
+    boxSizing: "border-box",
   };
 
   const chipStyle = {
@@ -171,13 +172,13 @@ https://trytonecheck.com`;
     fontWeight: 700,
     fontSize: "15px",
     color: "#1f2937",
-    background: "linear-gradient(135deg, #ffffff, #e9d5ff)",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+    background: "linear-gradient(135deg, #ffffff, #ede9fe)",
+    boxShadow: "0 10px 22px rgba(0,0,0,0.14)",
   };
 
   const primaryButtonStyle = {
-    padding: "16px 24px",
-    borderRadius: "14px",
+    padding: "16px 26px",
+    borderRadius: "16px",
     border: "none",
     cursor: "pointer",
     fontWeight: 800,
@@ -189,25 +190,39 @@ https://trytonecheck.com`;
 
   const resultCardStyle = {
     background: "#ffffff",
-    borderRadius: "20px",
-    padding: "20px",
+    borderRadius: "22px",
+    padding: "22px",
     boxShadow: "0 14px 32px rgba(15,23,42,0.12)",
   };
 
-  const shareBtnStyle = {
-    padding: "12px 16px",
+  const socialBtnStyle = {
+    width: "54px",
+    height: "54px",
     border: "none",
-    borderRadius: "12px",
+    borderRadius: "16px",
+    cursor: "pointer",
+    fontSize: "24px",
+    fontWeight: 800,
+    color: "#111827",
+    background: "linear-gradient(135deg, #ffffff, #e5e7eb)",
+    boxShadow: "0 10px 24px rgba(0,0,0,0.12)",
+  };
+
+  const copyBtnStyle = {
+    padding: "14px 18px",
+    border: "none",
+    borderRadius: "16px",
     cursor: "pointer",
     fontWeight: 800,
     fontSize: "15px",
-    color: "#111827",
-    background: "linear-gradient(135deg, #ffffff, #e5e7eb)",
+    color: "#ffffff",
+    background: "linear-gradient(135deg, #2563eb, #06b6d4)",
+    boxShadow: "0 12px 28px rgba(37,99,235,0.28)",
   };
 
   return (
     <div style={pageStyle}>
-      <div style={containerStyle}>
+      <div style={shellStyle}>
         <div style={heroCardStyle}>
           <div
             style={{
@@ -230,11 +245,11 @@ https://trytonecheck.com`;
 
           <h1
             style={{
-              fontSize: "60px",
+              fontSize: "64px",
               lineHeight: 1,
               margin: "0 0 14px 0",
               color: "#ffffff",
-              letterSpacing: "-1.5px",
+              letterSpacing: "-1.8px",
             }}
           >
             🧠💬 ToneCheck
@@ -244,9 +259,9 @@ https://trytonecheck.com`;
             style={{
               margin: "0 auto 28px auto",
               color: "#e9d5ff",
-              fontSize: "20px",
-              lineHeight: 1.5,
-              maxWidth: "760px",
+              fontSize: "21px",
+              lineHeight: 1.6,
+              maxWidth: "820px",
             }}
           >
             Check how your message may sound, spot communication risk, and get a better rewrite before you hit send.
@@ -258,7 +273,7 @@ https://trytonecheck.com`;
               justifyContent: "center",
               gap: "12px",
               flexWrap: "wrap",
-              marginBottom: "18px",
+              marginBottom: "20px",
             }}
           >
             <button style={chipStyle} onClick={() => setExample("Fine. Do whatever you want.")}>
@@ -280,24 +295,24 @@ https://trytonecheck.com`;
             placeholder="Paste your message, WhatsApp text, or email here..."
             style={{
               width: "100%",
-              minHeight: "260px",
-              padding: "22px",
-              fontSize: "24px",
+              minHeight: "300px",
+              padding: "24px",
+              fontSize: "26px",
               lineHeight: 1.6,
-              borderRadius: "22px",
-              background: "rgba(255,255,255,0.92)",
+              borderRadius: "24px",
+              background: "rgba(255,255,255,0.95)",
               color: "#111827",
-              border: "2px solid rgba(255,255,255,0.16)",
+              border: "2px solid rgba(255,255,255,0.18)",
               boxSizing: "border-box",
               outline: "none",
               resize: "vertical",
-              boxShadow: "inset 0 2px 8px rgba(0,0,0,0.06)",
+              boxShadow: "inset 0 2px 10px rgba(0,0,0,0.06)",
             }}
           />
 
           <div
             style={{
-              marginTop: "20px",
+              marginTop: "22px",
               display: "flex",
               justifyContent: "center",
               gap: "14px",
@@ -310,7 +325,7 @@ https://trytonecheck.com`;
               disabled={loading || !message.trim()}
               style={{
                 ...primaryButtonStyle,
-                opacity: loading || !message.trim() ? 0.7 : 1,
+                opacity: loading || !message.trim() ? 0.75 : 1,
               }}
             >
               {loading ? "Analyzing..." : "Analyze Message"}
@@ -341,9 +356,9 @@ https://trytonecheck.com`;
         {result && !result.error && (
           <div
             style={{
-              marginTop: "26px",
+              marginTop: "30px",
               display: "grid",
-              gap: "20px",
+              gap: "22px",
             }}
           >
             <div
@@ -357,7 +372,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Tone
                 </div>
-                <div style={{ marginTop: "10px", fontSize: "30px", fontWeight: 900, color: "#111827" }}>
+                <div style={{ marginTop: "10px", fontSize: "32px", fontWeight: 900, color: "#111827" }}>
                   {getToneEmoji()} {getToneLabel()}
                 </div>
               </div>
@@ -366,7 +381,7 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Risk Score
                 </div>
-                <div style={{ marginTop: "10px", fontSize: "36px", fontWeight: 900, color: "#7c3aed" }}>
+                <div style={{ marginTop: "10px", fontSize: "38px", fontWeight: 900, color: "#7c3aed" }}>
                   {result.risk_score}
                 </div>
               </div>
@@ -411,7 +426,7 @@ https://trytonecheck.com`;
               <div
                 style={{
                   width: "100%",
-                  height: "26px",
+                  height: "28px",
                   background: "#d1d5db",
                   borderRadius: "999px",
                   overflow: "hidden",
@@ -427,7 +442,7 @@ https://trytonecheck.com`;
                 />
               </div>
 
-              <div style={{ marginTop: "10px", fontSize: "15px", fontWeight: 700, color: "#4b5563" }}>
+              <div style={{ marginTop: "10px", fontSize: "16px", fontWeight: 700, color: "#4b5563" }}>
                 {result.regret_risk}% regret risk
               </div>
             </div>
@@ -495,16 +510,27 @@ https://trytonecheck.com`;
             <div
               style={{
                 display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 gap: "14px",
                 flexWrap: "wrap",
-                justifyContent: "center",
               }}
             >
-              <button onClick={shareWhatsApp} style={shareBtnStyle}>WhatsApp</button>
-              <button onClick={shareFacebook} style={shareBtnStyle}>Facebook</button>
-              <button onClick={shareX} style={shareBtnStyle}>X</button>
-              <button onClick={shareLinkedIn} style={shareBtnStyle}>LinkedIn</button>
-              <button onClick={copyResult} style={shareBtnStyle}>Copy Result</button>
+              <button onClick={shareWhatsApp} style={socialBtnStyle} title="Share on WhatsApp">
+                📱
+              </button>
+              <button onClick={shareFacebook} style={socialBtnStyle} title="Share on Facebook">
+                f
+              </button>
+              <button onClick={shareX} style={socialBtnStyle} title="Share on X">
+                𝕏
+              </button>
+              <button onClick={shareLinkedIn} style={socialBtnStyle} title="Share on LinkedIn">
+                in
+              </button>
+              <button onClick={copyResult} style={copyBtnStyle}>
+                Copy Result
+              </button>
             </div>
           </div>
         )}
