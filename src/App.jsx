@@ -64,15 +64,11 @@ function App() {
   }
 
   function getMeterColor(score) {
-  const s = Number(score ?? 0);
-
-  if (s >= 70)
-    return "linear-gradient(90deg,#ef4444,#dc2626)";
-  if (s >= 40)
-    return "linear-gradient(90deg,#f59e0b,#f97316)";
-
-  return "linear-gradient(90deg,#22c55e,#06b6d4)";
-}
+    const s = Number(score ?? 0);
+    if (s >= 70) return "linear-gradient(90deg,#ef4444,#dc2626)";
+    if (s >= 40) return "linear-gradient(90deg,#f59e0b,#f97316)";
+    return "linear-gradient(90deg,#22c55e,#06b6d4)";
+  }
 
   function buildShareText() {
     return `ToneCheck Result
@@ -105,9 +101,7 @@ https://trytonecheck.com`;
   }
 
   function shareWhatsApp() {
-    openShare(
-      `https://wa.me/?text=${encodeURIComponent(buildShareText())}`
-    );
+    openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`);
   }
 
   function shareFacebook() {
@@ -145,7 +139,7 @@ https://trytonecheck.com`;
     minHeight: "100vh",
     background:
       "radial-gradient(circle at top left, #6d28d9 0%, #1e1b4b 35%, #0f172a 100%)",
-    padding: "40px 16px",
+    padding: "40px 20px",
     fontFamily:
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     display: "flex",
@@ -155,7 +149,7 @@ https://trytonecheck.com`;
 
   const containerStyle = {
     width: "100%",
-    maxWidth: "1040px",
+    maxWidth: "980px",
     margin: "0 auto",
   };
 
@@ -243,7 +237,7 @@ https://trytonecheck.com`;
               letterSpacing: "-1.5px",
             }}
           >
-            💬✨ ToneCheck
+            🧠💬 ToneCheck
           </h1>
 
           <p
