@@ -74,16 +74,17 @@ function App() {
         <div style={{marginTop:"30px",background:"#f3f6ff",padding:"20px",borderRadius:"10px"}}>
 
           <p><b>Tone:</b> {result.tone}</p>
-
-          <p><b>Risk Score:</b> {result.communication_risk_score}</p>
-
-          <p><b>Recommended Action:</b> {result.recommended_action}</p>
+          <p><b>Risk Score:</b> {result.risk_score}</p>
+           <p><b>Risk Level:</b> {result.risk_level}</p>
+          <p><b>Confidence:</b> {result.confidence}</p>
+          <p><b>Advisory:</b> {result.advisory}</p>
 
         </div>
       )}
 
+      <pre>{JSON.stringify(result, null, 2)}</pre>
       <p style={{marginTop:"50px",fontSize:"14px",color:"#888"}}>
-        Built by MangoMind Labs
+        Built by @MangoMind Labs
       </p>
 
     </div>
