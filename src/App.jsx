@@ -5,12 +5,10 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
- async function analyze() {
+async function analyze() {
   try {
     setLoading(true);
     setResult(null);
-
-    console.log("Sending request...");
 
     const response = await fetch(
       "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
@@ -20,36 +18,28 @@ function App() {
           "Content-Type": "application/json",
           "x-api-key": "test-default-key",
         },
-        body: JSON.stringify({
-          message_text: message,
-        }),
+        body: JSON.stringify({ message_text: message }),
       }
     );
 
-    console.log("Response object:", response);
-    console.log("HTTP status:", response.status);
-
     const rawText = await response.text();
-    console.log("Raw response text:", rawText);
+    console.log("status:", response.status);
+    console.log("raw:", rawText);
 
     if (!response.ok) {
       throw new Error(`API ${response.status}: ${rawText}`);
     }
 
     const data = JSON.parse(rawText);
-    console.log("Parsed JSON:", data);
-
+    console.log("parsed:", data);
     setResult(data);
   } catch (error) {
     console.error("Analyze failed:", error);
-    setResult({
-      error: error.message || "Request failed",
-    });
+    setResult({ error: error.message || "Request failed" });
   } finally {
     setLoading(false);
   }
 }
-
   function setExample(text) {
     setMessage(text);
   }
