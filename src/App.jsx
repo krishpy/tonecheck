@@ -65,6 +65,19 @@ function App() {
   return "Neutral";
 }
 
+function getToneEmoji() {
+  const tone = getToneLabel().toLowerCase();
+
+  if (tone.includes("threat")) return "🚨";
+  if (tone.includes("passive")) return "😒";
+  if (tone.includes("aggressive")) return "😠";
+  if (tone.includes("tense")) return "😬";
+  if (tone.includes("neutral")) return "🙂";
+  if (tone.includes("friendly")) return "😊";
+
+  return "💬";
+}
+
 function getToneAnimation() {
   const tone = getToneLabel().toLowerCase();
 
