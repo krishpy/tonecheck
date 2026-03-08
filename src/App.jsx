@@ -282,7 +282,7 @@ https://trytonecheck.com`;
               letterSpacing: "-1.8px",
             }}
           >
-            🧠💬 ToneCheck
+            ✨💬 ToneCheck
           </h1>
 
           <p
