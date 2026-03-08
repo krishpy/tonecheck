@@ -25,6 +25,7 @@ function App() {
       );
 
       const data = await response.json();
+      console.log("ToneCheck API result:", data);
       setResult(data);
     } catch (error) {
       setResult({
@@ -39,24 +40,26 @@ function App() {
     setMessage(text);
   }
 
-  function getToneLabel() {
-    const tone = result?.tone;
-    if (tone) return tone;
+ function getToneLabel() {
+  if (result?.tone) return result.tone;
+  if (result?.label) return result.label;
 
-    const score = Number(result?.risk_score ?? 0);
-    if (score >= 70) return "Aggressive";
-    if (score >= 40) return "Tense";
-    return "Neutral";
-  }
+  const score = Number(result?.risk_score ?? 0);
+  if (score >= 85) return "Threatening";
+  if (score >= 70) return "Aggressive";
+  if (score >= 40) return "Tense";
+  return "Neutral";
+}
 
-  function getToneEmoji() {
-    const tone = getToneLabel().toLowerCase();
-    if (tone.includes("aggressive")) return "😠";
-    if (tone.includes("tense")) return "😬";
-    if (tone.includes("neutral")) return "😌";
-    if (tone.includes("friendly")) return "🙂";
-    return "💬";
-  }
+function getToneAnimation() {
+  const tone = getToneLabel().toLowerCase();
+
+  if (tone.includes("threat")) return "emoji-shake";
+  if (tone.includes("aggressive")) return "emoji-pulse";
+  if (tone.includes("tense")) return "emoji-wiggle";
+  if (tone.includes("passive")) return "emoji-slow-bounce";
+  return "emoji-float";
+}
 
   function getMeterWidth(score) {
     const bounded = Math.max(0, Math.min(Number(score ?? 0), 100));
@@ -372,9 +375,20 @@ https://trytonecheck.com`;
                 <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
                   Tone
                 </div>
-                <div style={{ marginTop: "10px", fontSize: "32px", fontWeight: 900, color: "#111827" }}>
-                  {getToneEmoji()} {getToneLabel()}
-                </div>
+                <div
+                  style={{
+                  marginTop: "10px",
+                  fontSize: "32px",
+                  fontWeight: 900,
+                  color: "#111827",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <span className={getToneAnimation()}>{getToneEmoji()}</span>
+                <span>{getToneLabel()}</span>
+              </div>
               </div>
 
               <div style={resultCardStyle}>
