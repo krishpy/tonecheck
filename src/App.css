@@ -37,6 +37,67 @@
   padding: 2em;
 }
 
+.emoji-shake {
+  display: inline-block;
+  animation: emojiShake 0.55s infinite;
+}
+
+.emoji-pulse {
+  display: inline-block;
+  animation: emojiPulse 1.15s ease-in-out infinite;
+}
+
+.emoji-wiggle {
+  display: inline-block;
+  animation: emojiWiggle 0.9s ease-in-out infinite;
+}
+
+.emoji-slow-bounce {
+  display: inline-block;
+  animation: emojiSlowBounce 1.8s ease-in-out infinite;
+}
+
+.emoji-float {
+  display: inline-block;
+  animation: emojiFloat 2.2s ease-in-out infinite;
+}
+
+@keyframes emojiShake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-2px); }
+  40% { transform: translateX(2px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes emojiPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+@keyframes emojiWiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+  75% { transform: rotate(-4deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes emojiSlowBounce {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(-5px); }
+  60% { transform: translateY(0); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes emojiFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
 .read-the-docs {
   color: #888;
 }
