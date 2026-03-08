@@ -148,7 +148,7 @@ https://trytonecheck.com`;
 
   const shellStyle = {
     width: "100%",
-    maxWidth: "1200px",
+    maxWidth: "100%",
     margin: "0 auto",
   };
 
