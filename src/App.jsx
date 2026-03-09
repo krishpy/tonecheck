@@ -5,6 +5,31 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
+function getManipulationLabel(signal) {
+  const map = {
+    guilt_pressure: "Guilt pressure",
+    emotional_leverage: "Emotional leverage",
+    blame_shifting: "Blame shifting",
+    gaslighting_signal: "Gaslighting cues",
+    subtle_control: "Subtle control",
+    forced_reassurance: "Forced reassurance",
+    emotional_dependency: "Emotional dependency",
+    moral_pressure: "Moral pressure",
+    control_disguised_as_care: "Control disguised as care",
+    none: "None detected",
+  };
+
+  return map[signal] || signal || "None detected";
+}
+
+function getRiskBand(score) {
+  const s = Number(score ?? 0);
+  if (s >= 70) return "High";
+  if (s >= 40) return "Medium";
+  if (s > 0) return "Low";
+  return "None";
+}
+
 async function analyze() {
   try {
     setLoading(true);
@@ -514,6 +539,71 @@ https://trytonecheck.com`;
                 )}
               </div>
             )}
+
+            {(result.primary_manipulation_signal || result.manipulation_risk !== undefined) && (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                    gap: "18px",
+                  }}
+                >
+                  <div style={resultCardStyle}>
+                    <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
+                      Primary Hidden Signal
+                    </div>
+                    <div style={{ marginTop: "10px", fontSize: "26px", fontWeight: 900, color: "#111827" }}>
+                      {getManipulationLabel(result.primary_manipulation_signal)}
+                    </div>
+                  </div>
+              
+                  <div style={resultCardStyle}>
+                    <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
+                      Manipulation Risk
+                    </div>
+                    <div style={{ marginTop: "10px", fontSize: "30px", fontWeight: 900, color: "#7c3aed" }}>
+                      {result.manipulation_risk ?? 0}%
+                    </div>
+                    <div style={{ marginTop: "6px", fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
+                      {getRiskBand(result.manipulation_risk)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            {Array.isArray(result.top_manipulation_signals) && result.top_manipulation_signals.length > 0 && (
+                <div style={resultCardStyle}>
+                  <div style={{ fontSize: "14px", color: "#6b7280", fontWeight: 700 }}>
+                    Detected Hidden Signals
+                  </div>
+              
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "10px",
+                    }}
+                  >
+                    {result.top_manipulation_signals.map((item, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "999px",
+                          background: "#f5f3ff",
+                          color: "#5b21b6",
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          border: "1px solid #ddd6fe",
+                        }}
+                      >
+                        {getManipulationLabel(item.name)} · {item.score}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
             {result.advisory && (
               <div style={resultCardStyle}>
