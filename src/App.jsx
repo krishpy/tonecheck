@@ -43,24 +43,31 @@ async function analyze() {
           "Content-Type": "application/json",
           "x-api-key": "test-default-key",
         },
-        body: JSON.stringify({ message_text: message }),
+        body: JSON.stringify({
+          message_text: message,
+        }),
       }
     );
 
     const rawText = await response.text();
-    console.log("status:", response.status);
-    console.log("raw:", rawText);
 
-    if (!response.ok) {
-      throw new Error(`API ${response.status}: ${rawText}`);
+    let data = {};
+    try {
+      data = JSON.parse(rawText);
+    } catch {
+      data = {};
     }
 
-    const data = JSON.parse(rawText);
-    console.log("parsed:", data);
+    if (!response.ok) {
+      throw new Error(data?.detail || "Something went wrong. Please try again.");
+    }
+
     setResult(data);
   } catch (error) {
     console.error("Analyze failed:", error);
-    setResult({ error: error.message || "Request failed" });
+    setResult({
+      error: "Something went wrong while analyzing the message. Please try again.",
+    });
   } finally {
     setLoading(false);
   }
