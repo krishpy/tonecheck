@@ -5,8 +5,14 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-function getManipulationLabel(signal) {
+function getHiddenSignalLabel(signal) {
   const map = {
+    threat: "Threat",
+    hostile_command: "Hostile command",
+    profanity: "Profanity",
+    insult: "Insult",
+    pressure: "Pressure",
+    passive_aggression: "Passive aggression",
     guilt_pressure: "Guilt pressure",
     emotional_leverage: "Emotional leverage",
     blame_shifting: "Blame shifting",
@@ -18,6 +24,9 @@ function getManipulationLabel(signal) {
     control_disguised_as_care: "Control disguised as care",
     none: "None detected",
   };
+
+  return map[signal] || signal || "None detected";
+}
 
   return map[signal] || signal || "None detected";
 }
@@ -560,7 +569,7 @@ https://trytonecheck.com`;
                       Primary Hidden Signal
                     </div>
                     <div style={{ marginTop: "10px", fontSize: "26px", fontWeight: 900, color: "#111827" }}>
-                      {getManipulationLabel(result.primary_manipulation_signal)}
+                      getHiddenSignalLabel(result.primary_hidden_signal || result.primary_manipulation_signal)
                     </div>
                   </div>
               
@@ -605,7 +614,7 @@ https://trytonecheck.com`;
                           border: "1px solid #ddd6fe",
                         }}
                       >
-                        {getManipulationLabel(item.name)} · {item.score}
+                        {getHiddenSignalLabel(item.name)} · {item.score}
                       </div>
                     ))}
                   </div>
