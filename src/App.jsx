@@ -28,8 +28,6 @@ function getHiddenSignalLabel(signal) {
   return map[signal] || signal || "None detected";
 }
 
-  return map[signal] || signal || "None detected";
-}
 
 function getRiskBand(score) {
   const s = Number(score ?? 0);
@@ -569,7 +567,7 @@ https://trytonecheck.com`;
                       Primary Hidden Signal
                     </div>
                     <div style={{ marginTop: "10px", fontSize: "26px", fontWeight: 900, color: "#111827" }}>
-                      getHiddenSignalLabel(result.primary_hidden_signal || result.primary_manipulation_signal)
+                      {getHiddenSignalLabel(result.primary_hidden_signal || result.primary_manipulation_signal)}
                     </div>
                   </div>
               
