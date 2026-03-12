@@ -141,6 +141,7 @@ Risk Level: ${result?.risk_level ?? ""}
 Regret Risk: ${result?.regret_risk ?? ""}
 Reply Likelihood: ${result?.reply_likelihood ?? ""}
 Advisory: ${result?.advisory ?? ""}
+ReWrite: ${result?.rewriteSuggestion ?? ""}
 
 Check yours at:
 https://trytonecheck.com`;
