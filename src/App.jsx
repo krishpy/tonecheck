@@ -169,10 +169,12 @@ ${getToneEmoji()} Tone: ${getToneLabel()}
 📬 Reply Likelihood: ${result?.reply_likelihood ?? ""}
 🕵️ Hidden Signal: ${primaryHiddenSignalLabel}
 💡 Advisory: ${result?.advisory ?? ""}${
-      displayedRewrite ? `
+      displayedRewrite
+        ? `
 
 ✍️ Suggested Rewrite:
-${displayedRewrite}` : ""
+${displayedRewrite}`
+        : ""
     }
 
 Check yours at:
@@ -274,7 +276,7 @@ https://trytonecheck.com`;
     minHeight: "100vh",
     width: "100%",
     background:
-      "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.9) 0%, rgba(244,247,255,1) 26%, rgba(234,240,255,1) 45%, rgba(224,231,255,1) 70%, rgba(245,247,250,1) 100%)",
+      "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.95) 0%, rgba(243,246,255,1) 18%, rgba(232,239,255,1) 36%, rgba(235,232,255,1) 58%, rgba(252,244,255,1) 76%, rgba(248,250,252,1) 100%)",
     fontFamily:
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     padding: "28px 18px 64px",
@@ -303,24 +305,39 @@ https://trytonecheck.com`;
 
   const glassOrb1 = {
     position: "absolute",
-    top: "-60px",
-    right: "-40px",
-    width: "220px",
-    height: "220px",
+    top: "-90px",
+    right: "-70px",
+    width: "300px",
+    height: "300px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(99,102,241,0.18), rgba(99,102,241,0))",
+    background: "radial-gradient(circle, rgba(99,102,241,0.22), rgba(99,102,241,0) 70%)",
     pointerEvents: "none",
+    filter: "blur(6px)",
   };
 
   const glassOrb2 = {
     position: "absolute",
-    bottom: "-90px",
-    left: "-60px",
-    width: "260px",
-    height: "260px",
+    bottom: "-110px",
+    left: "-70px",
+    width: "320px",
+    height: "320px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(236,72,153,0.14), rgba(236,72,153,0))",
+    background: "radial-gradient(circle, rgba(236,72,153,0.18), rgba(236,72,153,0) 70%)",
     pointerEvents: "none",
+    filter: "blur(8px)",
+  };
+
+  const glassOrb3 = {
+    position: "absolute",
+    top: "35%",
+    left: "42%",
+    transform: "translate(-50%, -50%)",
+    width: "180px",
+    height: "180px",
+    borderRadius: "999px",
+    background: "radial-gradient(circle, rgba(56,189,248,0.12), rgba(56,189,248,0) 72%)",
+    pointerEvents: "none",
+    filter: "blur(8px)",
   };
 
   const chipStyle = {
@@ -340,42 +357,37 @@ https://trytonecheck.com`;
   const actionButtonStyle = {
     padding: "15px 22px",
     borderRadius: "18px",
-    border: "1px solid rgba(15,23,42,0.06)",
+    border: "1px solid rgba(15,23,42,0.08)",
     cursor: "pointer",
     fontWeight: 750,
     fontSize: "15px",
-    background: "rgba(255,255,255,0.78)",
+    background: "rgba(255,255,255,0.82)",
     color: "#111827",
-    boxShadow: "0 8px 28px rgba(15,23,42,0.06)",
+    boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
   };
 
   const primaryButtonStyle = {
     padding: "16px 24px",
     borderRadius: "18px",
-    border: "1px solid rgba(79,70,229,0.18)",
+    border: "1px solid rgba(255,255,255,0.28)",
     cursor: "pointer",
     fontWeight: 800,
     fontSize: "16px",
     color: "#ffffff",
-    background: "linear-gradient(135deg, #111827, #4f46e5 55%, #7c3aed)",
-    boxShadow: "0 14px 32px rgba(79,70,229,0.22)",
+    background:
+      "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
+    boxShadow:
+      "0 16px 36px rgba(79,70,229,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
   };
 
   const cardStyle = {
-    background: "rgba(255,255,255,0.82)",
-    backdropFilter: "blur(16px)",
-    border: "1px solid rgba(255,255,255,0.74)",
-    borderRadius: "26px",
+    background: "rgba(255,255,255,0.78)",
+    backdropFilter: "blur(18px)",
+    border: "1px solid rgba(255,255,255,0.7)",
+    borderRadius: "28px",
     padding: "22px",
-    boxShadow: "0 10px 26px rgba(15,23,42,0.05)",
-  };
-
-  const metricValueStyle = {
-    marginTop: "10px",
-    fontSize: "34px",
-    fontWeight: 850,
-    letterSpacing: "-0.04em",
-    color: "#111827",
+    boxShadow:
+      "0 10px 30px rgba(15,23,42,0.05), 0 1px 0 rgba(255,255,255,0.6) inset",
   };
 
   return (
@@ -384,44 +396,93 @@ https://trytonecheck.com`;
         <div style={heroCardStyle}>
           <div style={glassOrb1} />
           <div style={glassOrb2} />
-
-          <div
-            style={{
-              position: "relative",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "10px",
-              background: "rgba(255,255,255,0.72)",
-              border: "1px solid rgba(15,23,42,0.06)",
-              borderRadius: "999px",
-              padding: "10px 16px",
-              color: "#334155",
-              fontSize: "13px",
-              fontWeight: 700,
-              marginBottom: "18px",
-            }}
-          >
-            <span>✨</span>
-            <span>Think before you send</span>
-          </div>
+          <div style={glassOrb3} />
 
           <div style={{ position: "relative" }}>
-            <h1
+            <div
               style={{
-                margin: 0,
-                fontSize: "60px",
-                lineHeight: 1,
-                letterSpacing: "-0.06em",
-                fontWeight: 850,
-                color: "#0f172a",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "16px",
+                marginBottom: "14px",
               }}
             >
-              ToneCheck
-            </h1>
+              <div
+                style={{
+                  position: "relative",
+                  width: "74px",
+                  height: "74px",
+                  borderRadius: "24px",
+                  display: "grid",
+                  placeItems: "center",
+                  background:
+                    "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
+                  boxShadow:
+                    "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
+                  border: "1px solid rgba(255,255,255,0.28)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: "8px",
+                    borderRadius: "18px",
+                    border: "1px solid rgba(255,255,255,0.22)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: "1px",
+                    color: "#ffffff",
+                    fontWeight: 900,
+                    letterSpacing: "-0.08em",
+                    textShadow: "0 2px 10px rgba(0,0,0,0.16)",
+                  }}
+                >
+                  <span style={{ fontSize: "28px", lineHeight: 1 }}>T</span>
+                  <span style={{ fontSize: "30px", lineHeight: 1 }}>✓</span>
+                </div>
+              </div>
+
+              <div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    letterSpacing: "0.18em",
+                    color: "#6366f1",
+                    textTransform: "uppercase",
+                    marginBottom: "6px",
+                  }}
+                >
+                  Communication Intelligence
+                </div>
+
+                <h1
+                  style={{
+                    margin: 0,
+                    fontSize: "72px",
+                    lineHeight: 0.93,
+                    letterSpacing: "-0.08em",
+                    fontWeight: 900,
+                    background:
+                      "linear-gradient(135deg, #0f172a 0%, #312e81 38%, #7c3aed 68%, #ec4899 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                >
+                  ToneCheck
+                </h1>
+              </div>
+            </div>
 
             <p
               style={{
-                margin: "16px 0 0 0",
+                margin: "10px 0 0 0",
                 maxWidth: "820px",
                 color: "#475569",
                 fontSize: "19px",
@@ -473,7 +534,8 @@ https://trytonecheck.com`;
                 boxSizing: "border-box",
                 outline: "none",
                 resize: "vertical",
-                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(15,23,42,0.05)",
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(15,23,42,0.05)",
               }}
             />
 
@@ -550,7 +612,15 @@ https://trytonecheck.com`;
                 gap: "20px",
               }}
             >
-              <div style={{ ...cardStyle, padding: "26px" }}>
+              <div
+                style={{
+                  ...cardStyle,
+                  padding: "26px",
+                  border: "1px solid rgba(99,102,241,0.16)",
+                  boxShadow:
+                    "0 12px 34px rgba(99,102,241,0.08), 0 1px 0 rgba(255,255,255,0.7) inset",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
@@ -561,7 +631,14 @@ https://trytonecheck.com`;
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 800, letterSpacing: "0.08em" }}>
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        color: "#64748b",
+                        fontWeight: 800,
+                        letterSpacing: "0.08em",
+                      }}
+                    >
                       TONE SUMMARY
                     </div>
 
@@ -610,14 +687,29 @@ https://trytonecheck.com`;
                       minWidth: "180px",
                       padding: "14px 16px",
                       borderRadius: "22px",
-                      background: "linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.9))",
+                      background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(248,250,252,0.92))",
                       border: "1px solid rgba(15,23,42,0.06)",
                     }}
                   >
-                    <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b", letterSpacing: "0.08em" }}>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        color: "#64748b",
+                        letterSpacing: "0.08em",
+                      }}
+                    >
                       PRIMARY HIDDEN SIGNAL
                     </div>
-                    <div style={{ marginTop: "8px", fontSize: "19px", fontWeight: 750, color: "#111827" }}>
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        fontSize: "19px",
+                        fontWeight: 750,
+                        color: "#111827",
+                      }}
+                    >
                       {primaryHiddenSignalLabel}
                     </div>
                   </div>
@@ -641,10 +733,12 @@ https://trytonecheck.com`;
                   <div
                     style={{
                       width: "100%",
-                      height: "16px",
-                      background: "rgba(226,232,240,0.72)",
+                      height: "18px",
+                      background:
+                        "linear-gradient(180deg, rgba(226,232,240,0.78), rgba(241,245,249,0.9))",
                       borderRadius: "999px",
                       overflow: "hidden",
+                      boxShadow: "inset 0 2px 6px rgba(15,23,42,0.06)",
                     }}
                   >
                     <div
@@ -652,8 +746,9 @@ https://trytonecheck.com`;
                         width: getMeterWidth(riskScore),
                         height: "100%",
                         background: getMeterColor(riskScore),
-                        boxShadow: `0 0 22px ${getToneAccent(riskScore)}55`,
+                        boxShadow: `0 0 24px ${getToneAccent(riskScore)}66`,
                         transition: "width 0.35s ease",
+                        borderRadius: "999px",
                       }}
                     />
                   </div>
@@ -674,17 +769,28 @@ https://trytonecheck.com`;
                 </div>
               </div>
 
-              <div style={{ ...cardStyle, padding: "24px" }}>
-                <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 800, letterSpacing: "0.08em" }}>
+              <div
+                style={{
+                  ...cardStyle,
+                  padding: "24px",
+                  border: "1px solid rgba(56,189,248,0.14)",
+                  boxShadow:
+                    "0 12px 34px rgba(56,189,248,0.07), 0 1px 0 rgba(255,255,255,0.7) inset",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "13px",
+                    color: "#64748b",
+                    fontWeight: 800,
+                    letterSpacing: "0.08em",
+                  }}
+                >
                   QUICK STATS
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                  <MetricCard
-                    label="Risk Score"
-                    value={result?.risk_score}
-                    accent="#7c3aed"
-                  />
+                  <MetricCard label="Risk Score" value={result?.risk_score} accent="#7c3aed" />
                   <MetricCard
                     label="Reply Likelihood"
                     value={`${result?.reply_likelihood ?? 0}%`}
@@ -704,46 +810,57 @@ https://trytonecheck.com`;
               </div>
             </div>
 
-            {Array.isArray(result.top_manipulation_signals) && result.top_manipulation_signals.length > 0 && (
-              <div style={cardStyle}>
-                <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 800, letterSpacing: "0.08em" }}>
-                  DETECTED SIGNALS
-                </div>
+            {Array.isArray(result.top_manipulation_signals) &&
+              result.top_manipulation_signals.length > 0 && (
+                <div style={cardStyle}>
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      color: "#64748b",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    DETECTED SIGNALS
+                  </div>
 
-                <div
-                  style={{
-                    marginTop: "14px",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "10px",
-                  }}
-                >
-                  {result.top_manipulation_signals.map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: "999px",
-                        background: "rgba(99,102,241,0.08)",
-                        color: "#4338ca",
-                        fontWeight: 700,
-                        fontSize: "14px",
-                        border: "1px solid rgba(99,102,241,0.12)",
-                      }}
-                    >
-                      {getHiddenSignalLabel(item.name)} · {item.score}
-                    </div>
-                  ))}
+                  <div
+                    style={{
+                      marginTop: "14px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "10px",
+                    }}
+                  >
+                    {result.top_manipulation_signals.map((item, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "999px",
+                          background: "rgba(99,102,241,0.08)",
+                          color: "#4338ca",
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          border: "1px solid rgba(99,102,241,0.12)",
+                        }}
+                      >
+                        {getHiddenSignalLabel(item.name)} · {item.score}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {displayedRewrite && (
               <div
                 style={{
                   ...cardStyle,
-                  background: "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,247,237,0.92))",
-                  border: "1px solid rgba(251,146,60,0.18)",
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                  border: "1px solid rgba(251,146,60,0.22)",
+                  boxShadow:
+                    "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
                   padding: "26px",
                 }}
               >
@@ -757,7 +874,14 @@ https://trytonecheck.com`;
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: "13px", color: "#9a3412", fontWeight: 800, letterSpacing: "0.08em" }}>
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        color: "#9a3412",
+                        fontWeight: 800,
+                        letterSpacing: "0.08em",
+                      }}
+                    >
                       SUGGESTED REWRITE
                     </div>
                     <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
@@ -786,10 +910,24 @@ https://trytonecheck.com`;
 
             {result.advisory && (
               <div style={cardStyle}>
-                <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 800, letterSpacing: "0.08em" }}>
+                <div
+                  style={{
+                    fontSize: "13px",
+                    color: "#64748b",
+                    fontWeight: 800,
+                    letterSpacing: "0.08em",
+                  }}
+                >
                   ADVISORY
                 </div>
-                <div style={{ marginTop: "12px", lineHeight: 1.8, fontSize: "18px", color: "#111827" }}>
+                <div
+                  style={{
+                    marginTop: "12px",
+                    lineHeight: 1.8,
+                    fontSize: "18px",
+                    color: "#111827",
+                  }}
+                >
                   {result.advisory}
                 </div>
               </div>
@@ -806,7 +944,14 @@ https://trytonecheck.com`;
                 }}
               >
                 <div>
-                  <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 800, letterSpacing: "0.08em" }}>
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      color: "#64748b",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                    }}
+                  >
                     SHARE RESULT
                   </div>
                   <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
