@@ -459,7 +459,7 @@ https://trytonecheck.com`;
                     marginBottom: "6px",
                   }}
                 >
-                  Communication Intelligence
+                  Think Before you send
                 </div>
 
                 <h1
