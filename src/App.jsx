@@ -775,7 +775,7 @@ https://trytonecheck.com`;
                   opacity: loading || !message.trim() ? 0.7 : 1,
                 }}
               >
-                {loading ? "Analyzing..." : "Analyze Message"}
+                {loading ? "Analyzing..." : "Analyze Tone"}
               </button>
             </div>
           </div>
