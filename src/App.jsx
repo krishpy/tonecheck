@@ -968,7 +968,6 @@ https://trytonecheck.com`;
                     <MiniTag label={`Risk Level: ${result?.risk_level || getRiskBand(riskScore)}`} />
                     <MiniTag label={`Reply: ${replyLikelihood}%`} />
                     <MiniTag label={`Regret: ${regretRisk}%`} />
-                    <MiniTag label={`Confidence: ${result?.confidence ?? "-"}`} />
                   </div>
                 </div>
               </div>
