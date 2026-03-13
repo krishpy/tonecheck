@@ -68,6 +68,13 @@ function App() {
         }
       );
 
+      const STAT_EXPLANATIONS = {
+  risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
+  reply: "How likely the other person is to respond positively.",
+  regret: "Chance you may regret sending this later.",
+  manipulation: "Whether the message may pressure or guilt the other person.",
+};
+
       const rawText = await response.text();
 
       let data = {};
@@ -993,22 +1000,33 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                  <MetricCard label="⚠️ Risk Score" value={result?.risk_score} accent="#7c3aed" />
-                  <MetricCard
-                    label="📬 Reply Likelihood"
-                    value={`${result?.reply_likelihood ?? 0}%`}
-                    accent="#0f766e"
-                  />
-                  <MetricCard
-                    label="💭 Regret Risk"
-                    value={`${result?.regret_risk ?? 0}%`}
-                    accent="#dc2626"
-                  />
-                  <MetricCard
-                    label="🕵️ Manipulation Risk"
-                    value={`${result?.manipulation_risk ?? 0}%`}
-                    accent="#4f46e5"
-                  />
+                 <MetricCard
+  label="⚠️ Risk Score"
+  value={result?.risk_score}
+  accent="#7c3aed"
+  explanation={STAT_EXPLANATIONS.risk}
+/>
+
+<MetricCard
+  label="📬 Reply Likelihood"
+  value={`${result?.reply_likelihood ?? 0}%`}
+  accent="#0f766e"
+  explanation={STAT_EXPLANATIONS.reply}
+/>
+
+<MetricCard
+  label="💭 Regret Risk"
+  value={`${result?.regret_risk ?? 0}%`}
+  accent="#dc2626"
+  explanation={STAT_EXPLANATIONS.regret}
+/>
+
+<MetricCard
+  label="🕵️ Manipulation Risk"
+  value={`${result?.manipulation_risk ?? 0}%`}
+  accent="#4f46e5"
+  explanation={STAT_EXPLANATIONS.manipulation}
+/>/>
                 </div>
               </div>
             </div>
@@ -1201,31 +1219,77 @@ https://trytonecheck.com`;
   );
 }
 
-function MetricCard({ label, value, accent }) {
+function MetricCard({ label, value, accent, explanation }) {
+  const [showTip, setShowTip] = React.useState(false);
+
   return (
     <div
-      className="tc-chip-hover"
       style={{
-        padding: "16px 18px",
-        borderRadius: "20px",
-        background: "rgba(255,255,255,0.85)",
-        border: "1px solid rgba(15,23,42,0.05)",
+        ...cardStyle,
+        padding: "18px",
+        position: "relative",
       }}
     >
-      <div style={{ fontSize: "13px", color: "#64748b", fontWeight: 700 }}>
-        {label}
-      </div>
+      {/* label row */}
       <div
         style={{
-          marginTop: "8px",
+          fontSize: "14px",
+          opacity: 0.75,
+          marginBottom: "6px",
+          display: "flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+      >
+        {label}
+
+        {/* info icon */}
+        <span
+          onMouseEnter={() => setShowTip(true)}
+          onMouseLeave={() => setShowTip(false)}
+          style={{
+            fontSize: "13px",
+            cursor: "help",
+            opacity: 0.6,
+          }}
+        >
+          ⓘ
+        </span>
+      </div>
+
+      {/* value */}
+      <div
+        style={{
           fontSize: "28px",
-          fontWeight: 850,
-          letterSpacing: "-0.04em",
+          fontWeight: "700",
           color: accent,
         }}
       >
         {value}
       </div>
+
+      {/* tooltip */}
+      {showTip && (
+        <div
+          style={{
+            position: "absolute",
+            top: "6px",
+            right: "6px",
+            transform: "translateY(-100%)",
+            background: "rgba(30,41,59,0.95)",
+            color: "white",
+            fontSize: "13px",
+            padding: "10px 12px",
+            borderRadius: "10px",
+            width: "200px",
+            lineHeight: "1.4",
+            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
+            animation: "fadeIn 0.15s ease",
+          }}
+        >
+          {explanation}
+        </div>
+      )}
     </div>
   );
 }
