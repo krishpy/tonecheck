@@ -1445,7 +1445,12 @@ https://trytonecheck.com`;
     </button>
   </div>
 </div>
-
+               
+)}
+      </div>
+    </div>
+  );
+}
 
 
 function MetricCard({ label, value, accent, explanation }) {
