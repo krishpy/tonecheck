@@ -129,6 +129,74 @@ function App() {
     return "#22c55e";
   }
 
+  function getToneTheme() {
+    const tone = getToneLabel().toLowerCase();
+    const score = Number(result?.risk_score ?? 0);
+
+    if (tone.includes("threat") || score >= 85) {
+      return {
+        bg: "linear-gradient(135deg, rgba(254,226,226,0.92), rgba(254,242,242,0.88))",
+        border: "rgba(239,68,68,0.30)",
+        glow: "rgba(239,68,68,0.25)",
+        chipBg: "rgba(254,226,226,0.85)",
+        chipText: "#b91c1c",
+        iconBg: "linear-gradient(135deg, #ef4444, #b91c1c)",
+        animation: "tc-threat",
+        emoji: "🚨",
+      };
+    }
+
+    if (tone.includes("aggressive") || score >= 70) {
+      return {
+        bg: "linear-gradient(135deg, rgba(255,237,213,0.94), rgba(255,247,237,0.88))",
+        border: "rgba(249,115,22,0.28)",
+        glow: "rgba(249,115,22,0.22)",
+        chipBg: "rgba(255,237,213,0.85)",
+        chipText: "#c2410c",
+        iconBg: "linear-gradient(135deg, #f97316, #ea580c)",
+        animation: "tc-aggressive",
+        emoji: "😠",
+      };
+    }
+
+    if (tone.includes("tense") || score >= 40) {
+      return {
+        bg: "linear-gradient(135deg, rgba(254,249,195,0.92), rgba(255,251,235,0.88))",
+        border: "rgba(245,158,11,0.28)",
+        glow: "rgba(245,158,11,0.20)",
+        chipBg: "rgba(254,249,195,0.85)",
+        chipText: "#a16207",
+        iconBg: "linear-gradient(135deg, #f59e0b, #d97706)",
+        animation: "tc-tense",
+        emoji: "😬",
+      };
+    }
+
+    if (tone.includes("passive")) {
+      return {
+        bg: "linear-gradient(135deg, rgba(237,233,254,0.92), rgba(250,245,255,0.88))",
+        border: "rgba(139,92,246,0.24)",
+        glow: "rgba(139,92,246,0.18)",
+        chipBg: "rgba(237,233,254,0.85)",
+        chipText: "#6d28d9",
+        iconBg: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+        animation: "tc-passive",
+        emoji: "😒",
+      };
+    }
+
+    return {
+      bg: "linear-gradient(135deg, rgba(236,253,245,0.92), rgba(240,253,250,0.88))",
+      border: "rgba(34,197,94,0.22)",
+      glow: "rgba(34,197,94,0.16)",
+      chipBg: "rgba(220,252,231,0.88)",
+      chipText: "#15803d",
+      iconBg: "linear-gradient(135deg, #22c55e, #14b8a6)",
+      animation: "tc-neutral",
+      emoji: "🙂",
+    };
+  }
+
   function getMeterWidth(score) {
     const bounded = Math.max(0, Math.min(Number(score ?? 0), 100));
     return `${bounded}%`;
@@ -136,10 +204,10 @@ function App() {
 
   function getMeterColor(score) {
     const s = Number(score ?? 0);
-    if (s >= 85) return "linear-gradient(90deg,#ef4444,#b91c1c)";
-    if (s >= 70) return "linear-gradient(90deg,#fb923c,#f97316)";
-    if (s >= 40) return "linear-gradient(90deg,#facc15,#f59e0b)";
-    return "linear-gradient(90deg,#34d399,#22c55e)";
+    if (s >= 85) return "linear-gradient(90deg,#ef4444,#b91c1c,#991b1b)";
+    if (s >= 70) return "linear-gradient(90deg,#fb923c,#f97316,#ea580c)";
+    if (s >= 40) return "linear-gradient(90deg,#fde047,#f59e0b,#d97706)";
+    return "linear-gradient(90deg,#34d399,#22c55e,#14b8a6)";
   }
 
   const displayedRewrite = useMemo(() => {
@@ -271,12 +339,13 @@ https://trytonecheck.com`;
   const regretRisk = Number(result?.regret_risk ?? 0);
   const riskScore = Number(result?.risk_score ?? 0);
   const replyLikelihood = Number(result?.reply_likelihood ?? 0);
+  const toneTheme = getToneTheme();
 
   const pageStyle = {
     minHeight: "100vh",
     width: "100%",
     background:
-      "radial-gradient(circle at 0% 0%, rgba(255,255,255,0.95) 0%, rgba(243,246,255,1) 18%, rgba(232,239,255,1) 36%, rgba(235,232,255,1) 58%, rgba(252,244,255,1) 76%, rgba(248,250,252,1) 100%)",
+      "radial-gradient(circle at 10% 0%, rgba(236,72,153,0.12) 0%, rgba(236,72,153,0.00) 18%), radial-gradient(circle at 100% 0%, rgba(99,102,241,0.16) 0%, rgba(99,102,241,0.00) 22%), radial-gradient(circle at 50% 100%, rgba(56,189,248,0.10) 0%, rgba(56,189,248,0.00) 20%), linear-gradient(180deg, #f8fafc 0%, #eef2ff 48%, #f5f3ff 100%)",
     fontFamily:
       "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     padding: "28px 18px 64px",
@@ -293,14 +362,14 @@ https://trytonecheck.com`;
   const heroCardStyle = {
     position: "relative",
     overflow: "hidden",
-    background: "rgba(255,255,255,0.72)",
-    backdropFilter: "blur(22px)",
-    WebkitBackdropFilter: "blur(22px)",
-    border: "1px solid rgba(255,255,255,0.68)",
-    borderRadius: "34px",
-    padding: "34px",
+    background: "rgba(255,255,255,0.66)",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
+    border: "1px solid rgba(255,255,255,0.72)",
+    borderRadius: "36px",
+    padding: "36px",
     boxShadow:
-      "0 10px 30px rgba(15,23,42,0.06), 0 30px 80px rgba(99,102,241,0.08)",
+      "0 14px 40px rgba(15,23,42,0.06), 0 35px 90px rgba(99,102,241,0.10), inset 0 1px 0 rgba(255,255,255,0.70)",
   };
 
   const glassOrb1 = {
@@ -310,7 +379,7 @@ https://trytonecheck.com`;
     width: "300px",
     height: "300px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(99,102,241,0.22), rgba(99,102,241,0) 70%)",
+    background: "radial-gradient(circle, rgba(99,102,241,0.24), rgba(99,102,241,0) 70%)",
     pointerEvents: "none",
     filter: "blur(6px)",
   };
@@ -322,7 +391,7 @@ https://trytonecheck.com`;
     width: "320px",
     height: "320px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(236,72,153,0.18), rgba(236,72,153,0) 70%)",
+    background: "radial-gradient(circle, rgba(236,72,153,0.20), rgba(236,72,153,0) 70%)",
     pointerEvents: "none",
     filter: "blur(8px)",
   };
@@ -335,7 +404,7 @@ https://trytonecheck.com`;
     width: "180px",
     height: "180px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(56,189,248,0.12), rgba(56,189,248,0) 72%)",
+    background: "radial-gradient(circle, rgba(56,189,248,0.15), rgba(56,189,248,0) 72%)",
     pointerEvents: "none",
     filter: "blur(8px)",
   };
@@ -348,7 +417,6 @@ https://trytonecheck.com`;
     fontWeight: 650,
     fontSize: "14px",
     color: "#111827",
-    background: "rgba(255,255,255,0.8)",
     backdropFilter: "blur(10px)",
     boxShadow: "0 4px 18px rgba(15,23,42,0.05)",
     transition: "all 0.2s ease",
@@ -392,8 +460,115 @@ https://trytonecheck.com`;
 
   return (
     <div style={pageStyle}>
+      <style>{`
+        @keyframes tc-float {
+          0%, 100% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-4px) scale(1.02); }
+        }
+
+        @keyframes tc-aggressive {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-1px); }
+          40% { transform: translateX(1px); }
+          60% { transform: translateX(-1px); }
+          80% { transform: translateX(1px); }
+        }
+
+        @keyframes tc-threat {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
+          50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(239,68,68,0.5)); }
+        }
+
+        @keyframes tc-tense {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(-2deg); }
+          75% { transform: rotate(2deg); }
+        }
+
+        @keyframes tc-passive {
+          0%, 100% { transform: translateY(0px); opacity: 1; }
+          50% { transform: translateY(-3px); opacity: 0.9; }
+        }
+
+        @keyframes tc-neutral {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-2px); }
+        }
+
+        @keyframes tc-gradient-move {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 100% 50%; }
+        }
+
+        .tc-tone-emoji {
+          animation-duration: 1.8s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          will-change: transform, filter;
+        }
+
+        .tc-glow-card {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .tc-glow-card::before {
+          content: "";
+          position: absolute;
+          inset: -1px;
+          border-radius: inherit;
+          background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.08), rgba(255,255,255,0.5));
+          opacity: 0.45;
+          pointer-events: none;
+        }
+
+        .tc-shimmer {
+          background-size: 200% 200%;
+          animation: tc-gradient-move 4.5s linear infinite;
+        }
+
+        .tc-chip-hover {
+          transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .tc-chip-hover:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 22px rgba(15,23,42,0.08);
+        }
+
+        .tc-button-hover {
+          transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+        }
+
+        .tc-button-hover:hover {
+          transform: translateY(-2px);
+          filter: saturate(1.05);
+        }
+
+        @media (max-width: 980px) {
+          .tc-grid-main {
+            grid-template-columns: 1fr !important;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .tc-title {
+            font-size: 52px !important;
+          }
+
+          .tc-hero {
+            padding: 24px !important;
+          }
+
+          .tc-textarea {
+            min-height: 220px !important;
+            font-size: 20px !important;
+          }
+        }
+      `}</style>
+
       <div style={shellStyle}>
-        <div style={heroCardStyle}>
+        <div className="tc-hero" style={heroCardStyle}>
           <div style={glassOrb1} />
           <div style={glassOrb2} />
           <div style={glassOrb3} />
@@ -451,26 +626,28 @@ https://trytonecheck.com`;
               <div>
                 <div
                   style={{
-                    fontSize: "14px",
-                    fontWeight: 700,
-                    letterSpacing: "0.18em",
+                    fontSize: "12px",
+                    fontWeight: 800,
+                    letterSpacing: "0.22em",
                     color: "#6366f1",
                     textTransform: "uppercase",
                     marginBottom: "6px",
                   }}
                 >
-                  Think Before you send
+                  Think Before You Send
                 </div>
 
                 <h1
+                  className="tc-title tc-shimmer"
                   style={{
                     margin: 0,
-                    fontSize: "72px",
-                    lineHeight: 0.93,
-                    letterSpacing: "-0.08em",
-                    fontWeight: 900,
+                    fontSize: "76px",
+                    lineHeight: 0.92,
+                    letterSpacing: "-0.09em",
+                    fontWeight: 950,
                     background:
-                      "linear-gradient(135deg, #0f172a 0%, #312e81 38%, #7c3aed 68%, #ec4899 100%)",
+                      "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
+                    backgroundSize: "200% 200%",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
@@ -502,40 +679,57 @@ https://trytonecheck.com`;
               flexWrap: "wrap",
             }}
           >
-            <button style={chipStyle} onClick={() => setExample("Fine. Do whatever you want.")}>
+            <button
+              className="tc-chip-hover"
+              style={{ ...chipStyle, background: "rgba(245,232,255,0.9)" }}
+              onClick={() => setExample("Fine. Do whatever you want.")}
+            >
               😒 Passive aggressive
             </button>
-            <button style={chipStyle} onClick={() => setExample("Why are you ignoring me?")}>
+            <button
+              className="tc-chip-hover"
+              style={{ ...chipStyle, background: "rgba(255,237,213,0.9)" }}
+              onClick={() => setExample("Why are you ignoring me?")}
+            >
               😠 Angry text
             </button>
-            <button style={chipStyle} onClick={() => setExample("Send me the file ASAP.")}>
+            <button
+              className="tc-chip-hover"
+              style={{ ...chipStyle, background: "rgba(224,242,254,0.9)" }}
+              onClick={() => setExample("Send me the file ASAP.")}
+            >
               🧾 Work message
             </button>
-            <button style={chipStyle} onClick={() => setExample("I disagree, but let’s discuss calmly.")}>
+            <button
+              className="tc-chip-hover"
+              style={{ ...chipStyle, background: "rgba(220,252,231,0.9)" }}
+              onClick={() => setExample("I disagree, but let’s discuss calmly.")}
+            >
               🤝 Constructive
             </button>
           </div>
 
           <div style={{ marginTop: "24px", position: "relative" }}>
             <textarea
+              className="tc-textarea"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Paste your message, WhatsApp text, or email here..."
               style={{
                 width: "100%",
                 minHeight: "240px",
-                padding: "24px 24px 64px",
+                padding: "24px 24px 72px",
                 fontSize: "24px",
                 lineHeight: 1.6,
                 borderRadius: "28px",
-                background: "rgba(255,255,255,0.88)",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
                 color: "#0f172a",
-                border: "1px solid rgba(15,23,42,0.08)",
+                border: "1px solid rgba(99,102,241,0.10)",
                 boxSizing: "border-box",
                 outline: "none",
                 resize: "vertical",
                 boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(15,23,42,0.05)",
+                  "inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 34px rgba(15,23,42,0.04)",
               }}
             />
 
@@ -550,6 +744,7 @@ https://trytonecheck.com`;
               }}
             >
               <button
+                className="tc-button-hover"
                 onClick={() => {
                   setMessage("");
                   setResult(null);
@@ -561,6 +756,7 @@ https://trytonecheck.com`;
               </button>
 
               <button
+                className="tc-button-hover"
                 onClick={analyze}
                 disabled={loading || !message.trim()}
                 style={{
@@ -594,7 +790,7 @@ https://trytonecheck.com`;
             style={{
               marginTop: "22px",
               ...cardStyle,
-              background: "rgba(254,242,242,0.9)",
+              background: "rgba(254,242,242,0.92)",
               color: "#b91c1c",
               fontWeight: 700,
             }}
@@ -606,6 +802,7 @@ https://trytonecheck.com`;
         {result && !result.error && (
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
             <div
+              className="tc-grid-main"
               style={{
                 display: "grid",
                 gridTemplateColumns: "1.5fr 1fr",
@@ -613,12 +810,13 @@ https://trytonecheck.com`;
               }}
             >
               <div
+                className="tc-glow-card"
                 style={{
                   ...cardStyle,
                   padding: "26px",
-                  border: "1px solid rgba(99,102,241,0.16)",
-                  boxShadow:
-                    "0 12px 34px rgba(99,102,241,0.08), 0 1px 0 rgba(255,255,255,0.7) inset",
+                  background: toneTheme.bg,
+                  border: `1px solid ${toneTheme.border}`,
+                  boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
                 }}
               >
                 <div
@@ -652,17 +850,23 @@ https://trytonecheck.com`;
                     >
                       <div
                         style={{
-                          width: "56px",
-                          height: "56px",
-                          borderRadius: "18px",
+                          width: "62px",
+                          height: "62px",
+                          borderRadius: "20px",
                           display: "grid",
                           placeItems: "center",
-                          background: "rgba(255,255,255,0.88)",
-                          border: "1px solid rgba(15,23,42,0.06)",
-                          fontSize: "28px",
+                          background: toneTheme.iconBg,
+                          border: `1px solid ${toneTheme.border}`,
+                          fontSize: "30px",
+                          boxShadow: `0 10px 28px ${toneTheme.glow}`,
                         }}
                       >
-                        {getToneEmoji()}
+                        <span
+                          className="tc-tone-emoji"
+                          style={{ animationName: toneTheme.animation, display: "inline-block" }}
+                        >
+                          {toneTheme.emoji}
+                        </span>
                       </div>
                       <div>
                         <div
@@ -687,9 +891,8 @@ https://trytonecheck.com`;
                       minWidth: "180px",
                       padding: "14px 16px",
                       borderRadius: "22px",
-                      background:
-                        "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(248,250,252,0.92))",
-                      border: "1px solid rgba(15,23,42,0.06)",
+                      background: toneTheme.chipBg,
+                      border: `1px solid ${toneTheme.border}`,
                     }}
                   >
                     <div
@@ -707,7 +910,7 @@ https://trytonecheck.com`;
                         marginTop: "8px",
                         fontSize: "19px",
                         fontWeight: 750,
-                        color: "#111827",
+                        color: toneTheme.chipText,
                       }}
                     >
                       {primaryHiddenSignalLabel}
@@ -742,12 +945,13 @@ https://trytonecheck.com`;
                     }}
                   >
                     <div
+                      className="tc-shimmer"
                       style={{
                         width: getMeterWidth(riskScore),
                         height: "100%",
                         background: getMeterColor(riskScore),
-                        boxShadow: `0 0 24px ${getToneAccent(riskScore)}66`,
-                        transition: "width 0.35s ease",
+                        boxShadow: `0 0 26px ${getToneAccent(riskScore)}66`,
+                        transition: "width 0.4s ease",
                         borderRadius: "999px",
                       }}
                     />
@@ -790,19 +994,19 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                  <MetricCard label="Risk Score" value={result?.risk_score} accent="#7c3aed" />
+                  <MetricCard label="⚠️ Risk Score" value={result?.risk_score} accent="#7c3aed" />
                   <MetricCard
-                    label="Reply Likelihood"
+                    label="📬 Reply Likelihood"
                     value={`${result?.reply_likelihood ?? 0}%`}
                     accent="#0f766e"
                   />
                   <MetricCard
-                    label="Regret Risk"
+                    label="💭 Regret Risk"
                     value={`${result?.regret_risk ?? 0}%`}
                     accent="#dc2626"
                   />
                   <MetricCard
-                    label="Manipulation Risk"
+                    label="🕵️ Manipulation Risk"
                     value={`${result?.manipulation_risk ?? 0}%`}
                     accent="#4f46e5"
                   />
@@ -835,6 +1039,7 @@ https://trytonecheck.com`;
                     {result.top_manipulation_signals.map((item, idx) => (
                       <div
                         key={idx}
+                        className="tc-chip-hover"
                         style={{
                           padding: "10px 14px",
                           borderRadius: "999px",
@@ -882,14 +1087,14 @@ https://trytonecheck.com`;
                         letterSpacing: "0.08em",
                       }}
                     >
-                      SUGGESTED REWRITE
+                      ✍️ SUGGESTED REWRITE
                     </div>
                     <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
                       A calmer version that keeps the core intent.
                     </div>
                   </div>
 
-                  <button onClick={copyRewriteOnly} style={actionButtonStyle}>
+                  <button className="tc-button-hover" onClick={copyRewriteOnly} style={actionButtonStyle}>
                     ✍️ Copy Rewrite
                   </button>
                 </div>
@@ -918,7 +1123,7 @@ https://trytonecheck.com`;
                     letterSpacing: "0.08em",
                   }}
                 >
-                  ADVISORY
+                  💡 ADVISORY
                 </div>
                 <div
                   style={{
@@ -985,7 +1190,7 @@ https://trytonecheck.com`;
                 <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
                 <ShareButton onClick={shareX} label="X" icon="𝕏" />
                 <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-                <button onClick={copyResult} style={primaryButtonStyle}>
+                <button className="tc-button-hover" onClick={copyResult} style={primaryButtonStyle}>
                   📋 Copy Full Result
                 </button>
               </div>
@@ -1000,6 +1205,7 @@ https://trytonecheck.com`;
 function MetricCard({ label, value, accent }) {
   return (
     <div
+      className="tc-chip-hover"
       style={{
         padding: "16px 18px",
         borderRadius: "20px",
@@ -1028,6 +1234,7 @@ function MetricCard({ label, value, accent }) {
 function MiniTag({ label }) {
   return (
     <div
+      className="tc-chip-hover"
       style={{
         padding: "10px 14px",
         borderRadius: "999px",
@@ -1046,6 +1253,7 @@ function MiniTag({ label }) {
 function ShareButton({ onClick, label, icon }) {
   return (
     <button
+      className="tc-chip-hover"
       onClick={onClick}
       title={label}
       style={{
