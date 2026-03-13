@@ -1319,29 +1319,29 @@ https://trytonecheck.com`;
             )}
 
             {result.advisory && (
-              <div style={cardStyle}>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#64748b",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  💡 Why This Matters
-                </div>
-                <div
-                  style={{
-                    marginTop: "12px",
-                    lineHeight: 1.8,
-                    fontSize: "18px",
-                    color: "#111827",
-                  }}
-                >
-                  {result.advisory}
-                </div>
-              </div>
-            )}
+  <div style={cardStyle}>
+    <div
+      style={{
+        fontSize: "13px",
+        color: "#64748b",
+        fontWeight: 800,
+        letterSpacing: "0.08em",
+      }}
+    >
+      💡 Why This Matters
+    </div>
+    <div
+      style={{
+        marginTop: "12px",
+        lineHeight: 1.8,
+        fontSize: "18px",
+        color: "#111827",
+      }}
+    >
+      {result.advisory}
+    </div>
+  </div>
+)}
 
 <div style={cardStyle}>
   <div
@@ -1395,7 +1395,11 @@ https://trytonecheck.com`;
     <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
     <ShareButton onClick={shareX} label="X" icon="𝕏" />
     <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-    <button className="tc-button-hover" onClick={downloadCard} style={primaryButtonStyle}>
+    <button
+      className="tc-button-hover"
+      onClick={downloadCard}
+      style={primaryButtonStyle}
+    >
       📸 Download Share Card
     </button>
   </div>
@@ -1420,8 +1424,8 @@ https://trytonecheck.com`;
   >
     TRY YOUR MESSAGE
   </div>
-     
-<div
+
+  <div
     style={{
       marginTop: "10px",
       fontSize: "18px",
@@ -1431,8 +1435,8 @@ https://trytonecheck.com`;
   >
     Paste another message and see how it sounds.
   </div>
-     
-<div
+
+  <div
     style={{
       marginTop: "8px",
       color: "#64748b",
@@ -1443,7 +1447,7 @@ https://trytonecheck.com`;
     Great for texts, emails, Slack messages, and difficult conversations.
   </div>
 
-<div style={{ marginTop: "16px" }}>
+  <div style={{ marginTop: "16px" }}>
     <button
       className="tc-button-hover"
       onClick={() => {
@@ -1460,10 +1464,10 @@ https://trytonecheck.com`;
     </button>
   </div>
 </div>
-               
-          )}
-         </div>
-       </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
