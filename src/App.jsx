@@ -1002,33 +1002,33 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                 <Card
+                 <MetricCard
                       label="⚠️ Risk Score"
                       value={result?.risk_score}
                       accent="#7c3aed"
                       explanation={STAT_EXPLANATIONS.risk}
                     />
 
-                    <Card
+                    <MetricCard
                       label="📬 Reply Likelihood"
                       value={`${result?.reply_likelihood ?? 0}%`}
                       accent="#0f766e"
                       explanation={STAT_EXPLANATIONS.reply}
                     />
 
-                    <Card
+                    <MetricCard
                       label="💭 Regret Risk"
                       value={`${result?.regret_risk ?? 0}%`}
                       accent="#dc2626"
                       explanation={STAT_EXPLANATIONS.regret}
                     />
                     
-                    <Card
+                    <MetricCard
                       label="🕵️ Manipulation Risk"
                       value={`${result?.manipulation_risk ?? 0}%`}
                       accent="#4f46e5"
                       explanation={STAT_EXPLANATIONS.manipulation}
-                    />/>
+                    />
                 </div>
               </div>
             </div>
