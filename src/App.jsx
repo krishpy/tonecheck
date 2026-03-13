@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import * as htmlToImage from "html-to-image";
 
      const STAT_EXPLANATIONS = {
@@ -8,11 +9,184 @@ import * as htmlToImage from "html-to-image";
   manipulation: "Whether the message may pressure or guilt the other person.",
 };
 
-function App() {
+const MINI_TOOLS = {
+  home: {
+    slug: "home",
+    title: "ToneCheck",
+    eyebrow: "Think Before You Send",
+    description:
+      "Check how your message may sound, detect hidden communication risk, and get a calmer rewrite before you hit send.",
+    placeholder: "Paste your message, WhatsApp text, or email here...",
+    analyzeLabel: "Analyze Tone",
+    examples: [
+      { label: "😒 Passive aggressive", text: "Fine. Do whatever you want." },
+      { label: "😠 Angry text", text: "Why are you ignoring me?" },
+      { label: "🧾 Work message", text: "Send me the file ASAP." },
+      { label: "🤝 Constructive", text: "I disagree, but let’s discuss calmly." },
+    ],
+    badge: "Communication Intelligence Demo",
+    resultMode: "default",
+  },
+  "should-i-send-this": {
+    slug: "should-i-send-this",
+    title: "Should I Send This?",
+    eyebrow: "Send Decision Tool",
+    description:
+      "Check whether your message may come off too aggressive, risky, manipulative, or regrettable before you hit send.",
+    placeholder: "Paste the message you're thinking of sending...",
+    analyzeLabel: "Check Message",
+    examples: [
+      { label: "Ignored?", text: "You keep ignoring me." },
+      { label: "No reply", text: "Why haven’t you answered me???" },
+      { label: "Soft ask", text: "Can we talk when you get a chance?" },
+      { label: "Passive", text: "Fine. Do whatever you want." },
+    ],
+    badge: "Mini Tool",
+    resultMode: "send_decision",
+  },
+  "passive-aggressive-detector": {
+    slug: "passive-aggressive-detector",
+    title: "Passive Aggressive Detector",
+    eyebrow: "Tone Signal Tool",
+    description:
+      "See whether your message sounds cold, sarcastic, dismissive, guilt-tripping, or indirectly hostile.",
+    placeholder: "Paste a message to check for passive aggression...",
+    analyzeLabel: "Detect Tone",
+    examples: [
+      { label: "Classic passive", text: "Fine. Do whatever you want." },
+      { label: "Dismissive", text: "Thanks for nothing." },
+      { label: "Cold compliance", text: "I’ll just do it myself." },
+      { label: "Fake polite", text: "No worries. Clearly you're busy." },
+    ],
+    badge: "Mini Tool",
+    resultMode: "passive_aggressive",
+  },
+  "manipulation-detector": {
+    slug: "manipulation-detector",
+    title: "Manipulation Detector",
+    eyebrow: "Hidden Signal Tool",
+    description:
+      "Check for guilt pressure, emotional leverage, reassurance demands, blame shifting, and hidden control.",
+    placeholder: "Paste a message to check for manipulation...",
+    analyzeLabel: "Analyze Message",
+    examples: [
+      { label: "Guilt", text: "After all I’ve done for you..." },
+      { label: "Leverage", text: "If you cared, you’d reply." },
+      { label: "Gaslight", text: "You’re overreacting." },
+      { label: "Control", text: "I only say this because I care about you." },
+    ],
+    badge: "Mini Tool",
+    resultMode: "manipulation",
+  },
+  "rude-or-polite": {
+    slug: "rude-or-polite",
+    title: "Rude or Polite?",
+    eyebrow: "Politeness Tool",
+    description:
+      "See whether your message sounds respectful, blunt, rude, insulting, or hostile.",
+    placeholder: "Paste a message to check how it may come across...",
+    analyzeLabel: "Check Tone",
+    examples: [
+      { label: "Blunt", text: "Send me the file today." },
+      { label: "Polite", text: "Can you please send me the file today?" },
+      { label: "Rude", text: "Shut up." },
+      { label: "Constructive", text: "I disagree, but let’s discuss calmly." },
+    ],
+    badge: "Mini Tool",
+    resultMode: "politeness",
+  },
+  "desperate-text-checker": {
+    slug: "desperate-text-checker",
+    title: "Desperate Text Checker",
+    eyebrow: "Relationship Tone Tool",
+    description:
+      "Check whether your message sounds clingy, needy, pressuring, over-eager, or emotionally dependent.",
+    placeholder: "Paste your text message...",
+    analyzeLabel: "Check Text",
+    examples: [
+      { label: "Hello??", text: "Hello??" },
+      { label: "Are you there?", text: "Are you there?" },
+      { label: "No reply", text: "Why aren’t you replying?" },
+      { label: "Needy", text: "Please answer me." },
+    ],
+    badge: "Mini Tool",
+    resultMode: "desperation",
+  },
+};
+
+function getToolConfigFromPath(pathname) {
+  if (pathname === "/") return MINI_TOOLS.home;
+  const slug = pathname.replace("/tools/", "");
+  return MINI_TOOLS[slug] || null;
+}
+
+
+function filterVisibleStatsByMode(mode, result) {
+  const overallRisk = result?.risk_score ?? 0;
+  const replyChance = `${result?.reply_likelihood ?? 0}%`;
+  const regretChance = `${result?.regret_risk ?? 0}%`;
+  const manipulationChance = `${result?.manipulation_risk ?? 0}%`;
+
+  if (mode === "send_decision") {
+    return [
+      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
+      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
+      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
+    ];
+  }
+
+  if (mode === "passive_aggressive") {
+    return [
+      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
+      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
+      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
+    ];
+  }
+
+  if (mode === "manipulation") {
+    return [
+      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
+      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
+      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
+    ];
+  }
+
+  if (mode === "politeness") {
+    return [
+      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
+      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
+      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
+    ];
+  }
+
+  if (mode === "desperation") {
+    return [
+      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
+      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
+      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
+    ];
+  }
+
+  return [
+    { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
+    { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
+    { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
+    { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
+  ];
+}
+
+function AppContent() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copyState, setCopyState] = useState("");
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentTool = useMemo(() => {
+    return getToolConfigFromPath(location.pathname) || MINI_TOOLS.home;
+  }, [location.pathname]);
 
       function getSendVerdict(score) {
        const s = Number(score ?? 0);
@@ -681,6 +855,29 @@ https://trytonecheck.com`;
           <div style={glassOrb2} />
           <div style={glassOrb3} />
 
+          <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <button
+              className="tc-chip-hover"
+              onClick={() => navigate("/")}
+              style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
+            >
+              Home
+            </button>
+          
+            {location.pathname !== "/" && (
+              <div
+                style={{
+                  ...chipStyle,
+                  background: "rgba(99,102,241,0.10)",
+                  color: "#4338ca",
+                  cursor: "default",
+                }}
+              >
+                {currentTool.title}
+              </div>
+            )}
+          </div>
+
           <div style={{ position: "relative" }}>
             <div
               style={{
@@ -690,7 +887,7 @@ https://trytonecheck.com`;
                 marginBottom: "14px",
               }}
             >
-              <div
+                 <div
                 style={{
                   position: "relative",
                   width: "74px",
@@ -732,18 +929,18 @@ https://trytonecheck.com`;
               </div>
 
               <div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 800,
-                    letterSpacing: "0.22em",
-                    color: "#6366f1",
-                    textTransform: "uppercase",
-                    marginBottom: "6px",
-                  }}
-                >
-                  Think Before You Send
-                </div>
+               <div
+                 style={{
+                   fontSize: "12px",
+                   fontWeight: 800,
+                   letterSpacing: "0.22em",
+                   color: "#6366f1",
+                   textTransform: "uppercase",
+                   marginBottom: "6px",
+                 }}
+               >
+                 {currentTool.eyebrow}
+               </div>
 
                 <h1
                   className="tc-title tc-shimmer"
@@ -766,63 +963,43 @@ https://trytonecheck.com`;
             </div>
 
             <p
-              style={{
-                margin: "10px 0 0 0",
-                maxWidth: "820px",
-                color: "#475569",
-                fontSize: "19px",
-                lineHeight: 1.7,
-              }}
-            >
-              Check how your message may sound, detect hidden communication risk,
-              and get a calmer rewrite before you hit send.
-            </p>
-          </div>
-
-          <div
             style={{
-              marginTop: "22px",
-              display: "flex",
-              gap: "10px",
-              flexWrap: "wrap",
+              margin: "10px 0 0 0",
+              maxWidth: "820px",
+              color: "#475569",
+              fontSize: "19px",
+              lineHeight: 1.7,
             }}
           >
-            <button
-              className="tc-chip-hover"
-              style={{ ...chipStyle, background: "rgba(245,232,255,0.9)" }}
-              onClick={() => setExample("Fine. Do whatever you want.")}
-            >
-              😒 Passive aggressive
-            </button>
-            <button
-              className="tc-chip-hover"
-              style={{ ...chipStyle, background: "rgba(255,237,213,0.9)" }}
-              onClick={() => setExample("Why are you ignoring me?")}
-            >
-              😠 Angry text
-            </button>
-            <button
-              className="tc-chip-hover"
-              style={{ ...chipStyle, background: "rgba(224,242,254,0.9)" }}
-              onClick={() => setExample("Send me the file ASAP.")}
-            >
-              🧾 Work message
-            </button>
-            <button
-              className="tc-chip-hover"
-              style={{ ...chipStyle, background: "rgba(220,252,231,0.9)" }}
-              onClick={() => setExample("I disagree, but let’s discuss calmly.")}
-            >
-              🤝 Constructive
-            </button>
+            {currentTool.description}
+          </p>
           </div>
+               <div
+                 style={{
+                   marginTop: "22px",
+                   display: "flex",
+                   gap: "10px",
+                   flexWrap: "wrap",
+                 }}
+               >
+                 {currentTool.examples.map((example) => (
+                   <button
+                     key={example.label}
+                     className="tc-chip-hover"
+                     style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
+                     onClick={() => setExample(example.text)}
+                   >
+                     {example.label}
+                   </button>
+                 ))}
+               </div>
 
           <div style={{ marginTop: "24px", position: "relative" }}>
             <textarea
               className="tc-textarea"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Paste your message, WhatsApp text, or email here..."
+              placeholder={currentTool.placeholder}
               style={{
                 width: "100%",
                 minHeight: "240px",
@@ -872,7 +1049,7 @@ https://trytonecheck.com`;
                   opacity: loading || !message.trim() ? 0.7 : 1,
                 }}
               >
-                {loading ? "Analyzing..." : "Analyze Tone"}
+                {loading ? "Analyzing..." : currentTool.analyzeLabel}
               </button>
             </div>
           </div>
@@ -890,6 +1067,7 @@ https://trytonecheck.com`;
           >
             <span>Private by default</span>
             <span>Built by MangoMind Labs</span>
+          {location.pathname === "/" && <MiniToolGrid />}
           </div>
         </div>
 
@@ -1112,35 +1290,17 @@ https://trytonecheck.com`;
                   QUICK STATS
                 </div>
 
-                <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                  <MetricCard
-                    label="⚠️ Risk Score"
-                    value={result?.risk_score}
-                    accent="#7c3aed"
-                    explanation={STAT_EXPLANATIONS.risk}
-                  />
-
-                  <MetricCard
-                    label="📬 Reply Chance"
-                    value={`${result?.reply_likelihood ?? 0}%`}
-                    accent="#0f766e"
-                    explanation={STAT_EXPLANATIONS.reply}
-                  />
-
-                  <MetricCard
-                    label="💭 Might Regret Sending"
-                    value={`${result?.regret_risk ?? 0}%`}
-                    accent="#dc2626"
-                    explanation={STAT_EXPLANATIONS.regret}
-                  />
-
-                  <MetricCard
-                    label="🕵️ Emotional Pressure Risk"
-                    value={`${result?.manipulation_risk ?? 0}%`}
-                    accent="#4f46e5"
-                    explanation={STAT_EXPLANATIONS.manipulation}
-                  />
-                </div>
+              <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
+  {filterVisibleStatsByMode(currentTool.resultMode, result).map((item) => (
+    <MetricCard
+      key={item.label}
+      label={item.label}
+      value={item.value}
+      accent={item.accent}
+      explanation={item.explanation}
+    />
+  ))}
+</div>
               </div>
             </div>
 
@@ -1249,6 +1409,7 @@ https://trytonecheck.com`;
               </div>
             )}
 
+            {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
             <div
               style={{
                 ...cardStyle,
@@ -1266,6 +1427,7 @@ https://trytonecheck.com`;
               >
                 SHOULD YOU SEND THIS?
               </div>
+                 )
 
               <div
                 style={{
@@ -1458,6 +1620,74 @@ https://trytonecheck.com`;
 }
 
 
+function MiniToolGrid() {
+  const tools = Object.values(MINI_TOOLS).filter((tool) => tool.slug !== "home");
+
+  return (
+    <div
+      style={{
+        marginTop: "22px",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+        gap: "16px",
+      }}
+    >
+      {tools.map((tool) => (
+        <Link
+          key={tool.slug}
+          to={`/tools/${tool.slug}`}
+          style={{
+            textDecoration: "none",
+            background: "rgba(255,255,255,0.74)",
+            backdropFilter: "blur(18px)",
+            WebkitBackdropFilter: "blur(18px)",
+            border: "1px solid rgba(255,255,255,0.7)",
+            borderRadius: "24px",
+            padding: "20px",
+            boxShadow: "0 10px 30px rgba(15,23,42,0.05)",
+            color: "#0f172a",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              color: "#6366f1",
+              textTransform: "uppercase",
+            }}
+          >
+            {tool.eyebrow}
+          </div>
+
+          <div
+            style={{
+              marginTop: "10px",
+              fontSize: "22px",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {tool.title}
+          </div>
+
+          <div
+            style={{
+              marginTop: "8px",
+              color: "#475569",
+              fontSize: "14px",
+              lineHeight: 1.6,
+            }}
+          >
+            {tool.description}
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+}
+
+
 function MetricCard({ label, value, accent, explanation }) {
   const [showTip, setShowTip] = React.useState(false);
 
@@ -1589,4 +1819,22 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-export default App;
+function RedirectHome() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/");
+  }, [navigate]);
+
+  return null;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<AppContent />} />
+      <Route path="/tools/:slug" element={<AppContent />} />
+      <Route path="*" element={<RedirectHome />} />
+    </Routes>
+  );
+}
