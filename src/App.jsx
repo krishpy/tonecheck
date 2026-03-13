@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import * as htmlToImage from "html-to-image";
 
      const STAT_EXPLANATIONS = {
   risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
@@ -54,6 +55,19 @@ function App() {
     if (s > 0) return "Low";
     return "None";
   }
+
+async function downloadCard() {
+  const node = document.getElementById("tone-result-card");
+
+  if (!node) return;
+
+  const dataUrl = await htmlToImage.toPng(node);
+
+  const link = document.createElement("a");
+  link.download = "tonecheck-result.png";
+  link.href = dataUrl;
+  link.click();
+}
 
   async function analyze() {
     try {
@@ -852,7 +866,7 @@ https://trytonecheck.com`;
               }}
             >
               <div
-                className="tc-glow-card"
+                <div id="tone-result-card" className="tc-glow-card">
                 style={{
                   ...cardStyle,
                   padding: "26px",
@@ -1256,9 +1270,10 @@ https://trytonecheck.com`;
                 <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
                 <ShareButton onClick={shareX} label="X" icon="𝕏" />
                 <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-                <button className="tc-button-hover" onClick={copyResult} style={primaryButtonStyle}>
-                  📋 Copy Full Result
+                <button onClick={downloadCard} style={primaryButtonStyle}>
+                  📸 Download Share Card
                 </button>
+               
               </div>
             </div>
           </div>
