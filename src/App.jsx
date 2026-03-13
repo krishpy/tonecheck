@@ -475,12 +475,9 @@ https://trytonecheck.com`;
           50% { transform: translateY(-4px) scale(1.02); }
         }
 
-        @keyframes tc-aggressive {
-          0%, 100% { transform: translateX(0); }
-          20% { transform: translateX(-1px); }
-          40% { transform: translateX(1px); }
-          60% { transform: translateX(-1px); }
-          80% { transform: translateX(1px); }
+         @keyframes tc-aggressive {
+           0%,100% { transform: scale(1); }
+           50% { transform: scale(1.12); }
         }
 
         @keyframes tc-threat {
@@ -509,17 +506,22 @@ https://trytonecheck.com`;
           100% { background-position: 100% 50%; }
         }
 
-        .tc-tone-emoji {
-          animation-duration: 1.8s;
-          animation-iteration-count: infinite;
-          animation-timing-function: ease-in-out;
-          will-change: transform, filter;
+       .tc-tone-emoji {
+            animation-duration: 1.8s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            transform-origin: center;
         }
 
         .tc-glow-card {
           position: relative;
           overflow: hidden;
         }
+
+        .tc-rewrite:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 18px 42px rgba(251,146,60,0.18);
+         }
 
         .tc-glow-card::before {
           content: "";
@@ -826,6 +828,8 @@ https://trytonecheck.com`;
                   background: toneTheme.bg,
                   border: `1px solid ${toneTheme.border}`,
                   boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
+                  backgroundSize: "200% 200%",
+                  animation: "tc-gradient-move 8s ease infinite"
                 }}
               >
                 <div
@@ -1092,6 +1096,7 @@ https://trytonecheck.com`;
                   ...cardStyle,
                   background:
                     "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                  transition: "all 0.25s ease",
                   border: "1px solid rgba(251,146,60,0.22)",
                   boxShadow:
                     "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
@@ -1109,6 +1114,7 @@ https://trytonecheck.com`;
                 >
                   <div>
                     <div
+                       className="tc-rewrite"
                       style={{
                         fontSize: "13px",
                         color: "#9a3412",
