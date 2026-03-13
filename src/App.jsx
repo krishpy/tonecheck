@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
      const STAT_EXPLANATIONS = {
   risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
