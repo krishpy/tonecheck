@@ -1003,32 +1003,32 @@ https://trytonecheck.com`;
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
                  <MetricCard
-  label="⚠️ Risk Score"
-  value={result?.risk_score}
-  accent="#7c3aed"
-  explanation={STAT_EXPLANATIONS.risk}
-/>
+                      label="⚠️ Risk Score"
+                      value={result?.risk_score}
+                      accent="#7c3aed"
+                      explanation={STAT_EXPLANATIONS.risk}
+                    />
 
-<MetricCard
-  label="📬 Reply Likelihood"
-  value={`${result?.reply_likelihood ?? 0}%`}
-  accent="#0f766e"
-  explanation={STAT_EXPLANATIONS.reply}
-/>
+                    <MetricCard
+                      label="📬 Reply Likelihood"
+                      value={`${result?.reply_likelihood ?? 0}%`}
+                      accent="#0f766e"
+                      explanation={STAT_EXPLANATIONS.reply}
+                    />
 
-<MetricCard
-  label="💭 Regret Risk"
-  value={`${result?.regret_risk ?? 0}%`}
-  accent="#dc2626"
-  explanation={STAT_EXPLANATIONS.regret}
-/>
-
-<MetricCard
-  label="🕵️ Manipulation Risk"
-  value={`${result?.manipulation_risk ?? 0}%`}
-  accent="#4f46e5"
-  explanation={STAT_EXPLANATIONS.manipulation}
-/>/>
+                    <MetricCard
+                      label="💭 Regret Risk"
+                      value={`${result?.regret_risk ?? 0}%`}
+                      accent="#dc2626"
+                      explanation={STAT_EXPLANATIONS.regret}
+                    />
+                    
+                    <MetricCard
+                      label="🕵️ Manipulation Risk"
+                      value={`${result?.manipulation_risk ?? 0}%`}
+                      accent="#4f46e5"
+                      explanation={STAT_EXPLANATIONS.manipulation}
+                    />/>
                 </div>
               </div>
             </div>
