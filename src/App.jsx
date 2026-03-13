@@ -907,7 +907,7 @@ https://trytonecheck.com`;
           </div>
         )}
 
-        {        {result && !result.error && (
+        {result && !result.error && (
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
             <div
               className="tc-grid-main"
