@@ -866,7 +866,9 @@ https://trytonecheck.com`;
               }}
             >
               <div
-                <div id="tone-result-card" className="tc-glow-card">
+                <div 
+                     id="tone-result-card" 
+                     className="tc-glow-card"
                 style={{
                   ...cardStyle,
                   padding: "26px",
