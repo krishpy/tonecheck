@@ -1,5 +1,12 @@
 import { useMemo, useState } from "react";
 
+     const STAT_EXPLANATIONS = {
+  risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
+  reply: "How likely the other person is to respond positively.",
+  regret: "Chance you may regret sending this later.",
+  manipulation: "Whether the message may pressure or guilt the other person.",
+};
+
 function App() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
@@ -68,12 +75,7 @@ function App() {
         }
       );
 
-      const STAT_EXPLANATIONS = {
-  risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
-  reply: "How likely the other person is to respond positively.",
-  regret: "Chance you may regret sending this later.",
-  manipulation: "Whether the message may pressure or guilt the other person.",
-};
+ 
 
       const rawText = await response.text();
 
