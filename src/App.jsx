@@ -479,6 +479,36 @@ https://trytonecheck.com`;
            0%,100% { transform: scale(1); }
            50% { transform: scale(1.12); }
         }
+          @keyframes tc-light-sweep {
+            0% {
+              transform: translateX(-120%);
+              opacity: 0;
+            }
+            40% {
+              opacity: 0.5;
+            }
+            100% {
+              transform: translateX(120%);
+              opacity: 0;
+  }
+}
+
+.tc-light-sweep {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255,255,255,0.35),
+    transparent
+  );
+  filter: blur(10px);
+  animation: tc-light-sweep 8s linear infinite;
+  pointer-events: none;
+}
 
         @keyframes tc-threat {
           0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
@@ -580,6 +610,7 @@ https://trytonecheck.com`;
 
       <div style={shellStyle}>
         <div className="tc-hero" style={heroCardStyle}>
+          <div className="tc-light-sweep"></div>
           <div style={glassOrb1} />
           <div style={glassOrb2} />
           <div style={glassOrb3} />
