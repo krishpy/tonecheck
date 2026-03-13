@@ -907,7 +907,7 @@ https://trytonecheck.com`;
           </div>
         )}
 
-        {result && !result.error && (
+        {        {result && !result.error && (
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
             <div
               className="tc-grid-main"
@@ -918,17 +918,17 @@ https://trytonecheck.com`;
               }}
             >
               <div
-                 id="tone-result-card"
-                 className="tc-glow-card"
-                 style={{
-                   ...cardStyle,
-                   padding: "26px",
-                   background: toneTheme.bg,
-                   border: `1px solid ${toneTheme.border}`,
-                   boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
-                   backgroundSize: "200% 200%",
-                 }}
-               >
+                id="tone-result-card"
+                className="tc-glow-card"
+                style={{
+                  ...cardStyle,
+                  padding: "26px",
+                  background: toneTheme.bg,
+                  border: `1px solid ${toneTheme.border}`,
+                  boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
+                  backgroundSize: "200% 200%",
+                }}
+              >
                 <div
                   style={{
                     display: "flex",
@@ -978,6 +978,7 @@ https://trytonecheck.com`;
                           {toneTheme.emoji}
                         </span>
                       </div>
+
                       <div>
                         <div
                           style={{
@@ -1025,16 +1026,15 @@ https://trytonecheck.com`;
                     >
                       {primaryHiddenSignalLabel}
                     </div>
-                         <div
-                           style={{
-                             marginTop: "4px",
-                             fontSize: "12px",
-                             color: "#64748b",
-                           }}
-                         >
-                           The strongest underlying feeling detected in the message.
-                         </div>
-                       
+                    <div
+                      style={{
+                        marginTop: "4px",
+                        fontSize: "12px",
+                        color: "#64748b",
+                      }}
+                    >
+                      The strongest underlying feeling detected in the message.
+                    </div>
                   </div>
                 </div>
 
@@ -1085,7 +1085,7 @@ https://trytonecheck.com`;
                       flexWrap: "wrap",
                     }}
                   >
-                    <MiniTag label={`Risk : ${result?.risk_level || getRiskBand(riskScore)}`} />
+                    <MiniTag label={`Risk: ${result?.risk_level || getRiskBand(riskScore)}`} />
                     <MiniTag label={`Reply chance: ${replyLikelihood}%`} />
                     <MiniTag label={`Regret chance: ${regretRisk}%`} />
                   </div>
@@ -1113,33 +1113,33 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                 <MetricCard
-                      label="⚠️ Risk Score"
-                      value={result?.risk_score}
-                      accent="#7c3aed"
-                      explanation={STAT_EXPLANATIONS.risk}
-                    />
+                  <MetricCard
+                    label="⚠️ Risk Score"
+                    value={result?.risk_score}
+                    accent="#7c3aed"
+                    explanation={STAT_EXPLANATIONS.risk}
+                  />
 
-                    <MetricCard
-                      label="📬 Reply Chance"
-                      value={`${result?.reply_likelihood ?? 0}%`}
-                      accent="#0f766e"
-                      explanation={STAT_EXPLANATIONS.reply}
-                    />
+                  <MetricCard
+                    label="📬 Reply Chance"
+                    value={`${result?.reply_likelihood ?? 0}%`}
+                    accent="#0f766e"
+                    explanation={STAT_EXPLANATIONS.reply}
+                  />
 
-                    <MetricCard
-                      label="💭 Might Regret Sending"
-                      value={`${result?.regret_risk ?? 0}%`}
-                      accent="#dc2626"
-                      explanation={STAT_EXPLANATIONS.regret}
-                    />
-                    
-                    <MetricCard
-                      label="🕵️ Emotional Pressure Risk"
-                      value={`${result?.manipulation_risk ?? 0}%`}
-                      accent="#4f46e5"
-                      explanation={STAT_EXPLANATIONS.manipulation}
-                    />
+                  <MetricCard
+                    label="💭 Might Regret Sending"
+                    value={`${result?.regret_risk ?? 0}%`}
+                    accent="#dc2626"
+                    explanation={STAT_EXPLANATIONS.regret}
+                  />
+
+                  <MetricCard
+                    label="🕵️ Emotional Pressure Risk"
+                    value={`${result?.manipulation_risk ?? 0}%`}
+                    accent="#4f46e5"
+                    explanation={STAT_EXPLANATIONS.manipulation}
+                  />
                 </div>
               </div>
             </div>
@@ -1188,121 +1188,52 @@ https://trytonecheck.com`;
               )}
 
             {displayedRewrite && (
-  <div
-    style={{
-      ...cardStyle,
-      background:
-        "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-      transition: "all 0.25s ease",
-      border: "1px solid rgba(251,146,60,0.22)",
-      boxShadow:
-        "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
-      padding: "26px",
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        gap: "14px",
-        alignItems: "center",
-        flexWrap: "wrap",
-      }}
-    >
-      <div>
-        <div
-          className="tc-rewrite"
-          style={{
-            fontSize: "13px",
-            color: "#9a3412",
-            fontWeight: 800,
-            letterSpacing: "0.08em",
-          }}
-        >
-          ✍️ SUGGESTED REWRITE
-        </div>
-        <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
-          A calmer version that keeps the core intent.
-        </div>
-      </div>
+              <div
+                style={{
+                  ...cardStyle,
+                  background:
+                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                  transition: "all 0.25s ease",
+                  border: "1px solid rgba(251,146,60,0.22)",
+                  boxShadow:
+                    "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
+                  padding: "26px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "14px",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <div>
+                    <div
+                      className="tc-rewrite"
+                      style={{
+                        fontSize: "13px",
+                        color: "#9a3412",
+                        fontWeight: 800,
+                        letterSpacing: "0.08em",
+                      }}
+                    >
+                      ✍️ SUGGESTED REWRITE
+                    </div>
+                    <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
+                      A calmer version that keeps the core intent.
+                    </div>
+                  </div>
 
-      <button
-        className="tc-button-hover"
-        onClick={copyRewriteOnly}
-        style={actionButtonStyle}
-      >
-        ✍️ Copy Rewrite
-      </button>
-    </div>
-
-    <div
-      style={{
-        marginTop: "16px",
-        fontSize: "22px",
-        lineHeight: 1.8,
-        color: "#111827",
-        fontWeight: 650,
-      }}
-    >
-      {displayedRewrite}
-    </div>
-  </div>
-)}
-           <div
-  style={{
-    ...cardStyle,
-    background: sendVerdict.bg,
-    border: `1px solid ${sendVerdict.border}`,
-  }}
->
-  <div
-    style={{
-      fontSize: "13px",
-      color: "#64748b",
-      fontWeight: 800,
-      letterSpacing: "0.08em",
-    }}
-  >
-    Should You Send This?
-  </div>
-
-  <div
-    style={{
-      marginTop: "12px",
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      flexWrap: "wrap",
-    }}
-  >
-    <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
-
-    <div>
-      <div
-        style={{
-          fontSize: "26px",
-          fontWeight: 850,
-          color: sendVerdict.color,
-          letterSpacing: "-0.03em",
-        }}
-      >
-        {sendVerdict.label}
-      </div>
-
-      <div
-        style={{
-          marginTop: "4px",
-          fontSize: "14px",
-          color: "#475569",
-          lineHeight: 1.5,
-        }}
-      >
-        {sendVerdict.text}
-      </div>
-    </div>
-  </div>
-</div>
-               
+                  <button
+                    className="tc-button-hover"
+                    onClick={copyRewriteOnly}
+                    style={actionButtonStyle}
+                  >
+                    ✍️ Copy Rewrite
+                  </button>
+                </div>
 
                 <div
                   style={{
@@ -1318,157 +1249,211 @@ https://trytonecheck.com`;
               </div>
             )}
 
+            <div
+              style={{
+                ...cardStyle,
+                background: sendVerdict.bg,
+                border: `1px solid ${sendVerdict.border}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#64748b",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                SHOULD YOU SEND THIS?
+              </div>
+
+              <div
+                style={{
+                  marginTop: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
+
+                <div>
+                  <div
+                    style={{
+                      fontSize: "26px",
+                      fontWeight: 850,
+                      color: sendVerdict.color,
+                      letterSpacing: "-0.03em",
+                    }}
+                  >
+                    {sendVerdict.label}
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      fontSize: "14px",
+                      color: "#475569",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    {sendVerdict.text}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {result.advisory && (
-  <div style={cardStyle}>
-    <div
-      style={{
-        fontSize: "13px",
-        color: "#64748b",
-        fontWeight: 800,
-        letterSpacing: "0.08em",
-      }}
-    >
-      💡 Why This Matters
-    </div>
-    <div
-      style={{
-        marginTop: "12px",
-        lineHeight: 1.8,
-        fontSize: "18px",
-        color: "#111827",
-      }}
-    >
-      {result.advisory}
-    </div>
-  </div>
-)}
+              <div style={cardStyle}>
+                <div
+                  style={{
+                    fontSize: "13px",
+                    color: "#64748b",
+                    fontWeight: 800,
+                    letterSpacing: "0.08em",
+                  }}
+                >
+                  💡 Why This Matters
+                </div>
+                <div
+                  style={{
+                    marginTop: "12px",
+                    lineHeight: 1.8,
+                    fontSize: "18px",
+                    color: "#111827",
+                  }}
+                >
+                  {result.advisory}
+                </div>
+              </div>
+            )}
 
-<div style={cardStyle}>
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      gap: "14px",
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    <div>
-      <div
-        style={{
-          fontSize: "13px",
-          color: "#64748b",
-          fontWeight: 800,
-          letterSpacing: "0.08em",
-        }}
-      >
-        Share ToneCheck Result
-      </div>
-      <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
-        Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
-      </div>
-    </div>
+            <div style={cardStyle}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "14px",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      color: "#64748b",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    Share ToneCheck Result
+                  </div>
+                  <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
+                    Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
+                  </div>
+                </div>
 
-    <div
-      style={{
-        color: copyState ? "#2563eb" : "#64748b",
-        fontWeight: 700,
-        fontSize: "14px",
-        minHeight: "20px",
-      }}
-    >
-      {copyState}
-    </div>
-  </div>
+                <div
+                  style={{
+                    color: copyState ? "#2563eb" : "#64748b",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    minHeight: "20px",
+                  }}
+                >
+                  {copyState}
+                </div>
+              </div>
 
-  <div
-    style={{
-      marginTop: "18px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: "12px",
-      flexWrap: "wrap",
-    }}
-  >
-    <ShareButton onClick={shareWhatsApp} label="WhatsApp" icon="📱" />
-    <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
-    <ShareButton onClick={shareX} label="X" icon="𝕏" />
-    <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-    <button
-      className="tc-button-hover"
-      onClick={downloadCard}
-      style={primaryButtonStyle}
-    >
-      📸 Download Share Card
-    </button>
-  </div>
-</div>
+              <div
+                style={{
+                  marginTop: "18px",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <ShareButton onClick={shareWhatsApp} label="WhatsApp" icon="📱" />
+                <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
+                <ShareButton onClick={shareX} label="X" icon="𝕏" />
+                <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
+                <button
+                  className="tc-button-hover"
+                  onClick={downloadCard}
+                  style={primaryButtonStyle}
+                >
+                  📸 Download Share Card
+                </button>
+              </div>
+            </div>
 
-<div
-  style={{
-    ...cardStyle,
-    textAlign: "center",
-    background:
-      "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,242,255,0.94))",
-    border: "1px solid rgba(99,102,241,0.14)",
-  }}
->
-  <div
-    style={{
-      fontSize: "13px",
-      color: "#64748b",
-      fontWeight: 800,
-      letterSpacing: "0.08em",
-    }}
-  >
-    TRY YOUR MESSAGE
-  </div>
+            <div
+              style={{
+                ...cardStyle,
+                textAlign: "center",
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,242,255,0.94))",
+                border: "1px solid rgba(99,102,241,0.14)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#64748b",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                TRY YOUR MESSAGE
+              </div>
 
-  <div
-    style={{
-      marginTop: "10px",
-      fontSize: "18px",
-      color: "#111827",
-      fontWeight: 700,
-    }}
-  >
-    Paste another message and see how it sounds.
-  </div>
+              <div
+                style={{
+                  marginTop: "10px",
+                  fontSize: "18px",
+                  color: "#111827",
+                  fontWeight: 700,
+                }}
+              >
+                Paste another message and see how it sounds.
+              </div>
 
-  <div
-    style={{
-      marginTop: "8px",
-      color: "#64748b",
-      fontSize: "14px",
-      lineHeight: 1.6,
-    }}
-  >
-    Great for texts, emails, Slack messages, and difficult conversations.
-  </div>
+              <div
+                style={{
+                  marginTop: "8px",
+                  color: "#64748b",
+                  fontSize: "14px",
+                  lineHeight: 1.6,
+                }}
+              >
+                Great for texts, emails, Slack messages, and difficult conversations.
+              </div>
 
-  <div style={{ marginTop: "16px" }}>
-    <button
-      className="tc-button-hover"
-      onClick={() => {
-        setResult(null);
-        setCopyState("");
-        setTimeout(() => {
-          const textarea = document.querySelector(".tc-textarea");
-          if (textarea) textarea.focus();
-        }, 50);
-      }}
-      style={primaryButtonStyle}
-    >
-      ✨ Try Another Message
-    </button>
-  </div>
-</div>
+              <div style={{ marginTop: "16px" }}>
+                <button
+                  className="tc-button-hover"
+                  onClick={() => {
+                    setResult(null);
+                    setCopyState("");
+                    setTimeout(() => {
+                      const textarea = document.querySelector(".tc-textarea");
+                      if (textarea) textarea.focus();
+                    }, 50);
+                  }}
+                  style={primaryButtonStyle}
+                >
+                  ✨ Try Another Message
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </div>
-   </div>
   );
 }
 
