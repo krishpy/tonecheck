@@ -1409,62 +1409,62 @@ https://trytonecheck.com`;
               </div>
             )}
 
-            {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
-            <div
-              style={{
-                ...cardStyle,
-                background: sendVerdict.bg,
-                border: `1px solid ${sendVerdict.border}`,
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "#64748b",
-                  fontWeight: 800,
-                  letterSpacing: "0.08em",
-                }}
-              >
-                SHOULD YOU SEND THIS?
-              </div>
-                 )
+           {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
+  <div
+    style={{
+      ...cardStyle,
+      background: sendVerdict.bg,
+      border: `1px solid ${sendVerdict.border}`,
+    }}
+  >
+    <div
+      style={{
+        fontSize: "13px",
+        color: "#64748b",
+        fontWeight: 800,
+        letterSpacing: "0.08em",
+      }}
+    >
+      SHOULD YOU SEND THIS?
+    </div>
 
-              <div
-                style={{
-                  marginTop: "12px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
+    <div
+      style={{
+        marginTop: "12px",
+        display: "flex",
+        alignItems: "center",
+        gap: "12px",
+        flexWrap: "wrap",
+      }}
+    >
+      <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
 
-                <div>
-                  <div
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: 850,
-                      color: sendVerdict.color,
-                      letterSpacing: "-0.03em",
-                    }}
-                  >
-                    {sendVerdict.label}
-                  </div>
+      <div>
+        <div
+          style={{
+            fontSize: "26px",
+            fontWeight: 850,
+            color: sendVerdict.color,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          {sendVerdict.label}
+        </div>
 
-                  <div
-                    style={{
-                      marginTop: "4px",
-                      fontSize: "14px",
-                      color: "#475569",
-                      lineHeight: 1.5,
-                    }}
-                  >
-                    {sendVerdict.text}
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div
+          style={{
+            marginTop: "4px",
+            fontSize: "14px",
+            color: "#475569",
+            lineHeight: 1.5,
+          }}
+        >
+          {sendVerdict.text}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
             {result.advisory && (
               <div style={cardStyle}>
