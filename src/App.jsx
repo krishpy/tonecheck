@@ -912,7 +912,7 @@ https://trytonecheck.com`;
                         letterSpacing: "0.08em",
                       }}
                     >
-                      PRIMARY HIDDEN SIGNAL
+                      What’s Coming Through
                     </div>
                     <div
                       style={{
@@ -924,6 +924,16 @@ https://trytonecheck.com`;
                     >
                       {primaryHiddenSignalLabel}
                     </div>
+                         <div
+                           style={{
+                             marginTop: "4px",
+                             fontSize: "12px",
+                             color: "#64748b",
+                           }}
+                         >
+                           The strongest underlying feeling detected in the message.
+                         </div>
+                       
                   </div>
                 </div>
 
@@ -938,7 +948,7 @@ https://trytonecheck.com`;
                       fontWeight: 700,
                     }}
                   >
-                    <span>Communication Risk</span>
+                    <span>Overall Risk</span>
                     <span>{riskScore}/100</span>
                   </div>
 
@@ -1010,21 +1020,21 @@ https://trytonecheck.com`;
                     />
 
                     <MetricCard
-                      label="📬 Reply Likelihood"
+                      label="📬 Reply Chance"
                       value={`${result?.reply_likelihood ?? 0}%`}
                       accent="#0f766e"
                       explanation={STAT_EXPLANATIONS.reply}
                     />
 
                     <MetricCard
-                      label="💭 Regret Risk"
+                      label="💭 Might Regret Sending"
                       value={`${result?.regret_risk ?? 0}%`}
                       accent="#dc2626"
                       explanation={STAT_EXPLANATIONS.regret}
                     />
                     
                     <MetricCard
-                      label="🕵️ Manipulation Risk"
+                      label="🕵️ Emotional Pressure Risk"
                       value={`${result?.manipulation_risk ?? 0}%`}
                       accent="#4f46e5"
                       explanation={STAT_EXPLANATIONS.manipulation}
@@ -1142,7 +1152,7 @@ https://trytonecheck.com`;
                     letterSpacing: "0.08em",
                   }}
                 >
-                  💡 ADVISORY
+                  💡 Why This Matters
                 </div>
                 <div
                   style={{
@@ -1176,7 +1186,7 @@ https://trytonecheck.com`;
                       letterSpacing: "0.08em",
                     }}
                   >
-                    SHARE RESULT
+                    Share ToneCheck Result
                   </div>
                   <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
                     Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
