@@ -1263,7 +1263,7 @@ https://trytonecheck.com`;
       letterSpacing: "0.08em",
     }}
   >
-    WOULD YOU SEND THIS?
+    Should You Send This?
   </div>
 
   <div
@@ -1468,6 +1468,7 @@ https://trytonecheck.com`;
         )}
       </div>
     </div>
+   </div>
   );
 }
 
