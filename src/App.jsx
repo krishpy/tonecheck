@@ -927,7 +927,6 @@ https://trytonecheck.com`;
                    border: `1px solid ${toneTheme.border}`,
                    boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
                    backgroundSize: "200% 200%",
-                   animation: "tc-gradient-move 8s ease infinite",
                  }}
                >
                 <div
@@ -1086,9 +1085,9 @@ https://trytonecheck.com`;
                       flexWrap: "wrap",
                     }}
                   >
-                    <MiniTag label={`Risk Level: ${result?.risk_level || getRiskBand(riskScore)}`} />
-                    <MiniTag label={`Reply: ${replyLikelihood}%`} />
-                    <MiniTag label={`Regret: ${regretRisk}%`} />
+                    <MiniTag label={`Risk : ${result?.risk_level || getRiskBand(riskScore)}`} />
+                    <MiniTag label={`Reply chance: ${replyLikelihood}%`} />
+                    <MiniTag label={`Regret chance: ${regretRisk}%`} />
                   </div>
                 </div>
               </div>
@@ -1189,104 +1188,120 @@ https://trytonecheck.com`;
               )}
 
             {displayedRewrite && (
-              <div
-                style={{
-                  ...cardStyle,
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-                  transition: "all 0.25s ease",
-                  border: "1px solid rgba(251,146,60,0.22)",
-                  boxShadow:
-                    "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
-                  padding: "26px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "14px",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div>
-                    <div
-                       className="tc-rewrite"
-                      style={{
-                        fontSize: "13px",
-                        color: "#9a3412",
-                        fontWeight: 800,
-                        letterSpacing: "0.08em",
-                      }}
-                    >
-                      ✍️ SUGGESTED REWRITE
-                    </div>
-                    <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
-                      A calmer version that keeps the core intent.
-                    </div>
-                  </div>
+  <div
+    style={{
+      ...cardStyle,
+      background:
+        "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+      transition: "all 0.25s ease",
+      border: "1px solid rgba(251,146,60,0.22)",
+      boxShadow:
+        "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
+      padding: "26px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "14px",
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <div>
+        <div
+          className="tc-rewrite"
+          style={{
+            fontSize: "13px",
+            color: "#9a3412",
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+          }}
+        >
+          ✍️ SUGGESTED REWRITE
+        </div>
+        <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
+          A calmer version that keeps the core intent.
+        </div>
+      </div>
 
-                  <button className="tc-button-hover" onClick={copyRewriteOnly} style={actionButtonStyle}>
-                    ✍️ Copy Rewrite
-                  </button>
-                </div>
+      <button
+        className="tc-button-hover"
+        onClick={copyRewriteOnly}
+        style={actionButtonStyle}
+      >
+        ✍️ Copy Rewrite
+      </button>
+    </div>
 
+    <div
+      style={{
+        marginTop: "16px",
+        fontSize: "22px",
+        lineHeight: 1.8,
+        color: "#111827",
+        fontWeight: 650,
+      }}
+    >
+      {displayedRewrite}
+    </div>
+  </div>
+)}
            <div
-            style={{
-              ...cardStyle,
-              background: sendVerdict.bg,
-              border: `1px solid ${sendVerdict.border}`,
-            }}
-          >
-            <div
-              style={{
-                fontSize: "13px",
-                color: "#64748b",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-              }}
-            >
-              WOULD YOU SEND THIS?
-            </div>
-          
-            <div
-              style={{
-                marginTop: "12px",
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
-          
-              <div>
-                <div
-                  style={{
-                    fontSize: "26px",
-                    fontWeight: 850,
-                    color: sendVerdict.color,
-                    letterSpacing: "-0.03em",
-                  }}
-                >
-                  {sendVerdict.label}
-                </div>
-          
-                <div
-                  style={{
-                    marginTop: "4px",
-                    fontSize: "14px",
-                    color: "#475569",
-                    lineHeight: 1.5,
-                  }}
-                >
-                  {sendVerdict.text}
-                </div>
-              </div>
-            </div>
-          </div>
+  style={{
+    ...cardStyle,
+    background: sendVerdict.bg,
+    border: `1px solid ${sendVerdict.border}`,
+  }}
+>
+  <div
+    style={{
+      fontSize: "13px",
+      color: "#64748b",
+      fontWeight: 800,
+      letterSpacing: "0.08em",
+    }}
+  >
+    WOULD YOU SEND THIS?
+  </div>
 
+  <div
+    style={{
+      marginTop: "12px",
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      flexWrap: "wrap",
+    }}
+  >
+    <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
+
+    <div>
+      <div
+        style={{
+          fontSize: "26px",
+          fontWeight: 850,
+          color: sendVerdict.color,
+          letterSpacing: "-0.03em",
+        }}
+      >
+        {sendVerdict.label}
+      </div>
+
+      <div
+        style={{
+          marginTop: "4px",
+          fontSize: "14px",
+          color: "#475569",
+          lineHeight: 1.5,
+        }}
+      >
+        {sendVerdict.text}
+      </div>
+    </div>
+  </div>
+</div>
                
 
                 <div
@@ -1446,9 +1461,9 @@ https://trytonecheck.com`;
   </div>
 </div>
                
-)}
-      </div>
-    </div>
+          )}
+         </div>
+       </div>
   );
 }
 
