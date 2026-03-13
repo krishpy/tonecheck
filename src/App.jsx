@@ -14,6 +14,41 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [copyState, setCopyState] = useState("");
 
+      function getSendVerdict(score) {
+       const s = Number(score ?? 0);
+     
+       if (s >= 70) {
+         return {
+           emoji: "🔴",
+           label: "No",
+           text: "This message is risky enough that most people should pause before sending.",
+           color: "#dc2626",
+           bg: "rgba(254,226,226,0.85)",
+           border: "rgba(239,68,68,0.22)",
+         };
+       }
+     
+       if (s >= 40) {
+         return {
+           emoji: "🟡",
+           label: "Maybe",
+           text: "This message may still work, but softening it could improve how it lands.",
+           color: "#b45309",
+           bg: "rgba(254,249,195,0.88)",
+           border: "rgba(245,158,11,0.22)",
+         };
+       }
+     
+       return {
+         emoji: "🟢",
+         label: "Safe",
+         text: "This message looks fairly safe to send as-is.",
+         color: "#15803d",
+         bg: "rgba(220,252,231,0.88)",
+         border: "rgba(34,197,94,0.22)",
+       };
+     }
+
   function getHiddenSignalLabel(signal) {
     const map = {
       threat: "Threat",
@@ -57,16 +92,32 @@ function App() {
   }
 
 async function downloadCard() {
-  const node = document.getElementById("tone-result-card");
+  try {
+    const node = document.getElementById("tone-result-card");
+    if (!node) {
+      setCopyState("Card not found");
+      setTimeout(() => setCopyState(""), 1800);
+      return;
+    }
 
-  if (!node) return;
+    const dataUrl = await htmlToImage.toPng(node, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+    });
 
-  const dataUrl = await htmlToImage.toPng(node);
+    const link = document.createElement("a");
+    link.download = "tonecheck-result.png";
+    link.href = dataUrl;
+    link.click();
 
-  const link = document.createElement("a");
-  link.download = "tonecheck-result.png";
-  link.href = dataUrl;
-  link.click();
+    setCopyState("Card downloaded");
+    setTimeout(() => setCopyState(""), 1800);
+  } catch (err) {
+    console.error("Download card failed:", err);
+    setCopyState("Download failed");
+    setTimeout(() => setCopyState(""), 1800);
+  }
 }
 
   async function analyze() {
@@ -363,6 +414,7 @@ https://trytonecheck.com`;
   const riskScore = Number(result?.risk_score ?? 0);
   const replyLikelihood = Number(result?.reply_likelihood ?? 0);
   const toneTheme = getToneTheme();
+  const sendVerdict = getSendVerdict(riskScore);
 
   const pageStyle = {
     minHeight: "100vh",
@@ -866,19 +918,18 @@ https://trytonecheck.com`;
               }}
             >
               <div
-                <div 
-                     id="tone-result-card" 
-                     className="tc-glow-card"
-                style={{
-                  ...cardStyle,
-                  padding: "26px",
-                  background: toneTheme.bg,
-                  border: `1px solid ${toneTheme.border}`,
-                  boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
-                  backgroundSize: "200% 200%",
-                  animation: "tc-gradient-move 8s ease infinite"
-                }}
-              >
+                 id="tone-result-card"
+                 className="tc-glow-card"
+                 style={{
+                   ...cardStyle,
+                   padding: "26px",
+                   background: toneTheme.bg,
+                   border: `1px solid ${toneTheme.border}`,
+                   boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
+                   backgroundSize: "200% 200%",
+                   animation: "tc-gradient-move 8s ease infinite",
+                 }}
+               >
                 <div
                   style={{
                     display: "flex",
@@ -1181,6 +1232,63 @@ https://trytonecheck.com`;
                   </button>
                 </div>
 
+           <div
+            style={{
+              ...cardStyle,
+              background: sendVerdict.bg,
+              border: `1px solid ${sendVerdict.border}`,
+            }}
+          >
+            <div
+              style={{
+                fontSize: "13px",
+                color: "#64748b",
+                fontWeight: 800,
+                letterSpacing: "0.08em",
+              }}
+            >
+              WOULD YOU SEND THIS?
+            </div>
+          
+            <div
+              style={{
+                marginTop: "12px",
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                flexWrap: "wrap",
+              }}
+            >
+              <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
+          
+              <div>
+                <div
+                  style={{
+                    fontSize: "26px",
+                    fontWeight: 850,
+                    color: sendVerdict.color,
+                    letterSpacing: "-0.03em",
+                  }}
+                >
+                  {sendVerdict.label}
+                </div>
+          
+                <div
+                  style={{
+                    marginTop: "4px",
+                    fontSize: "14px",
+                    color: "#475569",
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {sendVerdict.text}
+                </div>
+              </div>
+            </div>
+          </div>
+
+               
+
                 <div
                   style={{
                     marginTop: "16px",
@@ -1220,70 +1328,125 @@ https://trytonecheck.com`;
               </div>
             )}
 
-            <div style={cardStyle}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "14px",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "#64748b",
-                      fontWeight: 800,
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    Share ToneCheck Result
-                  </div>
-                  <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
-                    Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    color: copyState ? "#2563eb" : "#64748b",
-                    fontWeight: 700,
-                    fontSize: "14px",
-                    minHeight: "20px",
-                  }}
-                >
-                  {copyState}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "18px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <ShareButton onClick={shareWhatsApp} label="WhatsApp" icon="📱" />
-                <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
-                <ShareButton onClick={shareX} label="X" icon="𝕏" />
-                <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-                <button onClick={downloadCard} style={primaryButtonStyle}>
-                  📸 Download Share Card
-                </button>
-               
-              </div>
-            </div>
-          </div>
-        )}
+<div style={cardStyle}>
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "space-between",
+      gap: "14px",
+      alignItems: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    <div>
+      <div
+        style={{
+          fontSize: "13px",
+          color: "#64748b",
+          fontWeight: 800,
+          letterSpacing: "0.08em",
+        }}
+      >
+        Share ToneCheck Result
+      </div>
+      <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
+        Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
       </div>
     </div>
-  );
-}
+
+    <div
+      style={{
+        color: copyState ? "#2563eb" : "#64748b",
+        fontWeight: 700,
+        fontSize: "14px",
+        minHeight: "20px",
+      }}
+    >
+      {copyState}
+    </div>
+  </div>
+
+  <div
+    style={{
+      marginTop: "18px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: "12px",
+      flexWrap: "wrap",
+    }}
+  >
+    <ShareButton onClick={shareWhatsApp} label="WhatsApp" icon="📱" />
+    <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
+    <ShareButton onClick={shareX} label="X" icon="𝕏" />
+    <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
+    <button className="tc-button-hover" onClick={downloadCard} style={primaryButtonStyle}>
+      📸 Download Share Card
+    </button>
+  </div>
+</div>
+
+<div
+  style={{
+    ...cardStyle,
+    textAlign: "center",
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,242,255,0.94))",
+    border: "1px solid rgba(99,102,241,0.14)",
+  }}
+>
+  <div
+    style={{
+      fontSize: "13px",
+      color: "#64748b",
+      fontWeight: 800,
+      letterSpacing: "0.08em",
+    }}
+  >
+    TRY YOUR MESSAGE
+  </div>
+     
+<div
+    style={{
+      marginTop: "10px",
+      fontSize: "18px",
+      color: "#111827",
+      fontWeight: 700,
+    }}
+  >
+    Paste another message and see how it sounds.
+  </div>
+     
+<div
+    style={{
+      marginTop: "8px",
+      color: "#64748b",
+      fontSize: "14px",
+      lineHeight: 1.6,
+    }}
+  >
+    Great for texts, emails, Slack messages, and difficult conversations.
+  </div>
+
+<div style={{ marginTop: "16px" }}>
+    <button
+      className="tc-button-hover"
+      onClick={() => {
+        setResult(null);
+        setCopyState("");
+        setTimeout(() => {
+          const textarea = document.querySelector(".tc-textarea");
+          if (textarea) textarea.focus();
+        }, 50);
+      }}
+      style={primaryButtonStyle}
+    >
+      ✨ Try Another Message
+    </button>
+  </div>
+</div>
+
+
 
 function MetricCard({ label, value, accent, explanation }) {
   const [showTip, setShowTip] = React.useState(false);
