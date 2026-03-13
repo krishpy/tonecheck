@@ -1002,28 +1002,28 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-                 <MetricCard
+                 <Card
                       label="⚠️ Risk Score"
                       value={result?.risk_score}
                       accent="#7c3aed"
                       explanation={STAT_EXPLANATIONS.risk}
                     />
 
-                    <MetricCard
+                    <Card
                       label="📬 Reply Likelihood"
                       value={`${result?.reply_likelihood ?? 0}%`}
                       accent="#0f766e"
                       explanation={STAT_EXPLANATIONS.reply}
                     />
 
-                    <MetricCard
+                    <Card
                       label="💭 Regret Risk"
                       value={`${result?.regret_risk ?? 0}%`}
                       accent="#dc2626"
                       explanation={STAT_EXPLANATIONS.regret}
                     />
                     
-                    <MetricCard
+                    <Card
                       label="🕵️ Manipulation Risk"
                       value={`${result?.manipulation_risk ?? 0}%`}
                       accent="#4f46e5"
@@ -1226,67 +1226,70 @@ function MetricCard({ label, value, accent, explanation }) {
 
   return (
     <div
+      className="tc-chip-hover"
       style={{
-        ...cardStyle,
-        padding: "18px",
+        padding: "16px 18px",
+        borderRadius: "20px",
+        background: "rgba(255,255,255,0.85)",
+        border: "1px solid rgba(15,23,42,0.05)",
+        boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
         position: "relative",
       }}
     >
-      {/* label row */}
       <div
         style={{
-          fontSize: "14px",
-          opacity: 0.75,
-          marginBottom: "6px",
+          fontSize: "13px",
+          color: "#64748b",
+          fontWeight: 700,
           display: "flex",
           alignItems: "center",
           gap: "6px",
         }}
       >
-        {label}
+        <span>{label}</span>
 
-        {/* info icon */}
         <span
           onMouseEnter={() => setShowTip(true)}
           onMouseLeave={() => setShowTip(false)}
           style={{
-            fontSize: "13px",
+            fontSize: "12px",
             cursor: "help",
-            opacity: 0.6,
+            opacity: 0.65,
+            userSelect: "none",
           }}
         >
           ⓘ
         </span>
       </div>
 
-      {/* value */}
       <div
         style={{
+          marginTop: "8px",
           fontSize: "28px",
-          fontWeight: "700",
+          fontWeight: 850,
+          letterSpacing: "-0.04em",
           color: accent,
         }}
       >
         {value}
       </div>
 
-      {/* tooltip */}
       {showTip && (
         <div
           style={{
             position: "absolute",
-            top: "6px",
-            right: "6px",
+            top: "8px",
+            right: "10px",
             transform: "translateY(-100%)",
-            background: "rgba(30,41,59,0.95)",
-            color: "white",
-            fontSize: "13px",
+            background: "rgba(15,23,42,0.96)",
+            color: "#fff",
+            fontSize: "12px",
+            lineHeight: 1.45,
             padding: "10px 12px",
-            borderRadius: "10px",
-            width: "200px",
-            lineHeight: "1.4",
-            boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-            animation: "fadeIn 0.15s ease",
+            borderRadius: "12px",
+            width: "210px",
+            boxShadow: "0 14px 34px rgba(0,0,0,0.18)",
+            zIndex: 20,
           }}
         >
           {explanation}
