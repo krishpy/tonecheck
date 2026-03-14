@@ -216,40 +216,74 @@ function AppContent() {
     ? "Check tone, aggression, manipulation, reply chance, regret risk, and get a calmer rewrite before sending."
     : currentTool.description;
 
-      function getSendVerdict(score) {
-       const s = Number(score ?? 0);
-     
-       if (s >= 70) {
-         return {
-           emoji: "🔴",
-           label: "No",
-           text: "This message is risky enough that most people should pause before sending.",
-           color: "#dc2626",
-           bg: "rgba(254,226,226,0.85)",
-           border: "rgba(239,68,68,0.22)",
-         };
-       }
-     
-       if (s >= 40) {
-         return {
-           emoji: "🟡",
-           label: "Maybe",
-           text: "This message may still work, but softening it could improve how it lands.",
-           color: "#b45309",
-           bg: "rgba(254,249,195,0.88)",
-           border: "rgba(245,158,11,0.22)",
-         };
-       }
-     
-       return {
-         emoji: "🟢",
-         label: "Safe",
-         text: "This message looks fairly safe to send as-is.",
-         color: "#15803d",
-         bg: "rgba(220,252,231,0.88)",
-         border: "rgba(34,197,94,0.22)",
-       };
-     }
+     function getSendVerdict(score) {
+  const s = Number(score ?? 0);
+  const isSendDecisionTool = currentTool?.resultMode === "send_decision";
+
+  if (isSendDecisionTool) {
+    if (s >= 55) {
+      return {
+        emoji: "🔴",
+        label: "No",
+        text: "This message has enough friction or emotional charge that you should reconsider before sending.",
+        color: "#dc2626",
+        bg: "rgba(254,226,226,0.85)",
+        border: "rgba(239,68,68,0.22)",
+      };
+    }
+
+    if (s >= 25) {
+      return {
+        emoji: "🟡",
+        label: "Maybe",
+        text: "This message may still work, but softening it could improve how it lands.",
+        color: "#b45309",
+        bg: "rgba(254,249,195,0.88)",
+        border: "rgba(245,158,11,0.22)",
+      };
+    }
+
+    return {
+      emoji: "🟢",
+      label: "Safe",
+      text: "This message looks fairly safe to send as-is.",
+      color: "#15803d",
+      bg: "rgba(220,252,231,0.88)",
+      border: "rgba(34,197,94,0.22)",
+    };
+  }
+
+  if (s >= 70) {
+    return {
+      emoji: "🔴",
+      label: "No",
+      text: "This message is risky enough that most people should pause before sending.",
+      color: "#dc2626",
+      bg: "rgba(254,226,226,0.85)",
+      border: "rgba(239,68,68,0.22)",
+    };
+  }
+
+  if (s >= 40) {
+    return {
+      emoji: "🟡",
+      label: "Maybe",
+      text: "This message may still work, but softening it could improve how it lands.",
+      color: "#b45309",
+      bg: "rgba(254,249,195,0.88)",
+      border: "rgba(245,158,11,0.22)",
+    };
+  }
+
+  return {
+    emoji: "🟢",
+    label: "Safe",
+    text: "This message looks fairly safe to send as-is.",
+    color: "#15803d",
+    bg: "rgba(220,252,231,0.88)",
+    border: "rgba(34,197,94,0.22)",
+  };
+}
 
   function getHiddenSignalLabel(signal) {
     const map = {
