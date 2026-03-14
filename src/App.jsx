@@ -989,7 +989,7 @@ https://trytonecheck.com`;
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  ToneCheck
+                  {location.pathname === "/" ? "ToneCheck" : currentTool.title}
                 </h1>
               </div>
             </div>
@@ -1098,9 +1098,9 @@ https://trytonecheck.com`;
             }}
           >
             <span>Private by default</span>
-            <span>Built by MangoMind Labs</span>
-          {location.pathname === "/" && <MiniToolGrid />}
+            <span>Built by @MangoMind Labs</span>
           </div>
+          {location.pathname === "/" && <MiniToolGrid />}
         </div>
 
         {result?.error && (
