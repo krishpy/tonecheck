@@ -1659,17 +1659,42 @@ https://trytonecheck.com`;
 
        {displayedRewrite && (
               <div
+
+               <div
+                 style={{
+                   position: "absolute",
+                   top: 0,
+                   left: 0,
+                   right: 0,
+                   height: "6px",
+                   background: "linear-gradient(90deg, #fb923c, #f59e0b, #f97316)",
+                   opacity: 0.95,
+                 }}
+               />
                 style={{
-                  ...cardStyle,
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-                  transition: "all 0.25s ease",
-                  border: "1px solid rgba(251,146,60,0.22)",
-                  boxShadow:
-                    "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
-                  padding: "26px",
-                }}
+                 ...cardStyle,
+                 background:
+                   "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.98) 55%, rgba(255,237,213,0.92) 100%)",
+                 transition: "all 0.25s ease",
+                 border: "1px solid rgba(251,146,60,0.28)",
+                 boxShadow:
+                   "0 18px 44px rgba(251,146,60,0.14), 0 1px 0 rgba(255,255,255,0.82) inset",
+                 padding: "30px",
+                 position: "relative",
+                 overflow: "hidden",
+               }}
               >
+                   <div
+                     style={{
+                       position: "absolute",
+                       top: 0,
+                       left: 0,
+                       right: 0,
+                       height: "6px",
+                       background: "linear-gradient(90deg, #fb923c, #f59e0b, #f97316)",
+                       opacity: 0.95,
+                     }}
+                   />
                 <div
                   style={{
                     display: "flex",
@@ -1680,42 +1705,59 @@ https://trytonecheck.com`;
                   }}
                 >
                   <div>
+                      <div
+                           className="tc-rewrite"
+                           style={{
+                             fontSize: "13px",
+                             color: "#9a3412",
+                             fontWeight: 900,
+                             letterSpacing: "0.1em",
+                             textTransform: "uppercase",
+                           }}
+                         >
+                           ✨ Better Version
+                         </div>
                     <div
-                      className="tc-rewrite"
                       style={{
-                        fontSize: "13px",
-                        color: "#9a3412",
-                        fontWeight: 800,
-                        letterSpacing: "0.08em",
+                        marginTop: "8px",
+                        color: "#7c2d12",
+                        fontSize: "15px",
+                        lineHeight: 1.6,
+                        maxWidth: "780px",
                       }}
                     >
-                      ✍️ SUGGESTED REWRITE
+                      This version keeps your meaning, but is more likely to land well.
                     </div>
-                    <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
-                      A calmer version that keeps the core intent.
-                    </div>
-                  </div>
 
-                  <button
-                    className="tc-button-hover"
-                    onClick={copyRewriteOnly}
-                    style={actionButtonStyle}
-                  >
-                    ✍️ Copy Rewrite
-                  </button>
+                 <button
+                      className="tc-button-hover"
+                      onClick={copyRewriteOnly}
+                      style={{
+                        ...actionButtonStyle,
+                        background: "rgba(255,255,255,0.72)",
+                        border: "1px solid rgba(251,146,60,0.16)",
+                        color: "#9a3412",
+                        fontWeight: 800,
+                      }}
+                    >
+                      ✍️ Copy Rewrite
+                    </button>>
                 </div>
 
                 <div
-                  style={{
-                    marginTop: "16px",
-                    fontSize: "22px",
-                    lineHeight: 1.8,
-                    color: "#111827",
-                    fontWeight: 650,
-                  }}
-                >
-                  {displayedRewrite}
-                </div>
+                 style={{
+                   marginTop: "20px",
+                   fontSize: "26px",
+                   lineHeight: 1.75,
+                   color: "#111827",
+                   fontWeight: 700,
+                   whiteSpace: "pre-wrap",
+                   letterSpacing: "-0.01em",
+                 }}
+               >
+                 {displayedRewrite}
+               </div>
+                     
               </div>
             )}
 
