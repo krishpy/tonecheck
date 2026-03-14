@@ -1934,7 +1934,7 @@ function RedirectHome() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/");
+    navigate("/", { replace: true });
   }, [navigate]);
 
   return null;
