@@ -1407,7 +1407,6 @@ https://trytonecheck.com`;
                 </div>
               </div>
             </div>
-          </div>
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
             <div
               className="tc-grid-main"
