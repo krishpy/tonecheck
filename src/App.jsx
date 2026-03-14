@@ -1801,7 +1801,7 @@ https://trytonecheck.com`;
   ))}
 </div>
               </div>
-            </div>
+     
 
             {Array.isArray(result.top_manipulation_signals) &&
               result.top_manipulation_signals.length > 0 && (
