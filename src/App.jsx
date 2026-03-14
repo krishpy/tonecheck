@@ -116,8 +116,25 @@ const MINI_TOOLS = {
 
 function getToolConfigFromPath(pathname) {
   if (pathname === "/") return MINI_TOOLS.home;
-  const slug = pathname.replace("/tools/", "");
-  return MINI_TOOLS[slug] || null;
+
+  const SEO_ROUTE_MAP = {
+    "/should-i-send-this": "should-i-send-this",
+    "/passive-aggressive-text": "passive-aggressive-detector",
+    "/manipulative-text-checker": "manipulation-detector",
+    "/is-this-message-rude": "rude-or-polite",
+    "/desperate-text-checker": "desperate-text-checker",
+  };
+
+  if (SEO_ROUTE_MAP[pathname]) {
+    return MINI_TOOLS[SEO_ROUTE_MAP[pathname]];
+  }
+
+  if (pathname.startsWith("/tools/")) {
+    const slug = pathname.replace("/tools/", "");
+    return MINI_TOOLS[slug] || null;
+  }
+
+  return null;
 }
 
 
@@ -1833,7 +1850,15 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<AppContent />} />
+
       <Route path="/tools/:slug" element={<AppContent />} />
+
+      <Route path="/should-i-send-this" element={<AppContent />} />
+      <Route path="/passive-aggressive-text" element={<AppContent />} />
+      <Route path="/manipulative-text-checker" element={<AppContent />} />
+      <Route path="/is-this-message-rude" element={<AppContent />} />
+      <Route path="/desperate-text-checker" element={<AppContent />} />
+
       <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
