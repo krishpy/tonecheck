@@ -1937,7 +1937,6 @@ https://trytonecheck.com`;
           </div>
         )}
       </div>
-    </div>
   );
 }
 
