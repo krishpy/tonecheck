@@ -1659,16 +1659,6 @@ https://trytonecheck.com`;
 
        {displayedRewrite && (
               <div
-                 style={{
-                   position: "absolute",
-                   top: 0,
-                   left: 0,
-                   right: 0,
-                   height: "6px",
-                   background: "linear-gradient(90deg, #fb923c, #f59e0b, #f97316)",
-                   opacity: 0.95,
-                 }}
-               />
                 style={{
                  ...cardStyle,
                  background:
@@ -1693,6 +1683,7 @@ https://trytonecheck.com`;
                        opacity: 0.95,
                      }}
                    />
+                   
                 <div
                   style={{
                     display: "flex",
@@ -1702,6 +1693,7 @@ https://trytonecheck.com`;
                     flexWrap: "wrap",
                   }}
                 >
+                     
                   <div>
                       <div
                            className="tc-rewrite"
