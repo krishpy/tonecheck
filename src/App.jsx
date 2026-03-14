@@ -1659,8 +1659,6 @@ https://trytonecheck.com`;
 
        {displayedRewrite && (
               <div
-
-               <div
                  style={{
                    position: "absolute",
                    top: 0,
