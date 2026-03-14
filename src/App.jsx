@@ -739,12 +739,39 @@ https://trytonecheck.com`;
     <div style={pageStyle}>
          <Helmet>
             <title>{pageTitle}</title>
+             <script type="application/ld+json">
+                 {JSON.stringify({
+                   "@context": "https://schema.org",
+                   "@type": "WebApplication",
+                   name: currentTool.title,
+                   applicationCategory: "Communication Tool",
+                   operatingSystem: "Any",
+                   url: `https://trytonecheck.com${location.pathname}`,
+                   description: pageDescription,
+                 })}
+               </script>
             <meta name="description" content={pageDescription} />
             <meta property="og:title" content={pageTitle} />
             <meta property="og:description" content={pageDescription} />
             <meta property="og:type" content="website" />
             <meta property="og:url" content={`https://trytonecheck.com${location.pathname}`} />
-         </Helmet>
+
+           <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={pageTitle} />
+            <meta name="twitter:description" content={pageDescription} />
+
+          <script type="application/ld+json">
+              {JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                name: location.pathname === "/" ? "ToneCheck" : currentTool.title,
+                applicationCategory: "Communication Tool",
+                operatingSystem: "Any",
+                url: `https://trytonecheck.com${location.pathname}`,
+                description: pageDescription,
+              })}
+            </script>
+       </Helmet>
       <style>{`
         @keyframes tc-float {
           0%, 100% { transform: translateY(0px) scale(1); }
