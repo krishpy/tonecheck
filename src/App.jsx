@@ -746,17 +746,6 @@ https://trytonecheck.com`;
     <div style={pageStyle}>
          <Helmet>
             <title>{pageTitle}</title>
-             <script type="application/ld+json">
-                 {JSON.stringify({
-                   "@context": "https://schema.org",
-                   "@type": "WebApplication",
-                   name: currentTool.title,
-                   applicationCategory: "Communication Tool",
-                   operatingSystem: "Any",
-                   url: `https://trytonecheck.com${location.pathname}`,
-                   description: pageDescription,
-                 })}
-               </script>
             <meta name="description" content={pageDescription} />
             <meta property="og:title" content={pageTitle} />
             <meta property="og:description" content={pageDescription} />
@@ -1027,7 +1016,7 @@ https://trytonecheck.com`;
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  {location.pathname === "/" ? "ToneCheck" : currentTool.eyebrow}
+                  {location.pathname === "/" ? "ToneCheck" : currentTool.title}
                 </h1>
               </div>
             </div>
@@ -1156,6 +1145,7 @@ https://trytonecheck.com`;
         )}
 
         {result && !result.error && (
+          <>
          <div
             style={{
               position: "absolute",
@@ -1382,7 +1372,7 @@ https://trytonecheck.com`;
                   </div>
                 ) : null}
 
-                <div
+ <div
                   style={{
                     marginTop: "28px",
                     display: "flex",
@@ -1407,7 +1397,10 @@ https://trytonecheck.com`;
                 </div>
               </div>
             </div>
+          </div>
+
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
+               
             <div
               className="tc-grid-main"
               style={{
@@ -1935,8 +1928,10 @@ https://trytonecheck.com`;
             </div>
                {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
           </div>
-        )}
+          </>
+         )}
       </div>
+     </div>
   );
 }
 
