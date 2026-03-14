@@ -295,7 +295,7 @@ function AppContent() {
 
 async function downloadCard() {
   try {
-    const node = document.getElementById("tone-result-card");
+    const node = document.getElementById("tone-share-card");
     if (!node) {
       setCopyState("Card not found");
       setTimeout(() => setCopyState(""), 1800);
@@ -499,6 +499,13 @@ async function downloadCard() {
   const primaryHiddenSignalLabel = getHiddenSignalLabel(
     result?.primary_hidden_signal || result?.primary_manipulation_signal
   );
+
+
+ function getClampedMessage(text, max = 180) {
+    const value = String(text || "").trim();
+    if (value.length <= max) return value;
+    return `${value.slice(0, max).trim()}…`;
+  }
 
   function buildShareText() {
     return `✨ ToneCheck Result
@@ -1149,6 +1156,258 @@ https://trytonecheck.com`;
         )}
 
         {result && !result.error && (
+         <div
+            style={{
+              position: "absolute",
+              left: "-99999px",
+              top: 0,
+              pointerEvents: "none",
+              opacity: 0,
+            }}
+          >
+            <div
+              id="tone-share-card"
+              style={{
+                width: "1080px",
+                background:
+                  "linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #f5f3ff 100%)",
+                padding: "40px",
+                fontFamily:
+                  "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                color: "#0f172a",
+              }}
+            >
+              <div
+                style={{
+                  background: "rgba(255,255,255,0.92)",
+                  border: "1px solid rgba(255,255,255,0.82)",
+                  borderRadius: "32px",
+                  padding: "32px",
+                  boxShadow:
+                    "0 18px 46px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    gap: "24px",
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: 800,
+                        letterSpacing: "0.18em",
+                        textTransform: "uppercase",
+                        color: "#6366f1",
+                      }}
+                    >
+                      ToneCheck Result
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "10px",
+                        fontSize: "44px",
+                        lineHeight: 1,
+                        fontWeight: 900,
+                        letterSpacing: "-0.06em",
+                        background:
+                          "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
+                        backgroundSize: "200% 200%",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
+                      {location.pathname === "/" ? "ToneCheck" : currentTool.title}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      minWidth: "220px",
+                      borderRadius: "22px",
+                      padding: "16px 18px",
+                      background: toneTheme.chipBg,
+                      border: `1px solid ${toneTheme.border}`,
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        letterSpacing: "0.08em",
+                        color: "#64748b",
+                      }}
+                    >
+                      What’s Coming Through
+                    </div>
+                    <div
+                      style={{
+                        marginTop: "8px",
+                        fontSize: "24px",
+                        fontWeight: 800,
+                        color: toneTheme.chipText,
+                      }}
+                    >
+                      {primaryHiddenSignalLabel}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "26px",
+                    borderRadius: "24px",
+                    padding: "22px",
+                    background: "rgba(255,255,255,0.84)",
+                    border: "1px solid rgba(15,23,42,0.06)",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      color: "#64748b",
+                    }}
+                  >
+                    MESSAGE
+                  </div>
+                  <div
+                    style={{
+                      marginTop: "10px",
+                      fontSize: "28px",
+                      lineHeight: 1.6,
+                      color: "#111827",
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {getClampedMessage(message, 220)}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    marginTop: "22px",
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "16px",
+                  }}
+                >
+                  <div
+                    style={{
+                      borderRadius: "22px",
+                      padding: "18px",
+                      background: "rgba(255,255,255,0.84)",
+                      border: "1px solid rgba(15,23,42,0.06)",
+                    }}
+                  >
+                    <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                      Tone
+                    </div>
+                    <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                      {getToneEmoji()} {getToneLabel()}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      borderRadius: "22px",
+                      padding: "18px",
+                      background: "rgba(255,255,255,0.84)",
+                      border: "1px solid rgba(15,23,42,0.06)",
+                    }}
+                  >
+                    <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                      Overall Risk
+                    </div>
+                    <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                      {riskScore}/100
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      borderRadius: "22px",
+                      padding: "18px",
+                      background: "rgba(255,255,255,0.84)",
+                      border: "1px solid rgba(15,23,42,0.06)",
+                    }}
+                  >
+                    <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                      Verdict
+                    </div>
+                    <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                      {sendVerdict.emoji} {sendVerdict.label}
+                    </div>
+                  </div>
+                </div>
+
+                {displayedRewrite ? (
+                  <div
+                    style={{
+                      marginTop: "22px",
+                      borderRadius: "24px",
+                      padding: "22px",
+                      background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                      border: "1px solid rgba(251,146,60,0.18)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        letterSpacing: "0.08em",
+                        color: "#9a3412",
+                      }}
+                    >
+                      BETTER VERSION
+                    </div>
+                    <div
+                      style={{
+                        marginTop: "10px",
+                        fontSize: "26px",
+                        lineHeight: 1.7,
+                        color: "#111827",
+                        whiteSpace: "pre-wrap",
+                      }}
+                    >
+                      {displayedRewrite}
+                    </div>
+                  </div>
+                ) : null}
+
+                <div
+                  style={{
+                    marginTop: "28px",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    gap: "16px",
+                  }}
+                >
+                  <div style={{ color: "#64748b", fontSize: "18px" }}>
+                    Check yours at trytonecheck.com
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "22px",
+                      fontWeight: 900,
+                      letterSpacing: "-0.04em",
+                      color: "#312e81",
+                    }}
+                  >
+                    T✓ ToneCheck
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
             <div
               className="tc-grid-main"
