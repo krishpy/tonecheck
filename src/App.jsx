@@ -740,6 +740,10 @@ https://trytonecheck.com`;
          <Helmet>
             <title>{pageTitle}</title>
             <meta name="description" content={pageDescription} />
+            <meta property="og:title" content={pageTitle} />
+            <meta property="og:description" content={pageDescription} />
+            <meta property="og:type" content="website" />
+            <meta property="og:url" content={`https://trytonecheck.com${location.pathname}`} />
          </Helmet>
       <style>{`
         @keyframes tc-float {
@@ -989,7 +993,7 @@ https://trytonecheck.com`;
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  {location.pathname === "/" ? "ToneCheck" : currentTool.title}
+                  {location.pathname === "/" ? "ToneCheck" : currentTool.eyebrow}
                 </h1>
               </div>
             </div>
@@ -1666,7 +1670,7 @@ function MiniToolGrid() {
   return (
     <div
       style={{
-        marginTop: "22px",
+        marginTop: "44px",
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
         gap: "16px",
