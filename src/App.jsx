@@ -1159,7 +1159,7 @@ https://trytonecheck.com`;
             }}
           >
             <span>Private by default</span>
-            <span>Built by @MangoMind Labs</span>
+            <span>Built by MangoMind Labs</span>
           </div>
           {location.pathname === "/" && <MiniToolGrid />}
         </div>
@@ -1638,64 +1638,26 @@ https://trytonecheck.com`;
                   QUICK STATS
                 </div>
 
-              <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-  {filterVisibleStatsByMode(currentTool.resultMode, result).map((item) => (
-    <MetricCard
-      key={item.label}
-      label={item.label}
-      value={item.value}
-      accent={item.accent}
-      explanation={item.explanation}
-    />
-  ))}
-</div>
-              </div>
-            </div>
+                          {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
+  <div
+    style={{
+      ...cardStyle,
+      background: sendVerdict.bg,
+      border: `1px solid ${sendVerdict.border}`,
+    }}
+  >
+    <div
+      style={{
+        fontSize: "13px",
+        color: "#64748b",
+        fontWeight: 800,
+        letterSpacing: "0.08em",
+      }}
+    >
+      SHOULD YOU SEND THIS?
+    </div>
 
-            {Array.isArray(result.top_manipulation_signals) &&
-              result.top_manipulation_signals.length > 0 && (
-                <div style={cardStyle}>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "#64748b",
-                      fontWeight: 800,
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    DETECTED SIGNALS
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "14px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "10px",
-                    }}
-                  >
-                    {result.top_manipulation_signals.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="tc-chip-hover"
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: "999px",
-                          background: "rgba(99,102,241,0.08)",
-                          color: "#4338ca",
-                          fontWeight: 700,
-                          fontSize: "14px",
-                          border: "1px solid rgba(99,102,241,0.12)",
-                        }}
-                      >
-                        {getHiddenSignalLabel(item.name)} · {item.score}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {displayedRewrite && (
+       {displayedRewrite && (
               <div
                 style={{
                   ...cardStyle,
@@ -1757,25 +1719,6 @@ https://trytonecheck.com`;
               </div>
             )}
 
-           {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
-  <div
-    style={{
-      ...cardStyle,
-      background: sendVerdict.bg,
-      border: `1px solid ${sendVerdict.border}`,
-    }}
-  >
-    <div
-      style={{
-        fontSize: "13px",
-        color: "#64748b",
-        fontWeight: 800,
-        letterSpacing: "0.08em",
-      }}
-    >
-      SHOULD YOU SEND THIS?
-    </div>
-
     <div
       style={{
         marginTop: "12px",
@@ -1813,6 +1756,64 @@ https://trytonecheck.com`;
     </div>
   </div>
 )}
+
+              <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
+  {filterVisibleStatsByMode(currentTool.resultMode, result).map((item) => (
+    <MetricCard
+      key={item.label}
+      label={item.label}
+      value={item.value}
+      accent={item.accent}
+      explanation={item.explanation}
+    />
+  ))}
+</div>
+              </div>
+            </div>
+
+            {Array.isArray(result.top_manipulation_signals) &&
+              result.top_manipulation_signals.length > 0 && (
+                <div style={cardStyle}>
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      color: "#64748b",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    DETECTED SIGNALS
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "14px",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: "10px",
+                    }}
+                  >
+                    {result.top_manipulation_signals.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="tc-chip-hover"
+                        style={{
+                          padding: "10px 14px",
+                          borderRadius: "999px",
+                          background: "rgba(99,102,241,0.08)",
+                          color: "#4338ca",
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          border: "1px solid rgba(99,102,241,0.12)",
+                        }}
+                      >
+                        {getHiddenSignalLabel(item.name)} · {item.score}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
 
             {result.advisory && (
               <div style={cardStyle}>
