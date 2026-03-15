@@ -1415,8 +1415,8 @@ https://trytonecheck.com`;
               </div>
             )}
 
-            {result && !result.error && (
-	      <>
+                        {result && !result.error && (
+              <>
                 <div
                   style={{
                     position: "absolute",
@@ -1671,19 +1671,18 @@ https://trytonecheck.com`;
                 </div>
 
                 <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-  			<ToneSummaryCard
-    				cardStyle={cardStyle}
-   				 toneTheme={toneTheme}
-   				 getToneLabel={getToneLabel}
-    				getToneEmoji={getToneEmoji}
-   				 riskScore={riskScore}
-   				 sendVerdict={sendVerdict}
-    				primaryHiddenSignalLabel={primaryHiddenSignalLabel}
-    				getMeterWidth={getMeterWidth}
-    				getMeterColor={getMeterColor}
-    				getToneAccent={getToneAccent}
-  				/>
-        
+                  <ToneSummaryCard
+                    cardStyle={cardStyle}
+                    toneTheme={toneTheme}
+                    getToneLabel={getToneLabel}
+                    getToneEmoji={getToneEmoji}
+                    riskScore={riskScore}
+                    sendVerdict={sendVerdict}
+                    primaryHiddenSignalLabel={primaryHiddenSignalLabel}
+                    getMeterWidth={getMeterWidth}
+                    getMeterColor={getMeterColor}
+                    getToneAccent={getToneAccent}
+                  />
 
                   {finalRewrite && (
                     <div
@@ -1752,8 +1751,8 @@ https://trytonecheck.com`;
                         <span>Your message risk: {riskScore}</span>
                         <span>Rewrite risk: {rewriteRiskScore}</span>
                         <span style={{ color: "#15803d", fontWeight: 800 }}>
-                        ↑ {riskImprovement} points safer
-                      </span>
+                          ↑ {riskImprovement} points safer
+                        </span>
                       </div>
 
                       <div style={{ marginTop: "14px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -1888,70 +1887,63 @@ https://trytonecheck.com`;
                       </div>
 
                       <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-
-                          <button
-                        onClick={() =>
-                          window.open(
-                            `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
-                            "_blank"
-                          )
-                        }
-                        className="tc-button-hover"
-                        style={{
-                          padding: "16px 22px",
-                          borderRadius: "18px",
-                          border: "1px solid rgba(255,255,255,0.28)",
-                          cursor: "pointer",
-                          fontWeight: 800,
-                          fontSize: "15px",
-                          color: "#ffffff",
-                          background:
-                            "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
-                          boxShadow:
-                            "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
-                        }}
-                      >
-                        Send via WhatsApp
-                      </button>
-
-
-
-                        
                         <button
-                            onClick={copyRewriteOnly}
-                            className="tc-button-hover"
-                            style={{
-                              ...actionButtonStyle,
-                              background: "rgba(255,255,255,0.9)",
-                              border: "1px solid rgba(15,23,42,0.12)",
-                              color: "#111827",
-                            }}
-                          >
-                            ✍️ Copy rewrite
-                          </button>
-                        
-                       <button
-                        onClick={useRewriteMessage}
-                        className="tc-button-hover"
-                        style={{
-                          padding: "16px 22px",
-                          borderRadius: "18px",
-                          border: "1px solid rgba(255,255,255,0.28)",
-                          cursor: "pointer",
-                          fontWeight: 900,
-                          fontSize: "15px",
-                          color: "#ffffff",
-                          background:
-                            "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
-                          boxShadow:
-                            "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
-                        }}
-                      >
-                        ✏️ Use This Message
-                      </button>
+                          onClick={() =>
+                            window.open(
+                              `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
+                              "_blank"
+                            )
+                          }
+                          className="tc-button-hover"
+                          style={{
+                            padding: "16px 22px",
+                            borderRadius: "18px",
+                            border: "1px solid rgba(255,255,255,0.28)",
+                            cursor: "pointer",
+                            fontWeight: 800,
+                            fontSize: "15px",
+                            color: "#ffffff",
+                            background:
+                              "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
+                            boxShadow:
+                              "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
+                          }}
+                        >
+                          Send via WhatsApp
+                        </button>
 
-                        
-                      
+                        <button
+                          onClick={copyRewriteOnly}
+                          className="tc-button-hover"
+                          style={{
+                            ...actionButtonStyle,
+                            background: "rgba(255,255,255,0.9)",
+                            border: "1px solid rgba(15,23,42,0.12)",
+                            color: "#111827",
+                          }}
+                        >
+                          ✍️ Copy rewrite
+                        </button>
+
+                        <button
+                          onClick={useRewriteMessage}
+                          className="tc-button-hover"
+                          style={{
+                            padding: "16px 22px",
+                            borderRadius: "18px",
+                            border: "1px solid rgba(255,255,255,0.28)",
+                            cursor: "pointer",
+                            fontWeight: 900,
+                            fontSize: "15px",
+                            color: "#ffffff",
+                            background:
+                              "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
+                            boxShadow:
+                              "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
+                          }}
+                        >
+                          ✏️ Use This Message
+                        </button>
 
                         {copyState && (
                           <div
@@ -1980,7 +1972,6 @@ https://trytonecheck.com`;
                           gap: "8px",
                         }}
                       >
-                 
                         <span style={{ fontWeight: 700, color: "#4338ca" }}>
                           trytonecheck.com
                         </span>
@@ -1988,20 +1979,12 @@ https://trytonecheck.com`;
                     </div>
                   )}
 
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
-                      gap: "16px",
-                    }}
-                  >
-                    <StatsRow
-  			replyLikelihood={replyLikelihood}
- 			 regretRisk={regretRisk}
-  			manipulationRisk={manipulationRisk}
-  			statExplanations={STAT_EXPLANATIONS}
-		      />
-                  </div>
+                  <StatsRow
+                    replyLikelihood={replyLikelihood}
+                    regretRisk={regretRisk}
+                    manipulationRisk={manipulationRisk}
+                    statExplanations={STAT_EXPLANATIONS}
+                  />
 
                   {Array.isArray(result.top_manipulation_signals) &&
                     result.top_manipulation_signals.length > 0 && (
@@ -2119,11 +2102,11 @@ https://trytonecheck.com`;
                         flexWrap: "wrap",
                       }}
                     >
-                      <ShareButton 
-                        onClick={shareWhatsApp} 
-                        label="WhatsApp" 
-                        icon={<img src="/whatsapp.svg" alt="" style={{ width: 18, height: 18, display: "block"}} />}
-                        />
+                      <ShareButton
+                        onClick={shareWhatsApp}
+                        label="WhatsApp"
+                        icon={<img src="/whatsapp.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+                      />
                       <button
                         className="tc-button-hover"
                         onClick={copyResult}
@@ -2131,17 +2114,17 @@ https://trytonecheck.com`;
                       >
                         📋 Copy result
                       </button>
-                       <ShareButton 
-                        onClick={shareFacebook} 
-                        label="Facebook" 
-                        icon={<img src="/facebook.svg" alt="" style={{ width: 18, height: 18,  display: "block" }} />}
-                        />
+                      <ShareButton
+                        onClick={shareFacebook}
+                        label="Facebook"
+                        icon={<img src="/facebook.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+                      />
                       <ShareButton onClick={shareX} label="X" icon="𝕏" />
-                    <ShareButton 
-                        onClick={shareLinkedIn} 
-                        label="LinkedIn" 
-                        icon={<img src="/linkedin.svg" alt="" style={{ width: 18, height: 18,  display: "block" }} />}
-                        />
+                      <ShareButton
+                        onClick={shareLinkedIn}
+                        label="LinkedIn"
+                        icon={<img src="/linkedin.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+                      />
                       <button
                         className="tc-button-hover"
                         onClick={downloadCard}
@@ -2215,14 +2198,14 @@ https://trytonecheck.com`;
 
                   {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
                 </div>
-                </>
+              </>
             )}
           </div>
         </div>
       </div>
+    </div>
   );
-  }
-
+}
 
 export default function App() {
   return (
@@ -2237,4 +2220,4 @@ export default function App() {
       <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
-  }
+ }
