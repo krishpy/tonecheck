@@ -133,6 +133,7 @@ function getToolConfigFromPath(pathname) {
 
   if (SEO_ROUTE_MAP[pathname]) {
     return MINI_TOOLS[SEO_ROUTE_MAP[pathname]];
+  }
 
   if (pathname.startsWith("/tools/")) {
     const slug = pathname.replace("/tools/", "");
@@ -1884,7 +1885,7 @@ https://trytonecheck.com`;
                   </div>
 
                   {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
-                </div>
+                
               </>
             )}
           </div>
@@ -1910,4 +1911,4 @@ export default function App() {
       <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
- 
+}
