@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import * as htmlToImage from "html-to-image";
+import { Helmet } from "react-helmet-async";
+import { ToneSummaryCard, StatsRow } from "./components/results";
+import ShareButton from "./components/common/ShareButton";
 
-     const STAT_EXPLANATIONS = {
+const STAT_EXPLANATIONS = {
   risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
   reply: "How likely the other person is to respond positively.",
   regret: "Chance you may regret sending this later.",
@@ -116,63 +119,274 @@ const MINI_TOOLS = {
 
 function getToolConfigFromPath(pathname) {
   if (pathname === "/") return MINI_TOOLS.home;
-  const slug = pathname.replace("/tools/", "");
-  return MINI_TOOLS[slug] || null;
+
+  const SEO_ROUTE_MAP = {
+    "/should-i-send-this": "should-i-send-this",
+    "/passive-aggressive-text": "passive-aggressive-detector",
+    "/manipulative-text-checker": "manipulation-detector",
+    "/is-this-message-rude": "rude-or-polite",
+    "/desperate-text-checker": "desperate-text-checker",
+  };
+
+  if (SEO_ROUTE_MAP[pathname]) {
+    return MINI_TOOLS[SEO_ROUTE_MAP[pathname]];
+  }
+
+  if (pathname.startsWith("/tools/")) {
+    const slug = pathname.replace("/tools/", "");
+    return MINI_TOOLS[slug] || null;
+  }
+
+  return null;
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 
-function filterVisibleStatsByMode(mode, result) {
-  const overallRisk = result?.risk_score ?? 0;
-  const replyChance = `${result?.reply_likelihood ?? 0}%`;
-  const regretChance = `${result?.regret_risk ?? 0}%`;
-  const manipulationChance = `${result?.manipulation_risk ?? 0}%`;
+function MiniToolGrid () {
+  const [showMore, setShowMore] = React.useState(false);
 
-  if (mode === "send_decision") {
-    return [
-      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
-      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
-      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
-    ];
-  }
-
-  if (mode === "passive_aggressive") {
-    return [
-      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
-      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
-      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
-    ];
-  }
-
-  if (mode === "manipulation") {
-    return [
-      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
-      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
-      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
-    ];
-  }
-
-  if (mode === "politeness") {
-    return [
-      { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
-      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
-      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
-    ];
-  }
-
-  if (mode === "desperation") {
-    return [
-      { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
-      { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
-      { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
-    ];
-  }
-
-  return [
-    { label: "⚠️ Risk Score", value: overallRisk, accent: "#7c3aed", explanation: STAT_EXPLANATIONS.risk },
-    { label: "📬 Reply Chance", value: replyChance, accent: "#0f766e", explanation: STAT_EXPLANATIONS.reply },
-    { label: "💭 Might Regret Sending", value: regretChance, accent: "#dc2626", explanation: STAT_EXPLANATIONS.regret },
-    { label: "🕵️ Emotional Pressure Risk", value: manipulationChance, accent: "#4f46e5", explanation: STAT_EXPLANATIONS.manipulation },
+  const featuredTools = [
+    MINI_TOOLS["desperate-text-checker"],
+    MINI_TOOLS["rude-or-polite"],
   ];
+
+  const moreTools = [
+    MINI_TOOLS["should-i-send-this"],
+    MINI_TOOLS["passive-aggressive-detector"],
+    MINI_TOOLS["manipulation-detector"],
+  ];
+
+  const toolRouteMap = {
+    "should-i-send-this": "/should-i-send-this",
+    "passive-aggressive-detector": "/passive-aggressive-text",
+    "manipulation-detector": "/manipulative-text-checker",
+    "rude-or-polite": "/is-this-message-rude",
+    "desperate-text-checker": "/desperate-text-checker",
+  };
+
+ return (
+  <div style={{ marginTop: "28px" }}>
+    <div
+      style={{
+        fontSize: "12px",
+        fontWeight: 800,
+        letterSpacing: "0.08em",
+        color: "#6366f1",
+        textTransform: "uppercase",
+        marginBottom: "12px",
+      }}
+    >
+      Try other checks
+    </div>
+
+    <div
+      style={{
+        color: "#64748b",
+        fontSize: "13px",
+        lineHeight: 1.5,
+        marginBottom: "14px",
+      }}
+    >
+      Quick shortcuts for the most-used checks.
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+        gap: "16px",
+      }}
+    >
+      {featuredTools.map((tool) => (
+        <Link
+          key={tool.slug}
+          to={toolRouteMap[tool.slug] || `/tools/${tool.slug}`}
+          style={{
+            textDecoration: "none",
+            padding: "18px",
+            borderRadius: "18px",
+            background: "rgba(255,255,255,0.85)",
+            border: "1px solid rgba(15,23,42,0.06)",
+            boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
+            color: "#0f172a",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "11px",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              color: "#6366f1",
+              textTransform: "uppercase",
+            }}
+          >
+            {tool.eyebrow}
+          </div>
+
+          <div
+            style={{
+              marginTop: "7px",
+              fontSize: "18px",
+              fontWeight: 800,
+              letterSpacing: "-0.03em",
+            }}
+          >
+            {tool.title}
+          </div>
+
+          <div
+            style={{
+              marginTop: "6px",
+              color: "#475569",
+              fontSize: "13px",
+              lineHeight: 1.55,
+            }}
+          >
+            {tool.description}
+          </div>
+        </Link>
+      ))}
+
+      <div
+        onClick={() => setShowMore(!showMore)}
+        style={{
+          padding: "18px",
+          borderRadius: "18px",
+          background: "rgba(99,102,241,0.05)",
+          border: "1px dashed rgba(99,102,241,0.35)",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: 700,
+          color: "#4338ca",
+          fontSize: "14px",
+        }}
+      >
+        + More tools
+      </div>
+    </div>
+
+    {showMore && (
+      <div
+        style={{
+          display: "grid",
+          gap: "10px",
+          marginTop: "14px",
+        }}
+      >
+        {moreTools.map((tool) => (
+          <Link
+            key={tool.slug}
+            to={toolRouteMap[tool.slug] || `/tools/${tool.slug}`}
+            style={{
+              textDecoration: "none",
+              display: "block",
+              padding: "13px 14px",
+              borderRadius: "16px",
+              background: "rgba(255,255,255,0.86)",
+              border: "1px solid rgba(15,23,42,0.06)",
+              color: "#0f172a",
+              fontWeight: 700,
+              boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
+            }}
+          >
+            {tool.title}
+          </Link>
+        ))}
+      </div>
+    )}
+  </div>
+);
+
+}
+
+function SeoContentBlock({ tool }) {
+  if (!tool || tool.slug === "home") return null;
+
+  const contentMap = {
+    "should-i-send-this": {
+      h2: "Should you send this message?",
+      p1: "This tool helps you check whether a message may come across as aggressive, manipulative, emotionally loaded, or risky before you hit send.",
+      p2: "It is useful for texts, WhatsApp messages, emails, relationship conversations, and tense replies.",
+    },
+    "passive-aggressive-detector": {
+      h2: "Check if a message sounds passive aggressive",
+      p1: "This detector looks for sarcasm, dismissive compliance, cold phrasing, guilt pressure, and indirect hostility.",
+      p2: "Use it for texts like 'Fine. Do whatever you want.' or 'No worries. Clearly you're busy.'",
+    },
+    "manipulation-detector": {
+      h2: "Check for manipulation, guilt pressure, and hidden control",
+      p1: "This tool highlights emotional leverage, reassurance demands, blame shifting, control disguised as care, and subtle pressure.",
+      p2: "It is especially useful for emotionally loaded relationship and conflict messages.",
+    },
+    "rude-or-polite": {
+      h2: "See whether your message sounds rude or polite",
+      p1: "This checker helps you understand whether your wording sounds blunt, respectful, hostile, or unnecessarily harsh.",
+      p2: "It is useful for work messages, emails, feedback, Slack messages, and difficult conversations.",
+    },
+    "desperate-text-checker": {
+      h2: "Check whether your text sounds desperate or clingy",
+      p1: "This tool looks for repeated urgency, emotional dependency, over-eagerness, pressure, and reply-chasing language.",
+      p2: "It is useful before sending follow-ups, relationship texts, and unanswered messages.",
+    },
+  };
+
+  const c = contentMap[tool.slug];
+  if (!c) return null;
+
+  return (
+    <div
+      style={{
+        marginTop: "22px",
+        background: "rgba(255,255,255,0.74)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        border: "1px solid rgba(255,255,255,0.7)",
+        borderRadius: "28px",
+        padding: "24px",
+        boxShadow: "0 10px 30px rgba(15,23,42,0.05)",
+      }}
+    >
+      <h2
+        style={{
+          margin: 0,
+          fontSize: "28px",
+          lineHeight: 1.2,
+          letterSpacing: "-0.03em",
+          color: "#111827",
+        }}
+      >
+        {c.h2}
+      </h2>
+
+      <p style={{ marginTop: "12px", color: "#475569", lineHeight: 1.8, fontSize: "16px" }}>
+        {c.p1}
+      </p>
+
+      <p style={{ marginTop: "10px", color: "#475569", lineHeight: 1.8, fontSize: "16px" }}>
+        {c.p2}
+      </p>
+    </div>
+  );
+}
+
+function RedirectHome() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    navigate("/", { replace: true });
+  }, [navigate]);
+
+  return null;
 }
 
 function AppContent() {
@@ -180,6 +394,7 @@ function AppContent() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copyState, setCopyState] = useState("");
+  const [rewriteTone, setRewriteTone] = useState("default");
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -188,40 +403,94 @@ function AppContent() {
     return getToolConfigFromPath(location.pathname) || MINI_TOOLS.home;
   }, [location.pathname]);
 
-      function getSendVerdict(score) {
-       const s = Number(score ?? 0);
-     
-       if (s >= 70) {
-         return {
-           emoji: "🔴",
-           label: "No",
-           text: "This message is risky enough that most people should pause before sending.",
-           color: "#dc2626",
-           bg: "rgba(254,226,226,0.85)",
-           border: "rgba(239,68,68,0.22)",
-         };
-       }
-     
-       if (s >= 40) {
-         return {
-           emoji: "🟡",
-           label: "Maybe",
-           text: "This message may still work, but softening it could improve how it lands.",
-           color: "#b45309",
-           bg: "rgba(254,249,195,0.88)",
-           border: "rgba(245,158,11,0.22)",
-         };
-       }
-     
-       return {
-         emoji: "🟢",
-         label: "Safe",
-         text: "This message looks fairly safe to send as-is.",
-         color: "#15803d",
-         bg: "rgba(220,252,231,0.88)",
-         border: "rgba(34,197,94,0.22)",
-       };
-     }
+  const pageTitle =
+    location.pathname === "/"
+      ? "ToneCheck — Check how your message may land before you send it"
+      : `${currentTool.title} | ToneCheck`;
+
+  const pageDescription =
+    location.pathname === "/"
+      ? "Check tone, aggression, manipulation, reply chance, regret risk, and get a calmer rewrite before sending."
+      : currentTool.description;
+
+  const displayedRewrite = useMemo(() => {
+    return (
+      result?.rewrite_suggestion ||
+      result?.suggested_rewrite ||
+      result?.rewrite ||
+      result?.rewritten_text ||
+      ""
+    );
+  }, [result]);
+
+  function getSendVerdict(score) {
+    const s = Number(score ?? 0);
+    const isSendDecisionTool = currentTool?.resultMode === "send_decision";
+
+    if (isSendDecisionTool) {
+      if (s >= 55) {
+        return {
+          emoji: "🔴",
+          label: "No",
+          text: "This message has enough friction or emotional charge that you should reconsider before sending.",
+          color: "#dc2626",
+          bg: "rgba(254,226,226,0.85)",
+          border: "rgba(239,68,68,0.22)",
+        };
+      }
+
+      if (s >= 25) {
+        return {
+          emoji: "🟡",
+          label: "Maybe",
+          text: "This message may still work, but softening it could improve how it lands.",
+          color: "#b45309",
+          bg: "rgba(254,249,195,0.88)",
+          border: "rgba(245,158,11,0.22)",
+        };
+      }
+
+      return {
+        emoji: "🟢",
+        label: "Safe",
+        text: "This message looks fairly safe to send as-is.",
+        color: "#15803d",
+        bg: "rgba(220,252,231,0.88)",
+        border: "rgba(34,197,94,0.22)",
+      };
+    }
+
+    if (s >= 70) {
+      return {
+        emoji: "🔴",
+        label: "No",
+        text: "This message is risky enough that most people should pause before sending.",
+        color: "#dc2626",
+        bg: "rgba(254,226,226,0.85)",
+        border: "rgba(239,68,68,0.22)",
+      };
+    }
+
+    if (s >= 40) {
+      return {
+        emoji: "🟡",
+        label: "Maybe",
+        text: "This message may still work, but softening it could improve how it lands.",
+        color: "#b45309",
+        bg: "rgba(254,249,195,0.88)",
+        border: "rgba(245,158,11,0.22)",
+      };
+    }
+
+    return {
+      emoji: "🟢",
+      label: "Safe",
+      text: "This message looks fairly safe to send as-is.",
+      color: "#15803d",
+      bg: "rgba(220,252,231,0.88)",
+      border: "rgba(34,197,94,0.22)",
+    };
+  }
 
   function getHiddenSignalLabel(signal) {
     const map = {
@@ -263,86 +532,6 @@ function AppContent() {
     if (s >= 40) return "Medium";
     if (s > 0) return "Low";
     return "None";
-  }
-
-async function downloadCard() {
-  try {
-    const node = document.getElementById("tone-result-card");
-    if (!node) {
-      setCopyState("Card not found");
-      setTimeout(() => setCopyState(""), 1800);
-      return;
-    }
-
-    const dataUrl = await htmlToImage.toPng(node, {
-      cacheBust: true,
-      pixelRatio: 2,
-      backgroundColor: "#ffffff",
-    });
-
-    const link = document.createElement("a");
-    link.download = "tonecheck-result.png";
-    link.href = dataUrl;
-    link.click();
-
-    setCopyState("Card downloaded");
-    setTimeout(() => setCopyState(""), 1800);
-  } catch (err) {
-    console.error("Download card failed:", err);
-    setCopyState("Download failed");
-    setTimeout(() => setCopyState(""), 1800);
-  }
-}
-
-  async function analyze() {
-    try {
-      setLoading(true);
-      setResult(null);
-      setCopyState("");
-
-      const response = await fetch(
-        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "test-default-key",
-          },
-          body: JSON.stringify({
-            message_text: message,
-          }),
-        }
-      );
-
- 
-
-      const rawText = await response.text();
-
-      let data = {};
-      try {
-        data = JSON.parse(rawText);
-      } catch {
-        data = {};
-      }
-
-      if (!response.ok) {
-        throw new Error(data?.detail || "Something went wrong. Please try again.");
-      }
-
-      setResult(data);
-    } catch (error) {
-      console.error("Analyze failed:", error);
-      setResult({
-        error: "Something went wrong while analyzing the message. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function setExample(text) {
-    setMessage(text);
-    setCopyState("");
   }
 
   function getToneLabel() {
@@ -458,65 +647,41 @@ async function downloadCard() {
     return "linear-gradient(90deg,#34d399,#22c55e,#14b8a6)";
   }
 
-  const displayedRewrite = useMemo(() => {
-    return (
-      result?.rewrite_suggestion ||
-      result?.suggested_rewrite ||
-      result?.rewrite ||
-      result?.rewritten_text ||
-      ""
-    );
-  }, [result]);
+  function adjustRewriteTone(text, tone) {
+    if (!text) return text;
+
+    if (tone === "calmer") {
+      return text.replace(/\?+/g, ".").replace(/!/g, ".");
+    }
+
+    if (tone === "professional") {
+      return `Hi,\n\n${text}\n\nThank you.`;
+    }
+
+    if (tone === "friendlier") {
+      if (text.endsWith(".")) return text.replace(/\.$/, " 🙂");
+      return `${text} 🙂`;
+    }
+
+    if (tone === "direct") {
+      return text
+        .replace("Could you please", "Please")
+        .replace("when you get a chance", "today");
+    }
+
+    return text;
+  }
+
+  const finalRewrite = adjustRewriteTone(displayedRewrite, rewriteTone);
 
   const primaryHiddenSignalLabel = getHiddenSignalLabel(
     result?.primary_hidden_signal || result?.primary_manipulation_signal
   );
 
-  function buildShareText() {
-    return `✨ ToneCheck Result
-
-📝 Message:
-"${message}"
-
-${getToneEmoji()} Tone: ${getToneLabel()}
-⚠️ Risk Score: ${result?.risk_score ?? ""}
-📊 Risk Level: ${result?.risk_level ?? ""}
-💭 Regret Risk: ${result?.regret_risk ?? ""}
-📬 Reply Likelihood: ${result?.reply_likelihood ?? ""}
-🕵️ Hidden Signal: ${primaryHiddenSignalLabel}
-💡 Advisory: ${result?.advisory ?? ""}${
-      displayedRewrite
-        ? `
-
-✍️ Suggested Rewrite:
-${displayedRewrite}`
-        : ""
-    }
-
-Check yours at:
-https://trytonecheck.com`;
-  }
-
-  function buildShareHtml() {
-    return `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
-        <h2 style="margin:0 0 12px 0;">✨ ToneCheck Result</h2>
-        <p style="margin:0 0 12px 0;"><strong>📝 Message:</strong><br/>"${escapeHtml(message)}"</p>
-        <p style="margin:0 0 8px 0;"><strong>${getToneEmoji()} Tone:</strong> ${escapeHtml(getToneLabel())}</p>
-        <p style="margin:0 0 8px 0;"><strong>⚠️ Risk Score:</strong> ${result?.risk_score ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>📊 Risk Level:</strong> ${escapeHtml(result?.risk_level ?? "")}</p>
-        <p style="margin:0 0 8px 0;"><strong>💭 Regret Risk:</strong> ${result?.regret_risk ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>📬 Reply Likelihood:</strong> ${result?.reply_likelihood ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>🕵️ Hidden Signal:</strong> ${escapeHtml(primaryHiddenSignalLabel)}</p>
-        <p style="margin:0 0 12px 0;"><strong>💡 Advisory:</strong> ${escapeHtml(result?.advisory ?? "")}</p>
-        ${
-          displayedRewrite
-            ? `<p style="margin:0 0 12px 0;"><strong>✍️ Suggested Rewrite:</strong><br/>${escapeHtml(displayedRewrite)}</p>`
-            : ""
-        }
-        <p style="margin:0;"><strong>🔗 Check yours at:</strong> https://trytonecheck.com</p>
-      </div>
-    `;
+  function getClampedMessage(text, max = 180) {
+    const value = String(text || "").trim();
+    if (value.length <= max) return value;
+    return `${value.slice(0, max).trim()}…`;
   }
 
   async function copyResult() {
@@ -542,16 +707,74 @@ https://trytonecheck.com`;
     }
   }
 
+  function buildShareText() {
+    return `✨ ToneCheck Result
+
+📝 Message:
+"${message}"
+
+${getToneEmoji()} Tone: ${getToneLabel()}
+⚠️ Risk Score: ${result?.risk_score ?? ""}
+📊 Risk Level: ${result?.risk_level ?? ""}
+💭 Regret Risk: ${result?.regret_risk ?? ""}
+📬 Reply Likelihood: ${result?.reply_likelihood ?? ""}
+🕵️ Hidden Signal: ${primaryHiddenSignalLabel}
+💡 Advisory: ${result?.advisory ?? ""}${
+      finalRewrite
+        ? `
+
+✍️ Suggested Rewrite:
+${finalRewrite}`
+        : ""
+    }
+
+Check yours at:
+https://trytonecheck.com`;
+  }
+
+  function buildShareHtml() {
+    return `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
+        <h2 style="margin:0 0 12px 0;">✨ ToneCheck Result</h2>
+        <p style="margin:0 0 12px 0;"><strong>📝 Message:</strong><br/>"${escapeHtml(message)}"</p>
+        <p style="margin:0 0 8px 0;"><strong>${getToneEmoji()} Tone:</strong> ${escapeHtml(getToneLabel())}</p>
+        <p style="margin:0 0 8px 0;"><strong>⚠️ Risk Score:</strong> ${result?.risk_score ?? ""}</p>
+        <p style="margin:0 0 8px 0;"><strong>📊 Risk Level:</strong> ${escapeHtml(result?.risk_level ?? "")}</p>
+        <p style="margin:0 0 8px 0;"><strong>💭 Regret Risk:</strong> ${result?.regret_risk ?? ""}</p>
+        <p style="margin:0 0 8px 0;"><strong>📬 Reply Likelihood:</strong> ${result?.reply_likelihood ?? ""}</p>
+        <p style="margin:0 0 8px 0;"><strong>🕵️ Hidden Signal:</strong> ${escapeHtml(primaryHiddenSignalLabel)}</p>
+        <p style="margin:0 0 12px 0;"><strong>💡 Advisory:</strong> ${escapeHtml(result?.advisory ?? "")}</p>
+        ${
+          finalRewrite
+            ? `<p style="margin:0 0 12px 0;"><strong>✍️ Suggested Rewrite:</strong><br/>${escapeHtml(finalRewrite)}</p>`
+            : ""
+        }
+        <p style="margin:0;"><strong>🔗 Check yours at:</strong> https://trytonecheck.com</p>
+      </div>
+    `;
+  }
+
   async function copyRewriteOnly() {
-    if (!displayedRewrite) return;
+    if (!finalRewrite) return;
     try {
-      await navigator.clipboard.writeText(displayedRewrite);
+      await navigator.clipboard.writeText(finalRewrite);
       setCopyState("Rewrite copied");
       setTimeout(() => setCopyState(""), 1800);
     } catch {
       setCopyState("Copy failed");
       setTimeout(() => setCopyState(""), 1800);
     }
+  }
+
+  function useRewriteMessage() {
+    if (!finalRewrite) return;
+    setMessage(finalRewrite);
+    setResult(null);
+
+    setTimeout(() => {
+      const textarea = document.querySelector(".tc-textarea");
+      if (textarea) textarea.focus();
+    }, 50);
   }
 
   function openShare(url) {
@@ -584,9 +807,91 @@ https://trytonecheck.com`;
     );
   }
 
+  async function downloadCard() {
+    try {
+      const node = document.getElementById("tone-share-card");
+      if (!node) {
+        setCopyState("Card not found");
+        setTimeout(() => setCopyState(""), 1800);
+        return;
+      }
+
+      const dataUrl = await htmlToImage.toPng(node, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
+
+      const link = document.createElement("a");
+      link.download = "tonecheck-result.png";
+      link.href = dataUrl;
+      link.click();
+
+      setCopyState("Card downloaded");
+      setTimeout(() => setCopyState(""), 1800);
+    } catch (err) {
+      console.error("Download card failed:", err);
+      setCopyState("Download failed");
+      setTimeout(() => setCopyState(""), 1800);
+    }
+  }
+
+  async function analyze() {
+    try {
+      setLoading(true);
+      setResult(null);
+      setCopyState("");
+
+      const response = await fetch(
+        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "test-default-key",
+          },
+          body: JSON.stringify({
+            message_text: message,
+          }),
+        }
+      );
+
+      const rawText = await response.text();
+
+      let data = {};
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        data = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Something went wrong. Please try again.");
+      }
+
+      setResult(data);
+      setRewriteTone("default");
+    } catch (error) {
+      console.error("Analyze failed:", error);
+      setResult({
+        error: "Something went wrong while analyzing the message. Please try again.",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function setExample(text) {
+    setMessage(text);
+    setCopyState("");
+  }
+
   const regretRisk = Number(result?.regret_risk ?? 0);
   const riskScore = Number(result?.risk_score ?? 0);
+  const rewriteRiskScore = Math.max(0, riskScore - 40);
+  const riskImprovement = riskScore - rewriteRiskScore;
   const replyLikelihood = Number(result?.reply_likelihood ?? 0);
+  const manipulationRisk = Number(result?.manipulation_risk ?? 0);
   const toneTheme = getToneTheme();
   const sendVerdict = getSendVerdict(riskScore);
 
@@ -709,46 +1014,57 @@ https://trytonecheck.com`;
 
   return (
     <div style={pageStyle}>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://trytonecheck.com${location.pathname}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: location.pathname === "/" ? "ToneCheck" : currentTool.title,
+            applicationCategory: "Communication Tool",
+            operatingSystem: "Any",
+            url: `https://trytonecheck.com${location.pathname}`,
+            description: pageDescription,
+          })}
+        </script>
+      </Helmet>
+
       <style>{`
-        @keyframes tc-float {
-          0%, 100% { transform: translateY(0px) scale(1); }
-          50% { transform: translateY(-4px) scale(1.02); }
+        @keyframes tc-aggressive {
+          0%,100% { transform: scale(1); }
+          50% { transform: scale(1.12); }
         }
 
-         @keyframes tc-aggressive {
-           0%,100% { transform: scale(1); }
-           50% { transform: scale(1.12); }
+        @keyframes tc-light-sweep {
+          0% { transform: translateX(-120%); opacity: 0; }
+          40% { opacity: 0.5; }
+          100% { transform: translateX(120%); opacity: 0; }
         }
-          @keyframes tc-light-sweep {
-            0% {
-              transform: translateX(-120%);
-              opacity: 0;
-            }
-            40% {
-              opacity: 0.5;
-            }
-            100% {
-              transform: translateX(120%);
-              opacity: 0;
-  }
-}
 
-.tc-light-sweep {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 40%;
-  height: 100%;
-  background: linear-gradient(
-    110deg,
-    transparent,
-    rgba(255,255,255,0.35),
-    transparent
-  );
-  filter: blur(10px);
-  animation: tc-light-sweep 8s linear infinite;
-  pointer-events: none;
-}
+        .tc-light-sweep {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 40%;
+          height: 100%;
+          background: linear-gradient(
+            110deg,
+            transparent,
+            rgba(255,255,255,0.35),
+            transparent
+          );
+          filter: blur(10px);
+          animation: tc-light-sweep 8s linear infinite;
+          pointer-events: none;
+        }
 
         @keyframes tc-threat {
           0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
@@ -776,22 +1092,17 @@ https://trytonecheck.com`;
           100% { background-position: 100% 50%; }
         }
 
-       .tc-tone-emoji {
-            animation-duration: 1.8s;
-            animation-iteration-count: infinite;
-            animation-timing-function: ease-in-out;
-            transform-origin: center;
+        .tc-tone-emoji {
+          animation-duration: 1.8s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          transform-origin: center;
         }
 
         .tc-glow-card {
           position: relative;
           overflow: hidden;
         }
-
-        .tc-rewrite:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 18px 42px rgba(251,146,60,0.18);
-         }
 
         .tc-glow-card::before {
           content: "";
@@ -848,275 +1159,1009 @@ https://trytonecheck.com`;
         }
       `}</style>
 
-      <div style={shellStyle}>
-        <div className="tc-hero" style={heroCardStyle}>
-          <div className="tc-light-sweep"></div>
-          <div style={glassOrb1} />
-          <div style={glassOrb2} />
-          <div style={glassOrb3} />
+     <div style={shellStyle}>
+                 <div
+                  className="tc-grid-main"
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr",
+                    gap: "28px",
+                    alignItems: "start",
+                  }}
+                >
 
-          <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <button
-              className="tc-chip-hover"
-              onClick={() => navigate("/")}
-              style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
-            >
-              Home
-            </button>
-          
-            {location.pathname !== "/" && (
+
+                    
+                
+                    <div>
+
+            
+            <div className="tc-hero" style={heroCardStyle}>
+              <div className="tc-light-sweep"></div>
+              <div style={glassOrb1} />
+              <div style={glassOrb2} />
+              <div style={glassOrb3} />
+
+              <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                <button
+                  className="tc-chip-hover"
+                  onClick={() => navigate("/")}
+                  style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
+                >
+                  Home
+                </button>
+
+                {location.pathname !== "/" && (
+                  <div
+                    style={{
+                      ...chipStyle,
+                      background: "rgba(99,102,241,0.10)",
+                      color: "#4338ca",
+                      cursor: "default",
+                    }}
+                  >
+                    {currentTool.title}
+                  </div>
+                )}
+              </div>
+
+              <div style={{ position: "relative" }}>
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "16px",
+                    marginBottom: "14px",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "relative",
+                      width: "74px",
+                      height: "74px",
+                      borderRadius: "24px",
+                      display: "grid",
+                      placeItems: "center",
+                      background:
+                        "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
+                      boxShadow:
+                        "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
+                      border: "1px solid rgba(255,255,255,0.28)",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        inset: "8px",
+                        borderRadius: "18px",
+                        border: "1px solid rgba(255,255,255,0.22)",
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "baseline",
+                        gap: "1px",
+                        color: "#ffffff",
+                        fontWeight: 900,
+                        letterSpacing: "-0.08em",
+                        textShadow: "0 2px 10px rgba(0,0,0,0.16)",
+                      }}
+                    >
+                      <span style={{ fontSize: "28px", lineHeight: 1 }}>T</span>
+                      <span style={{ fontSize: "30px", lineHeight: 1 }}>✓</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        letterSpacing: "0.22em",
+                        color: "#6366f1",
+                        textTransform: "uppercase",
+                        marginBottom: "6px",
+                      }}
+                    >
+                      {currentTool.eyebrow}
+                    </div>
+
+                    <h1
+                      className="tc-title tc-shimmer"
+                      style={{
+                        margin: 0,
+                        fontSize: "76px",
+                        lineHeight: 0.92,
+                        letterSpacing: "-0.09em",
+                        fontWeight: 950,
+                        background:
+                          "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
+                        backgroundSize: "200% 200%",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      }}
+                    >
+                      {location.pathname === "/" ? "ToneCheck" : currentTool.title}
+                    </h1>
+                  </div>
+                </div>
+
+                <p
+                  style={{
+                    margin: "10px 0 0 0",
+                    maxWidth: "820px",
+                    color: "#475569",
+                    fontSize: "19px",
+                    lineHeight: 1.7,
+                  }}
+                >
+                  {currentTool.description}
+                </p>
+              </div>
+
               <div
                 style={{
-                  ...chipStyle,
-                  background: "rgba(99,102,241,0.10)",
-                  color: "#4338ca",
-                  cursor: "default",
+                  marginTop: "22px",
+                  display: "flex",
+                  gap: "10px",
+                  flexWrap: "wrap",
                 }}
               >
-                {currentTool.title}
+                {currentTool.examples.map((example) => (
+                  <button
+                    key={example.label}
+                    className="tc-chip-hover"
+                    style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
+                    onClick={() => setExample(example.text)}
+                  >
+                    {example.label}
+                  </button>
+                ))}
               </div>
-            )}
-          </div>
 
-          <div style={{ position: "relative" }}>
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "16px",
-                marginBottom: "14px",
-              }}
-            >
-                 <div
-                style={{
-                  position: "relative",
-                  width: "74px",
-                  height: "74px",
-                  borderRadius: "24px",
-                  display: "grid",
-                  placeItems: "center",
-                  background:
-                    "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
-                  boxShadow:
-                    "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
-                  border: "1px solid rgba(255,255,255,0.28)",
-                  overflow: "hidden",
-                }}
-              >
+              <div style={{ marginTop: "24px", position: "relative" }}>
+                <textarea
+                  className="tc-textarea"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={currentTool.placeholder}
+                  style={{
+                    width: "100%",
+                    minHeight: "240px",
+                    padding: "24px 24px 72px",
+                    fontSize: "24px",
+                    lineHeight: 1.6,
+                    borderRadius: "28px",
+                    background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
+                    color: "#0f172a",
+                    border: "1px solid rgba(99,102,241,0.10)",
+                    boxSizing: "border-box",
+                    outline: "none",
+                    resize: "vertical",
+                    boxShadow:
+                      "inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 34px rgba(15,23,42,0.04)",
+                  }}
+                />
+
                 <div
                   style={{
                     position: "absolute",
-                    inset: "8px",
-                    borderRadius: "18px",
-                    border: "1px solid rgba(255,255,255,0.22)",
-                  }}
-                />
-                <div
-                  style={{
-                    position: "relative",
+                    right: "16px",
+                    bottom: "16px",
                     display: "flex",
-                    alignItems: "baseline",
-                    gap: "1px",
-                    color: "#ffffff",
-                    fontWeight: 900,
-                    letterSpacing: "-0.08em",
-                    textShadow: "0 2px 10px rgba(0,0,0,0.16)",
-                  }}
-                >
-                  <span style={{ fontSize: "28px", lineHeight: 1 }}>T</span>
-                  <span style={{ fontSize: "30px", lineHeight: 1 }}>✓</span>
-                </div>
-              </div>
-
-              <div>
-               <div
-                 style={{
-                   fontSize: "12px",
-                   fontWeight: 800,
-                   letterSpacing: "0.22em",
-                   color: "#6366f1",
-                   textTransform: "uppercase",
-                   marginBottom: "6px",
-                 }}
-               >
-                 {currentTool.eyebrow}
-               </div>
-
-                <h1
-                  className="tc-title tc-shimmer"
-                  style={{
-                    margin: 0,
-                    fontSize: "76px",
-                    lineHeight: 0.92,
-                    letterSpacing: "-0.09em",
-                    fontWeight: 950,
-                    background:
-                      "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
-                    backgroundSize: "200% 200%",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  ToneCheck
-                </h1>
-              </div>
-            </div>
-
-            <p
-            style={{
-              margin: "10px 0 0 0",
-              maxWidth: "820px",
-              color: "#475569",
-              fontSize: "19px",
-              lineHeight: 1.7,
-            }}
-          >
-            {currentTool.description}
-          </p>
-          </div>
-               <div
-                 style={{
-                   marginTop: "22px",
-                   display: "flex",
-                   gap: "10px",
-                   flexWrap: "wrap",
-                 }}
-               >
-                 {currentTool.examples.map((example) => (
-                   <button
-                     key={example.label}
-                     className="tc-chip-hover"
-                     style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
-                     onClick={() => setExample(example.text)}
-                   >
-                     {example.label}
-                   </button>
-                 ))}
-               </div>
-
-          <div style={{ marginTop: "24px", position: "relative" }}>
-            <textarea
-              className="tc-textarea"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              placeholder={currentTool.placeholder}
-              style={{
-                width: "100%",
-                minHeight: "240px",
-                padding: "24px 24px 72px",
-                fontSize: "24px",
-                lineHeight: 1.6,
-                borderRadius: "28px",
-                background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
-                color: "#0f172a",
-                border: "1px solid rgba(99,102,241,0.10)",
-                boxSizing: "border-box",
-                outline: "none",
-                resize: "vertical",
-                boxShadow:
-                  "inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 34px rgba(15,23,42,0.04)",
-              }}
-            />
-
-            <div
-              style={{
-                position: "absolute",
-                right: "16px",
-                bottom: "16px",
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-              }}
-            >
-              <button
-                className="tc-button-hover"
-                onClick={() => {
-                  setMessage("");
-                  setResult(null);
-                  setCopyState("");
-                }}
-                style={actionButtonStyle}
-              >
-                Clear
-              </button>
-
-              <button
-                className="tc-button-hover"
-                onClick={analyze}
-                disabled={loading || !message.trim()}
-                style={{
-                  ...primaryButtonStyle,
-                  opacity: loading || !message.trim() ? 0.7 : 1,
-                }}
-              >
-                {loading ? "Analyzing..." : currentTool.analyzeLabel}
-              </button>
-            </div>
-          </div>
-
-          <div
-            style={{
-              marginTop: "14px",
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "12px",
-              flexWrap: "wrap",
-              color: "#64748b",
-              fontSize: "14px",
-            }}
-          >
-            <span>Private by default</span>
-            <span>Built by MangoMind Labs</span>
-          {location.pathname === "/" && <MiniToolGrid />}
-          </div>
-        </div>
-
-        {result?.error && (
-          <div
-            style={{
-              marginTop: "22px",
-              ...cardStyle,
-              background: "rgba(254,242,242,0.92)",
-              color: "#b91c1c",
-              fontWeight: 700,
-            }}
-          >
-            Error: {result.error}
-          </div>
-        )}
-
-        {result && !result.error && (
-          <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-            <div
-              className="tc-grid-main"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1.5fr 1fr",
-                gap: "20px",
-              }}
-            >
-              <div
-                id="tone-result-card"
-                className="tc-glow-card"
-                style={{
-                  ...cardStyle,
-                  padding: "26px",
-                  background: toneTheme.bg,
-                  border: `1px solid ${toneTheme.border}`,
-                  boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
-                  backgroundSize: "200% 200%",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: "14px",
+                    gap: "10px",
                     flexWrap: "wrap",
                   }}
                 >
-                  <div>
+                  <button
+                    className="tc-button-hover"
+                    onClick={() => {
+                      setMessage("");
+                      setResult(null);
+                      setCopyState("");
+                    }}
+                    style={actionButtonStyle}
+                  >
+                    Clear
+                  </button>
+
+                  <button
+                    className="tc-button-hover"
+                    onClick={analyze}
+                    disabled={loading || !message.trim()}
+                    style={{
+                      ...primaryButtonStyle,
+                      opacity: loading || !message.trim() ? 0.7 : 1,
+                    }}
+                  >
+                    {loading ? "Analyzing..." : currentTool.analyzeLabel}
+                  </button>
+                </div>
+              </div>
+
+              <div
+                style={{
+                  marginTop: "14px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "12px",
+                  flexWrap: "wrap",
+                  color: "#64748b",
+                  fontSize: "14px",
+                }}
+              >
+              </div>
+            {location.pathname === "/" && (
+              <div style={{ marginTop: "28px" }}>
+                <MiniToolGrid />
+              </div>
+            )}
+                          
+            </div>
+
+            {result?.error && (
+              <div
+                style={{
+                  marginTop: "22px",
+                  ...cardStyle,
+                  background: "rgba(254,242,242,0.92)",
+                  color: "#b91c1c",
+                  fontWeight: 700,
+                }}
+              >
+                Error: {result.error}
+              </div>
+            )}
+
+            {result && !result.error && (
+	      <>
+                <div
+                  style={{
+                    position: "absolute",
+                    left: "-99999px",
+                    top: 0,
+                    pointerEvents: "none",
+                    opacity: 0,
+                  }}
+                >
+                  <div
+                    id="tone-share-card"
+                    style={{
+                      width: "1080px",
+                      background:
+                        "linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #f5f3ff 100%)",
+                      padding: "40px",
+                      fontFamily:
+                        "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+                      color: "#0f172a",
+                    }}
+                  >
+                    <div
+                      style={{
+                        background: "rgba(255,255,255,0.92)",
+                        border: "1px solid rgba(255,255,255,0.82)",
+                        borderRadius: "32px",
+                        padding: "32px",
+                        boxShadow:
+                          "0 18px 46px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "flex-start",
+                          gap: "24px",
+                        }}
+                      >
+                        <div>
+                          <div
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: 800,
+                              letterSpacing: "0.18em",
+                              textTransform: "uppercase",
+                              color: "#6366f1",
+                            }}
+                          >
+                            ToneCheck Result
+                          </div>
+
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              fontSize: "44px",
+                              lineHeight: 1,
+                              fontWeight: 900,
+                              letterSpacing: "-0.06em",
+                              background:
+                                "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
+                              backgroundSize: "200% 200%",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }}
+                          >
+                            {location.pathname === "/" ? "ToneCheck" : currentTool.title}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            minWidth: "220px",
+                            borderRadius: "22px",
+                            padding: "16px 18px",
+                            background: toneTheme.chipBg,
+                            border: `1px solid ${toneTheme.border}`,
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              letterSpacing: "0.08em",
+                              color: "#64748b",
+                            }}
+                          >
+                            What’s Coming Through
+                          </div>
+                          <div
+                            style={{
+                              marginTop: "8px",
+                              fontSize: "24px",
+                              fontWeight: 800,
+                              color: toneTheme.chipText,
+                            }}
+                          >
+                            {primaryHiddenSignalLabel}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "26px",
+                          borderRadius: "24px",
+                          padding: "22px",
+                          background: "rgba(255,255,255,0.84)",
+                          border: "1px solid rgba(15,23,42,0.06)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            letterSpacing: "0.08em",
+                            color: "#64748b",
+                          }}
+                        >
+                          MESSAGE
+                        </div>
+                        <div
+                          style={{
+                            marginTop: "10px",
+                            fontSize: "28px",
+                            lineHeight: 1.6,
+                            color: "#111827",
+                            whiteSpace: "pre-wrap",
+                          }}
+                        >
+                          {getClampedMessage(message, 220)}
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "22px",
+                          display: "grid",
+                          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                          gap: "16px",
+                        }}
+                      >
+                        <div
+                          style={{
+                            borderRadius: "22px",
+                            padding: "18px",
+                            background: "rgba(255,255,255,0.84)",
+                            border: "1px solid rgba(15,23,42,0.06)",
+                          }}
+                        >
+                          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                            Tone
+                          </div>
+                          <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                            {getToneEmoji()} {getToneLabel()}
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            borderRadius: "22px",
+                            padding: "18px",
+                            background: "rgba(255,255,255,0.84)",
+                            border: "1px solid rgba(15,23,42,0.06)",
+                          }}
+                        >
+                          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                            Overall Risk
+                          </div>
+                          <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                            {riskScore}/100
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            borderRadius: "22px",
+                            padding: "18px",
+                            background: "rgba(255,255,255,0.84)",
+                            border: "1px solid rgba(15,23,42,0.06)",
+                          }}
+                        >
+                          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+                            Verdict
+                          </div>
+                          <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
+                            {sendVerdict.emoji} {sendVerdict.label}
+                          </div>
+                        </div>
+                      </div>
+
+                      {finalRewrite ? (
+                        <div
+                          style={{
+                            marginTop: "22px",
+                            borderRadius: "24px",
+                            padding: "22px",
+                            background:
+                              "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                            border: "1px solid rgba(251,146,60,0.18)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              letterSpacing: "0.08em",
+                              color: "#9a3412",
+                            }}
+                          >
+                            BETTER VERSION
+                          </div>
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              fontSize: "26px",
+                              lineHeight: 1.7,
+                              color: "#111827",
+                              whiteSpace: "pre-wrap",
+                            }}
+                          >
+                            {finalRewrite}
+                          </div>
+                        </div>
+                      ) : null}
+
+                      <div
+                        style={{
+                          marginTop: "28px",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          gap: "16px",
+                        }}
+                      >
+                        <div style={{ color: "#64748b", fontSize: "18px" }}>
+                          Check yours at trytonecheck.com
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "22px",
+                            fontWeight: 900,
+                            letterSpacing: "-0.04em",
+                            color: "#312e81",
+                          }}
+                        >
+                          T✓ ToneCheck
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
+  			<ToneSummaryCard
+    				cardStyle={cardStyle}
+   				 toneTheme={toneTheme}
+   				 getToneLabel={getToneLabel}
+    				getToneEmoji={getToneEmoji}
+   				 riskScore={riskScore}
+   				 sendVerdict={sendVerdict}
+    				primaryHiddenSignalLabel={primaryHiddenSignalLabel}
+    				getMeterWidth={getMeterWidth}
+    				getMeterColor={getMeterColor}
+    				getToneAccent={getToneAccent}
+  				/>
+        
+
+                  {finalRewrite && (
+                    <div
+                      style={{
+                        ...cardStyle,
+                        background:
+                          "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.98) 55%, rgba(255,237,213,0.92) 100%)",
+                        border: "1px solid rgba(251,146,60,0.28)",
+                        boxShadow:
+                          "0 18px 44px rgba(251,146,60,0.14), 0 1px 0 rgba(255,255,255,0.82) inset",
+                        padding: "30px",
+                        position: "relative",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          height: "6px",
+                          background: "linear-gradient(90deg, #fb923c, #f59e0b, #f97316)",
+                          opacity: 0.95,
+                        }}
+                      />
+
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: "#9a3412",
+                          fontWeight: 900,
+                          letterSpacing: "0.1em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        ✨ Better Version
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "8px",
+                          color: "#7c2d12",
+                          fontSize: "15px",
+                          lineHeight: 1.6,
+                          maxWidth: "780px",
+                        }}
+                      >
+                        This version keeps your meaning, but is more likely to land well.
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "16px",
+                          padding: "14px",
+                          borderRadius: "12px",
+                          background: "rgba(34,197,94,0.08)",
+                          border: "1px solid rgba(34,197,94,0.18)",
+                          display: "flex",
+                          gap: "18px",
+                          flexWrap: "wrap",
+                          fontSize: "14px",
+                          fontWeight: 700,
+                        }}
+                      >
+                        <span>Your message risk: {riskScore}</span>
+                        <span>Rewrite risk: {rewriteRiskScore}</span>
+                        <span style={{ color: "#15803d", fontWeight: 800 }}>
+                        ↑ {riskImprovement} points safer
+                      </span>
+                      </div>
+
+                      <div style={{ marginTop: "14px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+                        <button
+                          onClick={() => setRewriteTone("default")}
+                          style={{
+                            ...chipStyle,
+                            background: rewriteTone === "default" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
+                            color: rewriteTone === "default" ? "#4338ca" : "#111827",
+                          }}
+                        >
+                          Default
+                        </button>
+                        <button
+                          onClick={() => setRewriteTone("calmer")}
+                          style={{
+                            ...chipStyle,
+                            background: rewriteTone === "calmer" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
+                            color: rewriteTone === "calmer" ? "#4338ca" : "#111827",
+                          }}
+                        >
+                          Calmer
+                        </button>
+                        <button
+                          onClick={() => setRewriteTone("professional")}
+                          style={{
+                            ...chipStyle,
+                            background: rewriteTone === "professional" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
+                            color: rewriteTone === "professional" ? "#4338ca" : "#111827",
+                          }}
+                        >
+                          Professional
+                        </button>
+                        <button
+                          onClick={() => setRewriteTone("friendlier")}
+                          style={{
+                            ...chipStyle,
+                            background: rewriteTone === "friendlier" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
+                            color: rewriteTone === "friendlier" ? "#4338ca" : "#111827",
+                          }}
+                        >
+                          Friendlier
+                        </button>
+                        <button
+                          onClick={() => setRewriteTone("direct")}
+                          style={{
+                            ...chipStyle,
+                            background: rewriteTone === "direct" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
+                            color: rewriteTone === "direct" ? "#4338ca" : "#111827",
+                          }}
+                        >
+                          Direct
+                        </button>
+                      </div>
+
+                      <div style={{ marginTop: "20px", display: "grid", gap: "16px" }}>
+                        <div
+                          style={{
+                            padding: "16px",
+                            borderRadius: "14px",
+                            background: "rgba(248,250,252,0.9)",
+                            border: "1px solid rgba(15,23,42,0.06)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              letterSpacing: "0.06em",
+                              color: "#64748b",
+                            }}
+                          >
+                            YOUR MESSAGE
+                          </div>
+
+                          <div
+                            style={{
+                              marginTop: "8px",
+                              fontSize: "18px",
+                              lineHeight: 1.6,
+                              color: "#111827",
+                              whiteSpace: "pre-wrap",
+                            }}
+                          >
+                            "{message}"
+                          </div>
+                        </div>
+
+                        <div
+                          style={{
+                            padding: "18px",
+                            borderRadius: "14px",
+                            background: "rgba(255,255,255,0.95)",
+                            border: "1px solid rgba(251,146,60,0.25)",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              letterSpacing: "0.06em",
+                              color: "#9a3412",
+                            }}
+                          >
+                            BETTER VERSION
+                          </div>
+
+                          <div
+                            style={{
+                              marginTop: "10px",
+                              fontSize: "22px",
+                              lineHeight: 1.7,
+                              fontWeight: 700,
+                              color: "#111827",
+                              whiteSpace: "pre-wrap",
+                            }}
+                          >
+                            "{finalRewrite}"
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          fontSize: "15px",
+                          color: "#64748b",
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        Messages like this usually receive better responses because they reduce pressure and sound calmer.
+                      </div>
+
+                      <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
+
+                          <button
+                        onClick={() =>
+                          window.open(
+                            `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
+                            "_blank"
+                          )
+                        }
+                        className="tc-button-hover"
+                        style={{
+                          padding: "16px 22px",
+                          borderRadius: "18px",
+                          border: "1px solid rgba(255,255,255,0.28)",
+                          cursor: "pointer",
+                          fontWeight: 800,
+                          fontSize: "15px",
+                          color: "#ffffff",
+                          background:
+                            "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
+                          boxShadow:
+                            "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
+                        }}
+                      >
+                        Send via WhatsApp
+                      </button>
+
+
+
+                        
+                        <button
+                            onClick={copyRewriteOnly}
+                            className="tc-button-hover"
+                            style={{
+                              ...actionButtonStyle,
+                              background: "rgba(255,255,255,0.9)",
+                              border: "1px solid rgba(15,23,42,0.12)",
+                              color: "#111827",
+                            }}
+                          >
+                            ✍️ Copy rewrite
+                          </button>
+                        
+                       <button
+                        onClick={useRewriteMessage}
+                        className="tc-button-hover"
+                        style={{
+                          padding: "16px 22px",
+                          borderRadius: "18px",
+                          border: "1px solid rgba(255,255,255,0.28)",
+                          cursor: "pointer",
+                          fontWeight: 900,
+                          fontSize: "15px",
+                          color: "#ffffff",
+                          background:
+                            "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
+                          boxShadow:
+                            "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
+                        }}
+                      >
+                        ✏️ Use This Message
+                      </button>
+
+                        
+                      
+
+                        {copyState && (
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              fontWeight: 700,
+                              color: "#2563eb",
+                            }}
+                          >
+                            ✓ {copyState}
+                          </div>
+                        )}
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "18px",
+                          paddingTop: "14px",
+                          borderTop: "1px solid rgba(15,23,42,0.06)",
+                          fontSize: "14px",
+                          color: "#64748b",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          flexWrap: "wrap",
+                          gap: "8px",
+                        }}
+                      >
+                 
+                        <span style={{ fontWeight: 700, color: "#4338ca" }}>
+                          trytonecheck.com
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  <div
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))",
+                      gap: "16px",
+                    }}
+                  >
+                    <StatsRow
+  			replyLikelihood={replyLikelihood}
+ 			 regretRisk={regretRisk}
+  			manipulationRisk={manipulationRisk}
+  			statExplanations={STAT_EXPLANATIONS}
+		      />
+                  </div>
+
+                  {Array.isArray(result.top_manipulation_signals) &&
+                    result.top_manipulation_signals.length > 0 && (
+                      <div style={cardStyle}>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "#64748b",
+                            fontWeight: 800,
+                            letterSpacing: "0.08em",
+                          }}
+                        >
+                          DETECTED SIGNALS
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: "14px",
+                            display: "flex",
+                            flexWrap: "wrap",
+                            gap: "10px",
+                          }}
+                        >
+                          {result.top_manipulation_signals.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="tc-chip-hover"
+                              style={{
+                                padding: "10px 14px",
+                                borderRadius: "999px",
+                                background: "rgba(99,102,241,0.08)",
+                                color: "#4338ca",
+                                fontWeight: 700,
+                                fontSize: "14px",
+                                border: "1px solid rgba(99,102,241,0.12)",
+                              }}
+                            >
+                              {getHiddenSignalLabel(item.name)} · {item.score}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  {result.advisory && (
+                    <div style={cardStyle}>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          color: "#64748b",
+                          fontWeight: 800,
+                          letterSpacing: "0.08em",
+                        }}
+                      >
+                        💡 Why This Matters
+                      </div>
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          lineHeight: 1.8,
+                          fontSize: "18px",
+                          color: "#111827",
+                        }}
+                      >
+                        {result.advisory}
+                      </div>
+                    </div>
+                  )}
+
+                  <div style={cardStyle}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "14px",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "#64748b",
+                            fontWeight: 800,
+                            letterSpacing: "0.08em",
+                          }}
+                        >
+                          Share ToneCheck Result
+                        </div>
+                        <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
+                          Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
+                        </div>
+                      </div>
+
+                      <div
+                        style={{
+                          color: copyState ? "#2563eb" : "#64748b",
+                          fontWeight: 700,
+                          fontSize: "14px",
+                          minHeight: "20px",
+                        }}
+                      >
+                        {copyState}
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        marginTop: "18px",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        gap: "12px",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <ShareButton 
+                        onClick={shareWhatsApp} 
+                        label="WhatsApp" 
+                        icon={<img src="/whatsapp.svg" alt="" style={{ width: 18, height: 18, display: "block"}} />}
+                        />
+                      <button
+                        className="tc-button-hover"
+                        onClick={copyResult}
+                        style={actionButtonStyle}
+                      >
+                        📋 Copy result
+                      </button>
+                       <ShareButton 
+                        onClick={shareFacebook} 
+                        label="Facebook" 
+                        icon={<img src="/facebook.svg" alt="" style={{ width: 18, height: 18,  display: "block" }} />}
+                        />
+                      <ShareButton onClick={shareX} label="X" icon="𝕏" />
+                    <ShareButton 
+                        onClick={shareLinkedIn} 
+                        label="LinkedIn" 
+                        icon={<img src="/linkedin.svg" alt="" style={{ width: 18, height: 18,  display: "block" }} />}
+                        />
+                      <button
+                        className="tc-button-hover"
+                        onClick={downloadCard}
+                        style={primaryButtonStyle}
+                      >
+                        📸 Download Share Card
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      ...cardStyle,
+                      textAlign: "center",
+                      background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,242,255,0.94))",
+                      border: "1px solid rgba(99,102,241,0.14)",
+                    }}
+                  >
                     <div
                       style={{
                         fontSize: "13px",
@@ -1125,708 +2170,56 @@ https://trytonecheck.com`;
                         letterSpacing: "0.08em",
                       }}
                     >
-                      TONE SUMMARY
+                      TRY YOUR MESSAGE
                     </div>
 
                     <div
                       style={{
                         marginTop: "10px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
+                        fontSize: "18px",
+                        color: "#111827",
+                        fontWeight: 700,
                       }}
                     >
-                      <div
-                        style={{
-                          width: "62px",
-                          height: "62px",
-                          borderRadius: "20px",
-                          display: "grid",
-                          placeItems: "center",
-                          background: toneTheme.iconBg,
-                          border: `1px solid ${toneTheme.border}`,
-                          fontSize: "30px",
-                          boxShadow: `0 10px 28px ${toneTheme.glow}`,
-                        }}
-                      >
-                        <span
-                          className="tc-tone-emoji"
-                          style={{ animationName: toneTheme.animation, display: "inline-block" }}
-                        >
-                          {toneTheme.emoji}
-                        </span>
-                      </div>
-
-                      <div>
-                        <div
-                          style={{
-                            fontSize: "34px",
-                            fontWeight: 850,
-                            letterSpacing: "-0.04em",
-                            color: "#111827",
-                          }}
-                        >
-                          {getToneLabel()}
-                        </div>
-                        <div style={{ marginTop: "4px", color: "#64748b", fontSize: "15px" }}>
-                          {result?.advisory || "Analysis complete"}
-                        </div>
-                      </div>
+                      Paste another message and see how it sounds.
                     </div>
-                  </div>
 
-                  <div
-                    style={{
-                      minWidth: "180px",
-                      padding: "14px 16px",
-                      borderRadius: "22px",
-                      background: toneTheme.chipBg,
-                      border: `1px solid ${toneTheme.border}`,
-                    }}
-                  >
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 800,
-                        color: "#64748b",
-                        letterSpacing: "0.08em",
-                      }}
-                    >
-                      What’s Coming Through
-                    </div>
                     <div
                       style={{
                         marginTop: "8px",
-                        fontSize: "19px",
-                        fontWeight: 750,
-                        color: toneTheme.chipText,
-                      }}
-                    >
-                      {primaryHiddenSignalLabel}
-                    </div>
-                    <div
-                      style={{
-                        marginTop: "4px",
-                        fontSize: "12px",
                         color: "#64748b",
+                        fontSize: "14px",
+                        lineHeight: 1.6,
                       }}
                     >
-                      The strongest underlying feeling detected in the message.
+                      Great for texts, emails, Slack messages, and difficult conversations.
                     </div>
-                  </div>
-                </div>
 
-                <div style={{ marginTop: "22px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: "10px",
-                      color: "#475569",
-                      fontSize: "14px",
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span>Overall Risk</span>
-                    <span>{riskScore}/100</span>
-                  </div>
-
-                  <div
-                    style={{
-                      width: "100%",
-                      height: "18px",
-                      background:
-                        "linear-gradient(180deg, rgba(226,232,240,0.78), rgba(241,245,249,0.9))",
-                      borderRadius: "999px",
-                      overflow: "hidden",
-                      boxShadow: "inset 0 2px 6px rgba(15,23,42,0.06)",
-                    }}
-                  >
-                    <div
-                      className="tc-shimmer"
-                      style={{
-                        width: getMeterWidth(riskScore),
-                        height: "100%",
-                        background: getMeterColor(riskScore),
-                        boxShadow: `0 0 26px ${getToneAccent(riskScore)}66`,
-                        transition: "width 0.4s ease",
-                        borderRadius: "999px",
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "12px",
-                      display: "flex",
-                      gap: "10px",
-                      flexWrap: "wrap",
-                    }}
-                  >
-                    <MiniTag label={`Risk: ${result?.risk_level || getRiskBand(riskScore)}`} />
-                    <MiniTag label={`Reply chance: ${replyLikelihood}%`} />
-                    <MiniTag label={`Regret chance: ${regretRisk}%`} />
-                  </div>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  ...cardStyle,
-                  padding: "24px",
-                  border: "1px solid rgba(56,189,248,0.14)",
-                  boxShadow:
-                    "0 12px 34px rgba(56,189,248,0.07), 0 1px 0 rgba(255,255,255,0.7) inset",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#64748b",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  QUICK STATS
-                </div>
-
-              <div style={{ marginTop: "16px", display: "grid", gap: "14px" }}>
-  {filterVisibleStatsByMode(currentTool.resultMode, result).map((item) => (
-    <MetricCard
-      key={item.label}
-      label={item.label}
-      value={item.value}
-      accent={item.accent}
-      explanation={item.explanation}
-    />
-  ))}
-</div>
-              </div>
-            </div>
-
-            {Array.isArray(result.top_manipulation_signals) &&
-              result.top_manipulation_signals.length > 0 && (
-                <div style={cardStyle}>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "#64748b",
-                      fontWeight: 800,
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    DETECTED SIGNALS
-                  </div>
-
-                  <div
-                    style={{
-                      marginTop: "14px",
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "10px",
-                    }}
-                  >
-                    {result.top_manipulation_signals.map((item, idx) => (
-                      <div
-                        key={idx}
-                        className="tc-chip-hover"
-                        style={{
-                          padding: "10px 14px",
-                          borderRadius: "999px",
-                          background: "rgba(99,102,241,0.08)",
-                          color: "#4338ca",
-                          fontWeight: 700,
-                          fontSize: "14px",
-                          border: "1px solid rgba(99,102,241,0.12)",
+                    <div style={{ marginTop: "16px" }}>
+                      <button
+                        className="tc-button-hover"
+                        onClick={() => {
+                          setResult(null);
+                          setCopyState("");
+                          setRewriteTone("default");
+                          setTimeout(() => {
+                            const textarea = document.querySelector(".tc-textarea");
+                            if (textarea) textarea.focus();
+                          }, 50);
                         }}
+                        style={primaryButtonStyle}
                       >
-                        {getHiddenSignalLabel(item.name)} · {item.score}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {displayedRewrite && (
-              <div
-                style={{
-                  ...cardStyle,
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-                  transition: "all 0.25s ease",
-                  border: "1px solid rgba(251,146,60,0.22)",
-                  boxShadow:
-                    "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.75) inset",
-                  padding: "26px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: "14px",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div>
-                    <div
-                      className="tc-rewrite"
-                      style={{
-                        fontSize: "13px",
-                        color: "#9a3412",
-                        fontWeight: 800,
-                        letterSpacing: "0.08em",
-                      }}
-                    >
-                      ✍️ SUGGESTED REWRITE
-                    </div>
-                    <div style={{ marginTop: "6px", color: "#7c2d12", fontSize: "14px" }}>
-                      A calmer version that keeps the core intent.
+                        ✨ Try Another Message
+                      </button>
                     </div>
                   </div>
 
-                  <button
-                    className="tc-button-hover"
-                    onClick={copyRewriteOnly}
-                    style={actionButtonStyle}
-                  >
-                    ✍️ Copy Rewrite
-                  </button>
+                  {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
                 </div>
-
-                <div
-                  style={{
-                    marginTop: "16px",
-                    fontSize: "22px",
-                    lineHeight: 1.8,
-                    color: "#111827",
-                    fontWeight: 650,
-                  }}
-                >
-                  {displayedRewrite}
-                </div>
-              </div>
             )}
-
-           {(currentTool.resultMode === "send_decision" || currentTool.resultMode === "default") && (
-  <div
-    style={{
-      ...cardStyle,
-      background: sendVerdict.bg,
-      border: `1px solid ${sendVerdict.border}`,
-    }}
-  >
-    <div
-      style={{
-        fontSize: "13px",
-        color: "#64748b",
-        fontWeight: 800,
-        letterSpacing: "0.08em",
-      }}
-    >
-      SHOULD YOU SEND THIS?
-    </div>
-
-    <div
-      style={{
-        marginTop: "12px",
-        display: "flex",
-        alignItems: "center",
-        gap: "12px",
-        flexWrap: "wrap",
-      }}
-    >
-      <div style={{ fontSize: "28px" }}>{sendVerdict.emoji}</div>
-
-      <div>
-        <div
-          style={{
-            fontSize: "26px",
-            fontWeight: 850,
-            color: sendVerdict.color,
-            letterSpacing: "-0.03em",
-          }}
-        >
-          {sendVerdict.label}
+          </div>
         </div>
-
-        <div
-          style={{
-            marginTop: "4px",
-            fontSize: "14px",
-            color: "#475569",
-            lineHeight: 1.5,
-          }}
-        >
-          {sendVerdict.text}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-            {result.advisory && (
-              <div style={cardStyle}>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: "#64748b",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  💡 Why This Matters
-                </div>
-                <div
-                  style={{
-                    marginTop: "12px",
-                    lineHeight: 1.8,
-                    fontSize: "18px",
-                    color: "#111827",
-                  }}
-                >
-                  {result.advisory}
-                </div>
-              </div>
-            )}
-
-            <div style={cardStyle}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "14px",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div>
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      color: "#64748b",
-                      fontWeight: 800,
-                      letterSpacing: "0.08em",
-                    }}
-                  >
-                    Share ToneCheck Result
-                  </div>
-                  <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
-                    Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    color: copyState ? "#2563eb" : "#64748b",
-                    fontWeight: 700,
-                    fontSize: "14px",
-                    minHeight: "20px",
-                  }}
-                >
-                  {copyState}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "18px",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <ShareButton onClick={shareWhatsApp} label="WhatsApp" icon="📱" />
-                <ShareButton onClick={shareFacebook} label="Facebook" icon="f" />
-                <ShareButton onClick={shareX} label="X" icon="𝕏" />
-                <ShareButton onClick={shareLinkedIn} label="LinkedIn" icon="in" />
-                <button
-                  className="tc-button-hover"
-                  onClick={downloadCard}
-                  style={primaryButtonStyle}
-                >
-                  📸 Download Share Card
-                </button>
-              </div>
-            </div>
-
-            <div
-              style={{
-                ...cardStyle,
-                textAlign: "center",
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,242,255,0.94))",
-                border: "1px solid rgba(99,102,241,0.14)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "13px",
-                  color: "#64748b",
-                  fontWeight: 800,
-                  letterSpacing: "0.08em",
-                }}
-              >
-                TRY YOUR MESSAGE
-              </div>
-
-              <div
-                style={{
-                  marginTop: "10px",
-                  fontSize: "18px",
-                  color: "#111827",
-                  fontWeight: 700,
-                }}
-              >
-                Paste another message and see how it sounds.
-              </div>
-
-              <div
-                style={{
-                  marginTop: "8px",
-                  color: "#64748b",
-                  fontSize: "14px",
-                  lineHeight: 1.6,
-                }}
-              >
-                Great for texts, emails, Slack messages, and difficult conversations.
-              </div>
-
-              <div style={{ marginTop: "16px" }}>
-                <button
-                  className="tc-button-hover"
-                  onClick={() => {
-                    setResult(null);
-                    setCopyState("");
-                    setTimeout(() => {
-                      const textarea = document.querySelector(".tc-textarea");
-                      if (textarea) textarea.focus();
-                    }, 50);
-                  }}
-                  style={primaryButtonStyle}
-                >
-                  ✨ Try Another Message
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
   );
-}
-
-
-function MiniToolGrid() {
-  const tools = Object.values(MINI_TOOLS).filter((tool) => tool.slug !== "home");
-
-  return (
-    <div
-      style={{
-        marginTop: "22px",
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-        gap: "16px",
-      }}
-    >
-      {tools.map((tool) => (
-        <Link
-          key={tool.slug}
-          to={`/tools/${tool.slug}`}
-          style={{
-            textDecoration: "none",
-            background: "rgba(255,255,255,0.74)",
-            backdropFilter: "blur(18px)",
-            WebkitBackdropFilter: "blur(18px)",
-            border: "1px solid rgba(255,255,255,0.7)",
-            borderRadius: "24px",
-            padding: "20px",
-            boxShadow: "0 10px 30px rgba(15,23,42,0.05)",
-            color: "#0f172a",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              color: "#6366f1",
-              textTransform: "uppercase",
-            }}
-          >
-            {tool.eyebrow}
-          </div>
-
-          <div
-            style={{
-              marginTop: "10px",
-              fontSize: "22px",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {tool.title}
-          </div>
-
-          <div
-            style={{
-              marginTop: "8px",
-              color: "#475569",
-              fontSize: "14px",
-              lineHeight: 1.6,
-            }}
-          >
-            {tool.description}
-          </div>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-
-function MetricCard({ label, value, accent, explanation }) {
-  const [showTip, setShowTip] = React.useState(false);
-
-  return (
-    <div
-      className="tc-chip-hover"
-      style={{
-        padding: "16px 18px",
-        borderRadius: "20px",
-        background: "rgba(255,255,255,0.85)",
-        border: "1px solid rgba(15,23,42,0.05)",
-        boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
-        position: "relative",
-      }}
-    >
-      <div
-        style={{
-          fontSize: "13px",
-          color: "#64748b",
-          fontWeight: 700,
-          display: "flex",
-          alignItems: "center",
-          gap: "6px",
-        }}
-      >
-        <span>{label}</span>
-
-        <span
-          onMouseEnter={() => setShowTip(true)}
-          onMouseLeave={() => setShowTip(false)}
-          style={{
-            fontSize: "12px",
-            cursor: "help",
-            opacity: 0.65,
-            userSelect: "none",
-          }}
-        >
-          ⓘ
-        </span>
-      </div>
-
-      <div
-        style={{
-          marginTop: "8px",
-          fontSize: "28px",
-          fontWeight: 850,
-          letterSpacing: "-0.04em",
-          color: accent,
-        }}
-      >
-        {value}
-      </div>
-
-      {showTip && (
-        <div
-          style={{
-            position: "absolute",
-            top: "8px",
-            right: "10px",
-            transform: "translateY(-100%)",
-            background: "rgba(15,23,42,0.96)",
-            color: "#fff",
-            fontSize: "12px",
-            lineHeight: 1.45,
-            padding: "10px 12px",
-            borderRadius: "12px",
-            width: "210px",
-            boxShadow: "0 14px 34px rgba(0,0,0,0.18)",
-            zIndex: 20,
-          }}
-        >
-          {explanation}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function MiniTag({ label }) {
-  return (
-    <div
-      className="tc-chip-hover"
-      style={{
-        padding: "10px 14px",
-        borderRadius: "999px",
-        background: "rgba(255,255,255,0.85)",
-        border: "1px solid rgba(15,23,42,0.06)",
-        color: "#334155",
-        fontWeight: 700,
-        fontSize: "13px",
-      }}
-    >
-      {label}
-    </div>
-  );
-}
-
-function ShareButton({ onClick, label, icon }) {
-  return (
-    <button
-      className="tc-chip-hover"
-      onClick={onClick}
-      title={label}
-      style={{
-        minWidth: "112px",
-        height: "52px",
-        border: "1px solid rgba(15,23,42,0.06)",
-        borderRadius: "18px",
-        cursor: "pointer",
-        fontSize: "15px",
-        fontWeight: 800,
-        color: "#111827",
-        background: "rgba(255,255,255,0.82)",
-        boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
-      }}
-    >
-      <span style={{ marginRight: "8px" }}>{icon}</span>
-      {label}
-    </button>
-  );
-}
-
-function escapeHtml(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function RedirectHome() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate("/");
-  }, [navigate]);
-
-  return null;
 }
 
 export default function App() {
@@ -1834,6 +2227,11 @@ export default function App() {
     <Routes>
       <Route path="/" element={<AppContent />} />
       <Route path="/tools/:slug" element={<AppContent />} />
+      <Route path="/should-i-send-this" element={<AppContent />} />
+      <Route path="/passive-aggressive-text" element={<AppContent />} />
+      <Route path="/manipulative-text-checker" element={<AppContent />} />
+      <Route path="/is-this-message-rude" element={<AppContent />} />
+      <Route path="/desperate-text-checker" element={<AppContent />} />
       <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
