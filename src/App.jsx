@@ -4,6 +4,9 @@ import * as htmlToImage from "html-to-image";
 import { Helmet } from "react-helmet-async";
 import { ToneSummaryCard, StatsRow } from "./components/results";
 import ShareButton from "./components/common/ShareButton";
+import RewriteCard from "./components/results/RewriteCard";
+import DetectedSignals from "./components/results/DetectedSignals";
+import AdvisoryCard from "./components/results/AdvisoryCard";
 
 const STAT_EXPLANATIONS = {
   risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
@@ -1683,282 +1686,24 @@ https://trytonecheck.com`;
                     getMeterColor={getMeterColor}
                     getToneAccent={getToneAccent}
                   />
-
-                  {finalRewrite && (
-                    <div
-                      style={{
-                        ...cardStyle,
-                        background:
-                          "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.98) 55%, rgba(255,237,213,0.92) 100%)",
-                        border: "1px solid rgba(251,146,60,0.28)",
-                        boxShadow:
-                          "0 18px 44px rgba(251,146,60,0.14), 0 1px 0 rgba(255,255,255,0.82) inset",
-                        padding: "30px",
-                        position: "relative",
-                        overflow: "hidden",
-                      }}
-                    >
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: "6px",
-                          background: "linear-gradient(90deg, #fb923c, #f59e0b, #f97316)",
-                          opacity: 0.95,
-                        }}
-                      />
-
-                      <div
-                        style={{
-                          fontSize: "13px",
-                          color: "#9a3412",
-                          fontWeight: 900,
-                          letterSpacing: "0.1em",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        ✨ Better Version
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: "8px",
-                          color: "#7c2d12",
-                          fontSize: "15px",
-                          lineHeight: 1.6,
-                          maxWidth: "780px",
-                        }}
-                      >
-                        This version keeps your meaning, but is more likely to land well.
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: "16px",
-                          padding: "14px",
-                          borderRadius: "12px",
-                          background: "rgba(34,197,94,0.08)",
-                          border: "1px solid rgba(34,197,94,0.18)",
-                          display: "flex",
-                          gap: "18px",
-                          flexWrap: "wrap",
-                          fontSize: "14px",
-                          fontWeight: 700,
-                        }}
-                      >
-                        <span>Your message risk: {riskScore}</span>
-                        <span>Rewrite risk: {rewriteRiskScore}</span>
-                        <span style={{ color: "#15803d", fontWeight: 800 }}>
-                          ↑ {riskImprovement} points safer
-                        </span>
-                      </div>
-
-                      <div style={{ marginTop: "14px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                        <button
-                          onClick={() => setRewriteTone("default")}
-                          style={{
-                            ...chipStyle,
-                            background: rewriteTone === "default" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
-                            color: rewriteTone === "default" ? "#4338ca" : "#111827",
-                          }}
-                        >
-                          Default
-                        </button>
-                        <button
-                          onClick={() => setRewriteTone("calmer")}
-                          style={{
-                            ...chipStyle,
-                            background: rewriteTone === "calmer" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
-                            color: rewriteTone === "calmer" ? "#4338ca" : "#111827",
-                          }}
-                        >
-                          Calmer
-                        </button>
-                        <button
-                          onClick={() => setRewriteTone("professional")}
-                          style={{
-                            ...chipStyle,
-                            background: rewriteTone === "professional" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
-                            color: rewriteTone === "professional" ? "#4338ca" : "#111827",
-                          }}
-                        >
-                          Professional
-                        </button>
-                        <button
-                          onClick={() => setRewriteTone("friendlier")}
-                          style={{
-                            ...chipStyle,
-                            background: rewriteTone === "friendlier" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
-                            color: rewriteTone === "friendlier" ? "#4338ca" : "#111827",
-                          }}
-                        >
-                          Friendlier
-                        </button>
-                        <button
-                          onClick={() => setRewriteTone("direct")}
-                          style={{
-                            ...chipStyle,
-                            background: rewriteTone === "direct" ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.8)",
-                            color: rewriteTone === "direct" ? "#4338ca" : "#111827",
-                          }}
-                        >
-                          Direct
-                        </button>
-                      </div>
-
-                      <div style={{ marginTop: "20px", display: "grid", gap: "16px" }}>
-                        <div
-                          style={{
-                            padding: "16px",
-                            borderRadius: "14px",
-                            background: "rgba(248,250,252,0.9)",
-                            border: "1px solid rgba(15,23,42,0.06)",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 800,
-                              letterSpacing: "0.06em",
-                              color: "#64748b",
-                            }}
-                          >
-                            YOUR MESSAGE
-                          </div>
-
-                          <div
-                            style={{
-                              marginTop: "8px",
-                              fontSize: "18px",
-                              lineHeight: 1.6,
-                              color: "#111827",
-                              whiteSpace: "pre-wrap",
-                            }}
-                          >
-                            "{message}"
-                          </div>
-                        </div>
-
-                        <div
-                          style={{
-                            padding: "18px",
-                            borderRadius: "14px",
-                            background: "rgba(255,255,255,0.95)",
-                            border: "1px solid rgba(251,146,60,0.25)",
-                          }}
-                        >
-                          <div
-                            style={{
-                              fontSize: "12px",
-                              fontWeight: 800,
-                              letterSpacing: "0.06em",
-                              color: "#9a3412",
-                            }}
-                          >
-                            BETTER VERSION
-                          </div>
-
-                          <div
-                            style={{
-                              marginTop: "10px",
-                              fontSize: "22px",
-                              lineHeight: 1.7,
-                              fontWeight: 700,
-                              color: "#111827",
-                              whiteSpace: "pre-wrap",
-                            }}
-                          >
-                            "{finalRewrite}"
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: "12px",
-                          fontSize: "15px",
-                          color: "#64748b",
-                          lineHeight: 1.6,
-                        }}
-                      >
-                        Messages like this usually receive better responses because they reduce pressure and sound calmer.
-                      </div>
-
-                      <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-                        <button
-                          onClick={() =>
-                            window.open(
-                              `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
-                              "_blank"
-                            )
-                          }
-                          className="tc-button-hover"
-                          style={{
-                            padding: "16px 22px",
-                            borderRadius: "18px",
-                            border: "1px solid rgba(255,255,255,0.28)",
-                            cursor: "pointer",
-                            fontWeight: 800,
-                            fontSize: "15px",
-                            color: "#ffffff",
-                            background:
-                              "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
-                            boxShadow:
-                              "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
-                          }}
-                        >
-                          Send via WhatsApp
-                        </button>
-
-                        <button
-                          onClick={copyRewriteOnly}
-                          className="tc-button-hover"
-                          style={{
-                            ...actionButtonStyle,
-                            background: "rgba(255,255,255,0.9)",
-                            border: "1px solid rgba(15,23,42,0.12)",
-                            color: "#111827",
-                          }}
-                        >
-                          ✍️ Copy rewrite
-                        </button>
-
-                        <button
-                          onClick={useRewriteMessage}
-                          className="tc-button-hover"
-                          style={{
-                            padding: "16px 22px",
-                            borderRadius: "18px",
-                            border: "1px solid rgba(255,255,255,0.28)",
-                            cursor: "pointer",
-                            fontWeight: 900,
-                            fontSize: "15px",
-                            color: "#ffffff",
-                            background:
-                              "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
-                            boxShadow:
-                              "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
-                          }}
-                        >
-                          ✏️ Use This Message
-                        </button>
-
-                        {copyState && (
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              fontWeight: 700,
-                              color: "#2563eb",
-                            }}
-                          >
-                            ✓ {copyState}
-                          </div>
-                        )}
-                      </div>
-
+                {finalRewrite && (
+                    <RewriteCard
+                      cardStyle={cardStyle}
+                      chipStyle={chipStyle}
+                      message={message}
+                      finalRewrite={finalRewrite}
+                      riskScore={riskScore}
+                      rewriteRiskScore={rewriteRiskScore}
+                      riskImprovement={riskImprovement}
+                      rewriteTone={rewriteTone}
+                      setRewriteTone={setRewriteTone}
+                      copyRewriteOnly={copyRewriteOnly}
+                      useRewriteMessage={useRewriteMessage}
+                      copyState={copyState}
+                    />
+      )}
+              
+               
                       <div
                         style={{
                           marginTop: "18px",
@@ -1977,7 +1722,7 @@ https://trytonecheck.com`;
                         </span>
                       </div>
                     </div>
-                  )}
+                  
 
                   <StatsRow
                     replyLikelihood={replyLikelihood}
@@ -1986,73 +1731,15 @@ https://trytonecheck.com`;
                     statExplanations={STAT_EXPLANATIONS}
                   />
 
-                  {Array.isArray(result.top_manipulation_signals) &&
-                    result.top_manipulation_signals.length > 0 && (
-                      <div style={cardStyle}>
-                        <div
-                          style={{
-                            fontSize: "13px",
-                            color: "#64748b",
-                            fontWeight: 800,
-                            letterSpacing: "0.08em",
-                          }}
-                        >
-                          DETECTED SIGNALS
-                        </div>
+                  <DetectedSignals
+                    signals={result.top_manipulation_signals}
+                    getHiddenSignalLabel={getHiddenSignalLabel}
+                  />
 
-                        <div
-                          style={{
-                            marginTop: "14px",
-                            display: "flex",
-                            flexWrap: "wrap",
-                            gap: "10px",
-                          }}
-                        >
-                          {result.top_manipulation_signals.map((item, idx) => (
-                            <div
-                              key={idx}
-                              className="tc-chip-hover"
-                              style={{
-                                padding: "10px 14px",
-                                borderRadius: "999px",
-                                background: "rgba(99,102,241,0.08)",
-                                color: "#4338ca",
-                                fontWeight: 700,
-                                fontSize: "14px",
-                                border: "1px solid rgba(99,102,241,0.12)",
-                              }}
-                            >
-                              {getHiddenSignalLabel(item.name)} · {item.score}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                  {result.advisory && (
-                    <div style={cardStyle}>
-                      <div
-                        style={{
-                          fontSize: "13px",
-                          color: "#64748b",
-                          fontWeight: 800,
-                          letterSpacing: "0.08em",
-                        }}
-                      >
-                        💡 Why This Matters
-                      </div>
-                      <div
-                        style={{
-                          marginTop: "12px",
-                          lineHeight: 1.8,
-                          fontSize: "18px",
-                          color: "#111827",
-                        }}
-                      >
-                        {result.advisory}
-                      </div>
-                    </div>
-                  )}
+                  <AdvisoryCard
+                    advisory={result.advisory}
+                    cardStyle={cardStyle}
+                  />
 
                   <div style={cardStyle}>
                     <div
