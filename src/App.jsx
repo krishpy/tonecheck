@@ -2208,7 +2208,7 @@ https://trytonecheck.com`;
   );
 }
 
-}
+
 
 export default function App() {
   return (
@@ -2223,4 +2223,4 @@ export default function App() {
       <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
- }
+ 
