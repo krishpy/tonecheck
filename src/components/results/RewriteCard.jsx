@@ -92,15 +92,83 @@ export default function RewriteCard({
       </div>
 
       <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
-        <button onClick={copyRewriteOnly}>✍️ Copy rewrite</button>
-        <button onClick={useRewriteMessage}>✏️ Use This Message</button>
+  <button
+    onClick={() => {
+      if (!finalRewrite) return;
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
+        "_blank"
+      );
+    }}
+    className="tc-button-hover"
+    style={{
+      padding: "16px 22px",
+      borderRadius: "18px",
+      border: "1px solid rgba(255,255,255,0.28)",
+      cursor: "pointer",
+      fontWeight: 800,
+      fontSize: "15px",
+      color: "#ffffff",
+      background:
+        "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
+      boxShadow:
+        "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
+    }}
+  >
+    Send via WhatsApp
+  </button>
 
-        {copyState && (
-          <div style={{ fontWeight: 700, color: "#2563eb" }}>
-            ✓ {copyState}
-          </div>
-        )}
-      </div>
+  <button
+    onClick={copyRewriteOnly}
+    className="tc-button-hover"
+    style={{
+      padding: "15px 22px",
+      borderRadius: "18px",
+      border: "1px solid rgba(15,23,42,0.12)",
+      cursor: "pointer",
+      fontWeight: 750,
+      fontSize: "15px",
+      background: "rgba(255,255,255,0.9)",
+      color: "#111827",
+      boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
+    }}
+  >
+    ✍️ Copy rewrite
+  </button>
+
+  <button
+    onClick={useRewriteMessage}
+    className="tc-button-hover"
+    style={{
+      padding: "16px 22px",
+      borderRadius: "18px",
+      border: "1px solid rgba(255,255,255,0.28)",
+      cursor: "pointer",
+      fontWeight: 900,
+      fontSize: "15px",
+      color: "#ffffff",
+      background:
+        "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
+      boxShadow:
+        "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
+    }}
+  >
+    ✏️ Use This Message
+  </button>
+
+  {copyState && (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        fontWeight: 700,
+        color: "#2563eb",
+      }}
+    >
+      ✓ {copyState}
+    </div>
+  )}
+</div>
     </div>
   );
 }
