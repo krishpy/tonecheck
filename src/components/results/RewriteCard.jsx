@@ -94,83 +94,45 @@ export default function RewriteCard({
               </div>
 
               <div
-                title="This rewrite is less likely to create tension."
-                style={{
-                  width: "22px",
-                  height: "22px",
-                  borderRadius: "999px",
-                  display: "grid",
-                  placeItems: "center",
-                  background: "rgba(255,255,255,0.85)",
-                  border: "1px solid rgba(251,146,60,0.18)",
-                  color: "#d97706",
-                  fontSize: "13px",
-                  cursor: "help",
-                }}
-              >
-                💡
-              </div>
-            </div>
+                  title={`${riskImprovement} points safer than the original message`}
+                  style={{
+                    width: "72px",
+                    height: "72px",
+                    borderRadius: "999px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background:
+                      "linear-gradient(135deg, rgba(34,197,94,0.18), rgba(134,239,172,0.28))",
+                    border: "1px solid rgba(34,197,94,0.30)",
+                    color: "#15803d",
+                    fontWeight: 900,
+                    boxShadow: "0 10px 28px rgba(34,197,94,0.16)",
+                    animation: "tc-safer-pop 0.7s ease-out",
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: "18px",
+                      lineHeight: 1,
+                      letterSpacing: "-0.04em",
+                    }}
+                  >
+                    ↑{riskImprovement}
+                  </div>
 
-            <div
-  title={`${riskImprovement} points safer`}
-  style={{
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  }}
->
-  <div
-    style={{
-      width: "64px",
-      height: "64px",
-      borderRadius: "999px",
-      display: "grid",
-      placeItems: "center",
-      background: "linear-gradient(135deg, rgba(34,197,94,0.16), rgba(134,239,172,0.22))",
-      border: "1px solid rgba(34,197,94,0.22)",
-      color: "#15803d",
-      boxShadow: "0 10px 24px rgba(34,197,94,0.10)",
-      animation: "tc-safer-pop 1.6s ease-out",
-      flexShrink: 0,
-    }}
-  >
-            <div style={{ textAlign: "center", lineHeight: 1 }}>
-              <div
-                style={{
-                  fontSize: "18px",
-                  fontWeight: 900,
-                  letterSpacing: "-0.04em",
-                }}
-              >
-                ↑ {riskImprovement}
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              fontSize: "13px",
-              fontWeight: 800,
-              color: "#15803d",
-              lineHeight: 1.2,
-              whiteSpace: "nowrap",
-            }}
-          >
-            safer
-            <span
-              style={{
-                marginLeft: "6px",
-                display: "inline-block",
-                animation: "tc-safer-sparkle 1.2s ease-out",
-              }}
-            >
-              ✨
-            </span>
-          </div>
-        </div>
-
-          </div>
+                  <div
+                    style={{
+                      fontSize: "11px",
+                      fontWeight: 800,
+                      opacity: 0.8,
+                      marginTop: "2px",
+                    }}
+                  >
+                    safer
+                  </div>
+                </div>
 
           <div
             style={{

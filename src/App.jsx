@@ -627,6 +627,20 @@ https://trytonecheck.com`;
               80% { transform: translateX(1px) rotate(3deg); }
             }
 
+            @keyframes tc-safer-pop {
+              0% {
+                transform: scale(0.6);
+                opacity: 0;
+              }
+              70% {
+                transform: scale(1.05);
+              }
+              100% {
+                transform: scale(1);
+                opacity: 1;
+              }
+            }
+
 
             @keyframes tc-logo-pulse {
               0% {
