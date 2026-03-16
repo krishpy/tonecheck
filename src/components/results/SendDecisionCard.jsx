@@ -1,6 +1,5 @@
 import { getSendVerdict } from "../../utils/sendDecision";
 
-
 function getReadableSignal(signal) {
   const map = {
     polite_request_signal: "a polite ask",
@@ -20,7 +19,6 @@ function getReadableSignal(signal) {
 }
 
 function getVerdictTheme(toneClass) {
-   
   if (toneClass === "safe") {
     return {
       bg: "linear-gradient(135deg, rgba(220,252,231,0.96), rgba(240,253,244,0.94))",
@@ -53,23 +51,17 @@ function getVerdictTheme(toneClass) {
   };
 }
 
- const chipStyle = {
-      padding: "8px 12px",
-      borderRadius: "999px",
-      background: "rgba(255,255,255,0.74)",
-      border: "1px solid rgba(15,23,42,0.06)",
-      fontSize: "13px",
-      color: "#334155",
-      cursor: "help",
-    };
+const chipStyle = {
+  padding: "8px 12px",
+  borderRadius: "999px",
+  background: "rgba(255,255,255,0.74)",
+  border: "1px solid rgba(15,23,42,0.06)",
+  fontSize: "13px",
+  color: "#334155",
+  cursor: "help",
+};
 
 function getLevelLabel(score = 0) {
-  if (score >= 70) return "High";
-  if (score >= 35) return "Medium";
-  return "Low";
-}
-
-function getScoreHint(score = 0) {
   if (score >= 70) return "High";
   if (score >= 35) return "Medium";
   return "Low";
@@ -84,6 +76,7 @@ export default function SendDecisionCard({
 }) {
   const verdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
   const theme = getVerdictTheme(verdict.toneClass);
+  const regretLabel = getLevelLabel(regretRisk);
 
   return (
     <section
@@ -106,96 +99,96 @@ export default function SendDecisionCard({
         }}
       >
         <div style={{ flex: 1, minWidth: "280px" }}>
-  <div
-    style={{
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      flexWrap: "wrap",
-    }}
-  >
-    <div
-      style={{
-        fontSize: "14px",
-        fontWeight: 900,
-        letterSpacing: "0.12em",
-        textTransform: "uppercase",
-        color: "#64748b",
-      }}
-    >
-      Should I Send This?
-    </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "14px",
+                fontWeight: 900,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#64748b",
+              }}
+            >
+              Should I Send This?
+            </div>
 
-    <div
-      title="This is the quick answer based on tone, emotional pressure, and chance of regret."
-      style={{
-        width: "18px",
-        height: "18px",
-        borderRadius: "999px",
-        display: "grid",
-        placeItems: "center",
-        fontSize: "11px",
-        fontWeight: 800,
-        color: "#475569",
-        background: "rgba(255,255,255,0.72)",
-        border: "1px solid rgba(15,23,42,0.08)",
-        cursor: "help",
-      }}
-    >
-      i
-    </div>
-  </div>
+            <div
+              title="This is the quick answer based on tone, emotional pressure, and chance of regret."
+              style={{
+                width: "18px",
+                height: "18px",
+                borderRadius: "999px",
+                display: "grid",
+                placeItems: "center",
+                fontSize: "11px",
+                fontWeight: 800,
+                color: "#475569",
+                background: "rgba(255,255,255,0.72)",
+                border: "1px solid rgba(15,23,42,0.08)",
+                cursor: "help",
+              }}
+            >
+              i
+            </div>
+          </div>
 
-  <div
-    style={{
-      marginTop: "12px",
-      display: "flex",
-      alignItems: "center",
-      gap: "10px",
-      flexWrap: "wrap",
-    }}
-  >
-    <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        padding: "8px 12px",
-        borderRadius: "999px",
-        background: theme.pillBg,
-        color: theme.pillText,
-        fontWeight: 800,
-        fontSize: "14px",
-      }}
-    >
-      <span>{verdict.emoji}</span>
-      <span>{theme.title}</span>
-    </div>
+          <div
+            style={{
+              marginTop: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "8px 12px",
+                borderRadius: "999px",
+                background: theme.pillBg,
+                color: theme.pillText,
+                fontWeight: 800,
+                fontSize: "14px",
+              }}
+            >
+              <span>{verdict.emoji}</span>
+              <span>{theme.title}</span>
+            </div>
 
-    <div
-      style={{
-        fontSize: "18px",
-        fontWeight: 800,
-        letterSpacing: "-0.03em",
-        color: "#111827",
-      }}
-    >
-      {verdict.label}
-    </div>
-  </div>
+            <div
+              style={{
+                fontSize: "18px",
+                fontWeight: 800,
+                letterSpacing: "-0.03em",
+                color: "#111827",
+              }}
+            >
+              {verdict.label}
+            </div>
+          </div>
 
-  <div
-    style={{
-      marginTop: "10px",
-      color: "#475569",
-      fontSize: "15px",
-      lineHeight: 1.6,
-      maxWidth: "760px",
-    }}
-  >
-    {verdict.reason}
-  </div>
-</div>
+          <div
+            style={{
+              marginTop: "10px",
+              color: "#475569",
+              fontSize: "15px",
+              lineHeight: 1.6,
+              maxWidth: "760px",
+            }}
+          >
+            {verdict.reason}
+          </div>
+        </div>
 
         <div
           style={{
@@ -208,18 +201,18 @@ export default function SendDecisionCard({
           }}
         >
           <div
-          title="Overall chance this message creates tension, regret, or a bad reaction."
-          style={{
-            fontSize: "12px",
-            fontWeight: 800,
-            letterSpacing: "0.08em",
-            color: "#64748b",
-            textTransform: "uppercase",
-            cursor: "help",
-          }}
-        >
-          Decision
-        </div>
+            title="Quick read on whether this is okay to send as-is."
+            style={{
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              color: "#64748b",
+              textTransform: "uppercase",
+              cursor: "help",
+            }}
+          >
+            Decision
+          </div>
 
           <div
             style={{
@@ -230,12 +223,12 @@ export default function SendDecisionCard({
               color: "#111827",
             }}
           >
-            {verdict.lebel}
+            {verdict.label}
           </div>
         </div>
       </div>
 
-     <div
+      <div
         style={{
           marginTop: "18px",
           display: "flex",
@@ -244,31 +237,30 @@ export default function SendDecisionCard({
           flexWrap: "wrap",
         }}
       >
-          {tone ? (
-              <div
-                title="How your message emotionally comes across."
-                style={chipStyle}
-              >
-                Comes across as: <strong>{tone}</strong>
-              </div>
-            ) : null}
+        {tone ? (
+          <div
+            title="How your message emotionally comes across."
+            style={chipStyle}
+          >
+            Comes across as: <strong>{tone}</strong>
+          </div>
+        ) : null}
 
-            {hiddenSignal ? (
-              <div
-                title="The main feeling or pattern detected in the message."
-                style={chipStyle}
-              >
-                Feels like: <strong>{getReadableSignal(hiddenSignal)}</strong>
-              </div>
-            ) : null}
+        {hiddenSignal ? (
+          <div
+            title="The main feeling or pattern detected in the message."
+            style={chipStyle}
+          >
+            Feels like: <strong>{getReadableSignal(hiddenSignal)}</strong>
+          </div>
+        ) : null}
 
-            <div
-              title="Chance you may wish you had worded this differently later."
-              style={chipStyle}
-            >
-              Second thoughts: <strong>{regretLabel}</strong>
-            </div>
-
+        <div
+          title="Chance you may wish you had worded this differently later."
+          style={chipStyle}
+        >
+          Second thoughts: <strong>{regretLabel}</strong>
+        </div>
       </div>
     </section>
   );
