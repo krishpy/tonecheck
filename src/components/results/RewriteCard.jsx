@@ -23,7 +23,25 @@ export default function RewriteCard({
       }}
     >
 
-    <div
+      <div style={{ marginTop: "20px", display: "grid", gap: "16px" }}>
+        <div
+          style={{
+            padding: "16px",
+            borderRadius: "14px",
+            background: "rgba(248,250,252,0.9)",
+            border: "1px solid rgba(15,23,42,0.06)",
+          }}
+        >
+          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
+            YOUR MESSAGE
+          </div>
+
+          <div style={{ marginTop: "8px", fontSize: "18px" }}>
+            "{message}"
+          </div>
+        </div>
+
+            <div
         style={{
           marginTop: "16px",
           padding: "14px",
@@ -44,23 +62,6 @@ export default function RewriteCard({
         </span>
       </div>
 
-      <div style={{ marginTop: "20px", display: "grid", gap: "16px" }}>
-        <div
-          style={{
-            padding: "16px",
-            borderRadius: "14px",
-            background: "rgba(248,250,252,0.9)",
-            border: "1px solid rgba(15,23,42,0.06)",
-          }}
-        >
-          <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
-            YOUR MESSAGE
-          </div>
-
-          <div style={{ marginTop: "8px", fontSize: "18px" }}>
-            "{message}"
-          </div>
-        </div>
 
         <div
           style={{
@@ -71,7 +72,7 @@ export default function RewriteCard({
           }}
         >
           <div style={{ fontSize: "12px", fontWeight: 800, color: "#9a3412" }}>
-            BETTER VERSION
+             ✨ Better Version
           </div>
 
           <div style={{ marginTop: "10px", fontSize: "22px", fontWeight: 700 }}>
