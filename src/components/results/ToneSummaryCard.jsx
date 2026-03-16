@@ -67,7 +67,7 @@ export default function ToneSummaryCard({
               color: "#64748b",
             }}
           >
-            Tone Summary
+            Should I Send This?
           </div>
 
           <div
@@ -99,24 +99,25 @@ export default function ToneSummaryCard({
             <div>
               <div
                 style={{
-                  fontSize: "32px",
+                  fontSize: "34px",
                   lineHeight: 1,
                   fontWeight: 900,
                   letterSpacing: "-0.05em",
                   color: "#111827",
                 }}
               >
-                {toneLabel}
+                {sendVerdict?.label}
               </div>
 
               <div
                 style={{
-                  marginTop: "6px",
+                  marginTop: "8px",
                   fontSize: "15px",
                   color: "#475569",
+                  maxWidth: "760px",
                 }}
               >
-                This is how your message is likely to come across.
+                {sendVerdict?.reason}
               </div>
             </div>
           </div>
@@ -132,7 +133,7 @@ export default function ToneSummaryCard({
           }}
         >
           <div
-            title="The quick overall read of how this message may land."
+            title="How the message emotionally comes across."
             style={{
               fontSize: "12px",
               fontWeight: 800,
@@ -142,19 +143,19 @@ export default function ToneSummaryCard({
               cursor: "help",
             }}
           >
-            How it sounds
+            Tone
           </div>
 
           <div
             style={{
               marginTop: "8px",
-              fontSize: "22px",
+              fontSize: "24px",
               fontWeight: 900,
               letterSpacing: "-0.03em",
               color: "#111827",
             }}
           >
-            {sendVerdict?.emoji} {sendVerdict?.label}
+            {toneLabel}
           </div>
 
           <div
