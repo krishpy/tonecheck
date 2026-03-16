@@ -4,7 +4,6 @@ import {
   RewriteCard,
   StatsRow,
   DetectedSignals,
-  AdvisoryCard,
 } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
@@ -366,8 +365,6 @@ export default function ResultSection({
           signals={result.top_manipulation_signals}
           getHiddenSignalLabel={getHiddenSignalLabel}
         />
-
-        <AdvisoryCard advisory={result.advisory} cardStyle={cardStyle} />
 
         <div style={cardStyle}>
           <div
