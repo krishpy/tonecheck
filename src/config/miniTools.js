@@ -102,5 +102,3 @@ const MINI_TOOLS = {
     resultMode: "desperation",
   },
 };
-
-export default MINI_TOOLS;
