@@ -171,12 +171,13 @@ export default function HeroSection({
         </div>
 
         <p
-          style={{
+         style={{
             margin: "10px 0 0 0",
-            maxWidth: "820px",
+            maxWidth: "760px",
             color: "#475569",
-            fontSize: "19px",
-            lineHeight: 1.7,
+            fontSize: "20px",
+            lineHeight: 1.6,
+            fontWeight: 500,
           }}
         >
           {currentTool.description}
