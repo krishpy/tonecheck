@@ -907,6 +907,59 @@ https://trytonecheck.com`;
   );
 }
 
+function getResultBadge(result, riskImprovement) {
+  if (!result) return null;
+
+  if (result.risk_score >= 70) {
+    return {
+      text: "⚠️ High-risk message caught",
+      color: "#ef4444",
+      bg: "rgba(239,68,68,0.10)",
+      border: "1px solid rgba(239,68,68,0.25)"
+    };
+  }
+
+  if (riskImprovement > 20) {
+    return {
+      text: "✨ Safer rewrite found",
+      color: "#16a34a",
+      bg: "rgba(34,197,94,0.10)",
+      border: "1px solid rgba(34,197,94,0.25)"
+    };
+  }
+
+  return {
+    text: "✅ Message already safe",
+    color: "#2563eb",
+    bg: "rgba(37,99,235,0.10)",
+    border: "1px solid rgba(37,99,235,0.25)"
+  };
+}
+
+const resultBadge = getResultBadge(result, riskImprovement);
+
+
+{resultBadge && (
+  <div
+    style={{
+      marginTop: "18px",
+      marginBottom: "12px",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "10px",
+      padding: "10px 14px",
+      borderRadius: "999px",
+      fontWeight: 800,
+      fontSize: "14px",
+      color: resultBadge.color,
+      background: resultBadge.bg,
+      border: resultBadge.border,
+    }}
+  >
+    {resultBadge.text}
+  </div>
+)}
+
 export default function App() {
   return (
     <Routes>
