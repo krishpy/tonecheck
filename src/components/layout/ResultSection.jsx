@@ -8,6 +8,7 @@ import {
 } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
+import { getDecisionTheme } from "../../utils/sendDecision";
 
 export default function ResultSection({
   result,

@@ -75,6 +75,7 @@ export default function SendDecisionCard({
   hiddenSignal = "",
 }) {
   const verdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
+  const decisionTheme = getDecisionTheme(sendVerdict.toneClass);
   const theme = getVerdictTheme(verdict.toneClass);
   const regretLabel = getLevelLabel(regretRisk);
 
