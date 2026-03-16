@@ -1,21 +1,3 @@
-function getReadableSignal(signal) {
-  const map = {
-    polite_request_signal: "a polite ask",
-    accusatory_pressure_signal: "blame or pressure",
-    pressure_signal: "urgency or pressure",
-    passive_aggression_signal: "passive aggression",
-    hostility_signal: "hostility",
-    threat_signal: "a threat",
-    profanity_signal: "harsh language",
-    insult_signal: "an insult",
-    hostile_command_signal: "a harsh command",
-    constructive_disagreement_signal: "calm disagreement",
-    neutral_information: "neutral",
-  };
-
-  return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
-}
-
 function getToneAnimation(label = "") {
   const tone = String(label).toLowerCase();
 
@@ -26,16 +8,37 @@ function getToneAnimation(label = "") {
   return "tc-tone-neutral";
 }
 
+function getToneTooltip(label = "") {
+  const tone = String(label).toLowerCase();
+
+  if (tone.includes("neutral")) {
+    return "Neutral means the message sounds fairly calm and not emotionally loaded.";
+  }
+  if (tone.includes("tense")) {
+    return "Tense means the message may feel stressed, pressuring, or slightly confrontational.";
+  }
+  if (tone.includes("aggressive")) {
+    return "Aggressive means the message may feel harsh, hostile, or likely to start conflict.";
+  }
+  if (tone.includes("passive")) {
+    return "Passive aggressive means the message may sound indirect, resentful, or sarcastic.";
+  }
+  if (tone.includes("friendly") || tone.includes("polite")) {
+    return "This tone sounds warm, respectful, and easier for the other person to receive.";
+  }
+
+  return "This shows how the message is likely to come across emotionally.";
+}
+
 export default function ToneSummaryCard({
   toneTheme,
   getToneLabel,
   getToneEmoji,
-  riskScore,
   sendVerdict,
-  primaryHiddenSignalLabel,
 }) {
   const toneLabel = getToneLabel();
   const toneAnimationClass = getToneAnimation(toneLabel);
+  const toneTooltip = getToneTooltip(toneLabel);
 
   return (
     <section
@@ -60,35 +63,35 @@ export default function ToneSummaryCard({
         <div style={{ flex: 1, minWidth: "280px" }}>
           <div
             style={{
-              fontSize: "12px",
+              fontSize: "34px",
+              lineHeight: 1,
               fontWeight: 900,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color: "#64748b",
+              letterSpacing: "-0.05em",
+              color: "#111827",
             }}
           >
-            Should I Send This?
+            Should I send this?
           </div>
 
           <div
             style={{
-              marginTop: "12px",
+              marginTop: "14px",
               display: "flex",
               alignItems: "center",
-              gap: "12px",
+              gap: "14px",
               flexWrap: "wrap",
             }}
           >
             <div
               style={{
-                width: "56px",
-                height: "56px",
-                borderRadius: "18px",
+                width: "68px",
+                height: "68px",
+                borderRadius: "20px",
                 display: "grid",
                 placeItems: "center",
                 background: toneTheme.iconBg,
                 color: "#fff",
-                fontSize: "28px",
+                fontSize: "36px",
                 boxShadow: "0 10px 24px rgba(15,23,42,0.10)",
                 overflow: "hidden",
               }}
@@ -99,10 +102,10 @@ export default function ToneSummaryCard({
             <div>
               <div
                 style={{
-                  fontSize: "34px",
+                  fontSize: "26px",
                   lineHeight: 1,
                   fontWeight: 900,
-                  letterSpacing: "-0.05em",
+                  letterSpacing: "-0.04em",
                   color: "#111827",
                 }}
               >
@@ -133,7 +136,7 @@ export default function ToneSummaryCard({
           }}
         >
           <div
-            title="How the message emotionally comes across."
+            title={toneTooltip}
             style={{
               fontSize: "12px",
               fontWeight: 800,
@@ -157,40 +160,6 @@ export default function ToneSummaryCard({
           >
             {toneLabel}
           </div>
-
-          <div
-            style={{
-              marginTop: "8px",
-              fontSize: "14px",
-              color: "#64748b",
-            }}
-          >
-            Intensity: <strong style={{ color: "#111827" }}>{riskScore}/100</strong>
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: "18px",
-          display: "flex",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
-      >
-        <div
-          title="The main thing this message may feel like to the other person."
-          style={{
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.72)",
-            border: "1px solid rgba(15,23,42,0.06)",
-            fontSize: "13px",
-            color: "#334155",
-            cursor: "help",
-          }}
-        >
-          Feels like: <strong>{getReadableSignal(primaryHiddenSignalLabel)}</strong>
         </div>
       </div>
     </section>

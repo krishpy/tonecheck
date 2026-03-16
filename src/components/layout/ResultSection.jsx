@@ -311,9 +311,7 @@ export default function ResultSection({
               toneTheme={toneTheme}
               getToneLabel={getToneLabel}
               getToneEmoji={getToneEmoji}
-              riskScore={riskScore}
               sendVerdict={sendVerdict}
-              primaryHiddenSignalLabel={primaryHiddenSignalLabel}
             />
 
       
