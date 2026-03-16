@@ -113,27 +113,63 @@ export default function RewriteCard({
             </div>
 
             <div
+  title={`${riskImprovement} points safer`}
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+  }}
+>
+  <div
+    style={{
+      width: "64px",
+      height: "64px",
+      borderRadius: "999px",
+      display: "grid",
+      placeItems: "center",
+      background: "linear-gradient(135deg, rgba(34,197,94,0.16), rgba(134,239,172,0.22))",
+      border: "1px solid rgba(34,197,94,0.22)",
+      color: "#15803d",
+      boxShadow: "0 10px 24px rgba(34,197,94,0.10)",
+      animation: "tc-safer-pop 1.6s ease-out",
+      flexShrink: 0,
+    }}
+  >
+            <div style={{ textAlign: "center", lineHeight: 1 }}>
+              <div
+                style={{
+                  fontSize: "18px",
+                  fontWeight: 900,
+                  letterSpacing: "-0.04em",
+                }}
+              >
+                ↑ {riskImprovement}
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 800,
+              color: "#15803d",
+              lineHeight: 1.2,
+              whiteSpace: "nowrap",
+            }}
+          >
+            safer
+            <span
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "8px 12px",
-                borderRadius: "999px",
-                background: "rgba(34,197,94,0.10)",
-                border: "1px solid rgba(34,197,94,0.18)",
-                color: "#15803d",
-                fontSize: "14px",
-                fontWeight: 800,
-                boxShadow: "0 0 0 rgba(34,197,94,0)",
-                animation: "tc-safer-pop 1.6s ease-out",
+                marginLeft: "6px",
+                display: "inline-block",
+                animation: "tc-safer-sparkle 1.2s ease-out",
               }}
             >
-              <span style={{ fontSize: "15px" }}>↑</span>
-              <span>{riskImprovement} points safer</span>
-              <span style={{ fontSize: "14px", animation: "tc-safer-sparkle 1.2s ease-out" }}>
-                ✨
-              </span>
-            </div>
+              ✨
+            </span>
+          </div>
+        </div>
+
           </div>
 
           <div
