@@ -1,4 +1,4 @@
-const MINI_TOOLS = {
+export const MINI_TOOLS = {
   home: {
     slug: "home",
     title: "ToneCheck",
@@ -16,6 +16,7 @@ const MINI_TOOLS = {
     badge: "Communication Intelligence Demo",
     resultMode: "default",
   },
+
   "should-i-send-this": {
     slug: "should-i-send-this",
     title: "Should I Send This?",
@@ -33,6 +34,7 @@ const MINI_TOOLS = {
     badge: "Mini Tool",
     resultMode: "send_decision",
   },
+
   "passive-aggressive-detector": {
     slug: "passive-aggressive-detector",
     title: "Passive Aggressive Detector",
@@ -50,6 +52,7 @@ const MINI_TOOLS = {
     badge: "Mini Tool",
     resultMode: "passive_aggressive",
   },
+
   "manipulation-detector": {
     slug: "manipulation-detector",
     title: "Manipulation Detector",
@@ -67,6 +70,7 @@ const MINI_TOOLS = {
     badge: "Mini Tool",
     resultMode: "manipulation",
   },
+
   "rude-or-polite": {
     slug: "rude-or-polite",
     title: "Rude or Polite?",
@@ -84,6 +88,7 @@ const MINI_TOOLS = {
     badge: "Mini Tool",
     resultMode: "politeness",
   },
+
   "desperate-text-checker": {
     slug: "desperate-text-checker",
     title: "Desperate Text Checker",
@@ -102,3 +107,26 @@ const MINI_TOOLS = {
     resultMode: "desperation",
   },
 };
+
+export function getToolConfigFromPath(pathname) {
+  if (pathname === "/") return MINI_TOOLS.home;
+
+  const SEO_ROUTE_MAP = {
+    "/should-i-send-this": "should-i-send-this",
+    "/passive-aggressive-text": "passive-aggressive-detector",
+    "/manipulative-text-checker": "manipulation-detector",
+    "/is-this-message-rude": "rude-or-polite",
+    "/desperate-text-checker": "desperate-text-checker",
+  };
+
+  if (SEO_ROUTE_MAP[pathname]) {
+    return MINI_TOOLS[SEO_ROUTE_MAP[pathname]];
+  }
+
+  if (pathname.startsWith("/tools/")) {
+    const slug = pathname.replace("/tools/", "");
+    return MINI_TOOLS[slug] || null;
+  }
+
+  return null;
+}
