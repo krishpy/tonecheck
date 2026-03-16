@@ -1805,8 +1805,6 @@ https://trytonecheck.com`;
     </div>
   
   );
-}
-
 
 
 export default function App() {
