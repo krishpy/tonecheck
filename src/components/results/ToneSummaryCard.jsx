@@ -90,49 +90,52 @@ export default function ToneSummaryCard({
           </div>
         </div>
 
-        <div
-          style={{
-            minWidth: "180px",
-            padding: "16px 18px",
-            borderRadius: "22px",
-            background: "rgba(255,255,255,0.72)",
-            border: "1px solid rgba(15,23,42,0.06)",
-          }}
-        >
-          <div
+            <div
             style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#64748b",
+              minWidth: "200px",
+              padding: "16px 18px",
+              borderRadius: "22px",
+              background: "rgba(255,255,255,0.78)",
+              border: "1px solid rgba(15,23,42,0.06)",
             }}
           >
-            Overall
+            <div
+              title="The quick overall read of how this message may land."
+              style={{
+                fontSize: "12px",
+                fontWeight: 800,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#64748b",
+                cursor: "help",
+              }}
+            >
+              How it sounds
+            </div>
+
+            <div
+              style={{
+                marginTop: "8px",
+                fontSize: "22px",
+                fontWeight: 900,
+                letterSpacing: "-0.03em",
+                color: "#111827",
+              }}
+            >
+              {sendVerdict?.emoji} {sendVerdict?.label}
+            </div>
+
+            <div
+              style={{
+                marginTop: "8px",
+                fontSize: "14px",
+                color: "#64748b",
+              }}
+            >
+              Intensity: <strong style={{ color: "#111827" }}>{riskScore}/100</strong>
+            </div>
           </div>
 
-          <div
-            style={{
-              marginTop: "8px",
-              fontSize: "22px",
-              fontWeight: 900,
-              letterSpacing: "-0.03em",
-              color: "#111827",
-            }}
-          >
-            {sendVerdict?.emoji} {sendVerdict?.label}
-          </div>
-
-          <div
-            style={{
-              marginTop: "8px",
-              fontSize: "14px",
-              color: "#64748b",
-            }}
-          >
-            Score: <strong style={{ color: "#111827" }}>{riskScore}</strong>
-          </div>
-        </div>
       </div>
 
       <div

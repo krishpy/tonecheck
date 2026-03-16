@@ -199,7 +199,7 @@ export default function SendDecisionCard({
             cursor: "help",
           }}
         >
-          Send Score
+          Decision
         </div>
 
           <div
@@ -211,7 +211,7 @@ export default function SendDecisionCard({
               color: "#111827",
             }}
           >
-            {riskScore}
+            {verdict.lebel}
           </div>
         </div>
       </div>
