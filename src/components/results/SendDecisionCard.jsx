@@ -148,6 +148,7 @@ export default function SendDecisionCard({
               flexWrap: "wrap",
             }}
           >
+            
             <div
               style={{
                 display: "inline-flex",
@@ -164,18 +165,6 @@ export default function SendDecisionCard({
               <span>{verdict.emoji}</span>
               <span>{theme.title}</span>
             </div>
-
-            <div
-              style={{
-                fontSize: "18px",
-                fontWeight: 800,
-                letterSpacing: "-0.03em",
-                color: "#111827",
-              }}
-            >
-              {verdict.label}
-            </div>
-          </div>
 
           <div
             style={{
@@ -223,7 +212,7 @@ export default function SendDecisionCard({
               color: "#111827",
             }}
           >
-            {verdict.label}
+            {verdict.title}
           </div>
         </div>
       </div>
