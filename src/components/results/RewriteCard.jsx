@@ -44,22 +44,6 @@ export default function RewriteCard({
         </span>
       </div>
 
-
-
-      <div
-        style={{
-          fontSize: "13px",
-          color: "#9a3412",
-          fontWeight: 900,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}
-      >
-        ✨ Better Version
-      </div>
-
-      
-
       <div style={{ marginTop: "20px", display: "grid", gap: "16px" }}>
         <div
           style={{
@@ -77,6 +61,24 @@ export default function RewriteCard({
             "{message}"
           </div>
         </div>
+
+
+
+      <div
+        style={{
+          fontSize: "13px",
+          color: "#9a3412",
+          fontWeight: 900,
+          letterSpacing: "0.1em",
+          textTransform: "uppercase",
+        }}
+      >
+        ✨ Better Version
+      </div>
+
+      
+
+      
 
         <div
           style={{
