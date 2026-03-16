@@ -316,25 +316,28 @@ export default function ResultSection({
             />
 
         {resultBadge && (
-              <div
-                style={{
-                  marginTop: "18px",
-                  marginBottom: "12px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  padding: "10px 14px",
-                  borderRadius: "999px",
-                  fontWeight: 800,
-                  fontSize: "14px",
-                  color: resultBadge.color,
-                  background: resultBadge.bg,
-                  border: resultBadge.border,
-                }}
-              >
-                {resultBadge.text}
-              </div>
-            )}
+  <div style={{ marginTop: "10px", marginBottom: "2px" }}>
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "10px 16px",
+        borderRadius: "999px",
+        fontWeight: 900,
+        fontSize: "14px",
+        color: resultBadge.color,
+        background: resultBadge.bg,
+        border: resultBadge.border,
+        boxShadow: "0 8px 22px rgba(15,23,42,0.06)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <span style={{ fontSize: "15px" }}>{resultBadge.text.split(" ")[0]}</span>
+      <span>{resultBadge.text.replace(resultBadge.text.split(" ")[0] + " ", "")}</span>
+    </div>
+  </div>
+)}
 
       
 
