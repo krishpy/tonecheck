@@ -1,6 +1,15 @@
 import { getSendVerdict } from "../../utils/sendDecision";
 
 function getVerdictTheme(toneClass) {
+    const chipStyle = {
+      padding: "8px 12px",
+      borderRadius: "999px",
+      background: "rgba(255,255,255,0.74)",
+      border: "1px solid rgba(15,23,42,0.06)",
+      fontSize: "13px",
+      color: "#334155",
+      cursor: "help",
+    };
   if (toneClass === "safe") {
     return {
       bg: "linear-gradient(135deg, rgba(220,252,231,0.96), rgba(240,253,244,0.94))",
@@ -201,61 +210,38 @@ export default function SendDecisionCard({
           flexWrap: "wrap",
         }}
       >
-        {tone ? (
+            {tone ? (
+            <div
+              title="How your message emotionally comes across."
+              style={chipStyle}
+            >
+              Mood: <strong>{tone}</strong>
+            </div>
+          ) : null}
+
+          {hiddenSignal ? (
+            <div
+              title="The main pattern detected in your message."
+              style={chipStyle}
+            >
+              Pattern: <strong>{hiddenSignal.replaceAll("_", " ")}</strong>
+            </div>
+          ) : null}
+
           <div
-            style={{
-              padding: "8px 12px",
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(15,23,42,0.06)",
-              fontSize: "13px",
-              color: "#334155",
-            }}
+            title="Chance you may wish you had worded this differently later."
+            style={chipStyle}
           >
-            Tone: <strong>{tone}</strong>
+            Regret chance: <strong>{regretRisk}</strong>
           </div>
-        ) : null}
 
-        {hiddenSignal ? (
           <div
-            style={{
-              padding: "8px 12px",
-              borderRadius: "999px",
-              background: "rgba(255,255,255,0.74)",
-              border: "1px solid rgba(15,23,42,0.06)",
-              fontSize: "13px",
-              color: "#334155",
-            }}
+            title="How much emotional pressure this message may create."
+            style={chipStyle}
           >
-            Signal: <strong>{hiddenSignal}</strong>
+            Pressure level: <strong>{manipulationRisk}</strong>
           </div>
-        ) : null}
 
-        <div
-          style={{
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.74)",
-            border: "1px solid rgba(15,23,42,0.06)",
-            fontSize: "13px",
-            color: "#334155",
-          }}
-        >
-          Second-thought risk: <strong>{regretRisk}</strong>
-        </div>
-
-        <div
-          style={{
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.74)",
-            border: "1px solid rgba(15,23,42,0.06)",
-            fontSize: "13px",
-            color: "#334155",
-          }}
-        >
-          Pressure risk: <strong>{manipulationRisk}</strong>
-        </div>
       </div>
     </section>
   );
