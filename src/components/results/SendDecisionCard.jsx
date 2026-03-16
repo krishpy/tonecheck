@@ -3,30 +3,33 @@ import { getSendVerdict } from "../../utils/sendDecision";
 function getVerdictTheme(toneClass) {
   if (toneClass === "safe") {
     return {
-      bg: "linear-gradient(135deg, rgba(236,253,245,0.95), rgba(240,253,250,0.92))",
-      border: "1px solid rgba(34,197,94,0.20)",
-      pillBg: "rgba(34,197,94,0.14)",
+      bg: "linear-gradient(135deg, rgba(220,252,231,0.96), rgba(240,253,244,0.94))",
+      border: "1px solid rgba(34,197,94,0.28)",
+      pillBg: "rgba(34,197,94,0.16)",
       pillText: "#15803d",
       title: "Safe to send",
+      shadow: "0 12px 30px rgba(34,197,94,0.10)",
     };
   }
 
   if (toneClass === "maybe") {
     return {
-      bg: "linear-gradient(135deg, rgba(255,251,235,0.96), rgba(255,247,237,0.92))",
-      border: "1px solid rgba(245,158,11,0.20)",
-      pillBg: "rgba(245,158,11,0.14)",
+      bg: "linear-gradient(135deg, rgba(254,249,195,0.96), rgba(255,251,235,0.94))",
+      border: "1px solid rgba(245,158,11,0.28)",
+      pillBg: "rgba(245,158,11,0.16)",
       pillText: "#b45309",
       title: "Pause and rethink",
+      shadow: "0 12px 30px rgba(245,158,11,0.10)",
     };
   }
 
   return {
-    bg: "linear-gradient(135deg, rgba(254,242,242,0.96), rgba(255,247,237,0.92))",
-    border: "1px solid rgba(239,68,68,0.20)",
-    pillBg: "rgba(239,68,68,0.14)",
+    bg: "linear-gradient(135deg, rgba(254,226,226,0.96), rgba(254,242,242,0.94))",
+    border: "1px solid rgba(239,68,68,0.28)",
+    pillBg: "rgba(239,68,68,0.16)",
     pillText: "#b91c1c",
     title: "Better not send",
+    shadow: "0 12px 30px rgba(239,68,68,0.10)",
   };
 }
 
@@ -48,7 +51,7 @@ export default function SendDecisionCard({
         border: theme.border,
         borderRadius: "28px",
         padding: "22px",
-        boxShadow: "0 10px 30px rgba(15,23,42,0.05)",
+        boxShadow: theme.shadow,
       }}
     >
       <div
@@ -129,8 +132,8 @@ export default function SendDecisionCard({
             minWidth: "120px",
             padding: "14px 16px",
             borderRadius: "20px",
-            background: "rgba(255,255,255,0.72)",
-            border: "1px solid rgba(15,23,42,0.06)",
+            background: theme.pillBg,
+            border: theme.border,
             textAlign: "center",
           }}
         >
