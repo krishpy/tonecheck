@@ -1,15 +1,7 @@
 import { getSendVerdict } from "../../utils/sendDecision";
 
 function getVerdictTheme(toneClass) {
-    const chipStyle = {
-      padding: "8px 12px",
-      borderRadius: "999px",
-      background: "rgba(255,255,255,0.74)",
-      border: "1px solid rgba(15,23,42,0.06)",
-      fontSize: "13px",
-      color: "#334155",
-      cursor: "help",
-    };
+   
   if (toneClass === "safe") {
     return {
       bg: "linear-gradient(135deg, rgba(220,252,231,0.96), rgba(240,253,244,0.94))",
@@ -40,6 +32,28 @@ function getVerdictTheme(toneClass) {
     title: "Better not send",
     shadow: "0 12px 30px rgba(239,68,68,0.10)",
   };
+}
+
+ const chipStyle = {
+      padding: "8px 12px",
+      borderRadius: "999px",
+      background: "rgba(255,255,255,0.74)",
+      border: "1px solid rgba(15,23,42,0.06)",
+      fontSize: "13px",
+      color: "#334155",
+      cursor: "help",
+    };
+
+function getLevelLabel(score = 0) {
+  if (score >= 70) return "High";
+  if (score >= 35) return "Medium";
+  return "Low";
+}
+
+function getScoreHint(score = 0) {
+  if (score >= 70) return "High";
+  if (score >= 35) return "Medium";
+  return "Low";
 }
 
 export default function SendDecisionCard({
