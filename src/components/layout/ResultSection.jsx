@@ -346,7 +346,6 @@ export default function ResultSection({
           replyLikelihood={replyLikelihood}
           regretRisk={regretRisk}
           manipulationRisk={manipulationRisk}
-          statExplanations={statExplanations}
         />
 
         <DetectedSignals

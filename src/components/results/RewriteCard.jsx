@@ -72,13 +72,11 @@ export default function RewriteCard({
           fontWeight: 700,
         }}
       >
-        <span>Your message risk: {riskScore}</span>
-        <span>Rewrite risk: {rewriteRiskScore}</span>
         <span style={{ color: "#15803d", fontWeight: 800 }}>
           ↑ {riskImprovement} points safer
         </span>
       </div>  
-      
+
       </div>
 
       <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
