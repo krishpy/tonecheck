@@ -16,6 +16,16 @@ function getReadableSignal(signal) {
   return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
 }
 
+function getToneAnimation(label = "") {
+  const tone = String(label).toLowerCase();
+
+  if (tone.includes("tense")) return "tc-tone-tense";
+  if (tone.includes("aggressive")) return "tc-tone-aggressive";
+  if (tone.includes("passive")) return "tc-tone-passive";
+  if (tone.includes("friendly") || tone.includes("polite")) return "tc-tone-friendly";
+  return "tc-tone-neutral";
+}
+
 export default function ToneSummaryCard({
   toneTheme,
   getToneLabel,
@@ -24,6 +34,9 @@ export default function ToneSummaryCard({
   sendVerdict,
   primaryHiddenSignalLabel,
 }) {
+  const toneLabel = getToneLabel();
+  const toneAnimationClass = getToneAnimation(toneLabel);
+
   return (
     <section
       className="tc-glow-card"
@@ -77,9 +90,10 @@ export default function ToneSummaryCard({
                 color: "#fff",
                 fontSize: "28px",
                 boxShadow: "0 10px 24px rgba(15,23,42,0.10)",
+                overflow: "hidden",
               }}
             >
-              {getToneEmoji()}
+              <span className={toneAnimationClass}>{getToneEmoji()}</span>
             </div>
 
             <div>
@@ -92,7 +106,7 @@ export default function ToneSummaryCard({
                   color: "#111827",
                 }}
               >
-                {getToneLabel()}
+                {toneLabel}
               </div>
 
               <div
@@ -108,52 +122,51 @@ export default function ToneSummaryCard({
           </div>
         </div>
 
-            <div
+        <div
+          style={{
+            minWidth: "200px",
+            padding: "16px 18px",
+            borderRadius: "22px",
+            background: "rgba(255,255,255,0.78)",
+            border: "1px solid rgba(15,23,42,0.06)",
+          }}
+        >
+          <div
+            title="The quick overall read of how this message may land."
             style={{
-              minWidth: "200px",
-              padding: "16px 18px",
-              borderRadius: "22px",
-              background: "rgba(255,255,255,0.78)",
-              border: "1px solid rgba(15,23,42,0.06)",
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#64748b",
+              cursor: "help",
             }}
           >
-            <div
-              title="The quick overall read of how this message may land."
-              style={{
-                fontSize: "12px",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-                color: "#64748b",
-                cursor: "help",
-              }}
-            >
-              How it sounds
-            </div>
-
-            <div
-              style={{
-                marginTop: "8px",
-                fontSize: "22px",
-                fontWeight: 900,
-                letterSpacing: "-0.03em",
-                color: "#111827",
-              }}
-            >
-              {sendVerdict?.emoji} {sendVerdict?.label}
-            </div>
-
-            <div
-              style={{
-                marginTop: "8px",
-                fontSize: "14px",
-                color: "#64748b",
-              }}
-            >
-              Intensity: <strong style={{ color: "#111827" }}>{riskScore}/100</strong>
-            </div>
+            How it sounds
           </div>
 
+          <div
+            style={{
+              marginTop: "8px",
+              fontSize: "22px",
+              fontWeight: 900,
+              letterSpacing: "-0.03em",
+              color: "#111827",
+            }}
+          >
+            {sendVerdict?.emoji} {sendVerdict?.label}
+          </div>
+
+          <div
+            style={{
+              marginTop: "8px",
+              fontSize: "14px",
+              color: "#64748b",
+            }}
+          >
+            Intensity: <strong style={{ color: "#111827" }}>{riskScore}/100</strong>
+          </div>
+        </div>
       </div>
 
       <div
@@ -178,7 +191,6 @@ export default function ToneSummaryCard({
         >
           Feels like: <strong>{getReadableSignal(primaryHiddenSignalLabel)}</strong>
         </div>
-        
       </div>
     </section>
   );

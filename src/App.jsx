@@ -288,7 +288,7 @@ function AppContent() {
 "${message}"
 
 ${getToneEmoji()} Tone: ${getToneLabel()}
-⚠️ Risk Score: ${result?.risk_score ?? ""}
+⚠️ Risk Score: ${result?.risk_score ?? ""}/100
 📊 Risk Level: ${result?.risk_level ?? ""}
 💭 Regret Risk: ${result?.regret_risk ?? ""}
 📬 Reply Likelihood: ${result?.reply_likelihood ?? ""}
@@ -612,6 +612,62 @@ https://trytonecheck.com`;
       </Helmet>
 
       <style>{`
+
+                  @keyframes tc-tone-friendly {
+              0%, 100% { transform: translateY(0px) scale(1); }
+              50% { transform: translateY(-2px) scale(1.06); }
+            }
+
+            @keyframes tc-tone-tense {
+              0%, 100% { transform: translateX(0px) rotate(0deg); }
+              20% { transform: translateX(-1px) rotate(-4deg); }
+              40% { transform: translateX(1px) rotate(4deg); }
+              60% { transform: translateX(-1px) rotate(-3deg); }
+              80% { transform: translateX(1px) rotate(3deg); }
+            }
+
+            @keyframes tc-tone-aggressive {
+              0%, 100% { transform: scale(1) translateY(0); }
+              30% { transform: scale(1.08) translateY(-1px); }
+              60% { transform: scale(1.02) translateY(1px); }
+            }
+
+            @keyframes tc-tone-passive {
+              0%, 100% { transform: rotate(0deg) translateY(0px); }
+              25% { transform: rotate(-4deg) translateY(-1px); }
+              75% { transform: rotate(4deg) translateY(0px); }
+            }
+
+            @keyframes tc-tone-neutral {
+              0%, 100% { transform: scale(1); }
+              50% { transform: scale(1.03); }
+            }
+
+            .tc-tone-friendly {
+              display: inline-block;
+              animation: tc-tone-friendly 1.8s ease-in-out infinite;
+            }
+
+            .tc-tone-tense {
+              display: inline-block;
+              animation: tc-tone-tense 1.15s ease-in-out infinite;
+            }
+
+            .tc-tone-aggressive {
+              display: inline-block;
+              animation: tc-tone-aggressive 0.9s ease-in-out infinite;
+            }
+
+            .tc-tone-passive {
+              display: inline-block;
+              animation: tc-tone-passive 2s ease-in-out infinite;
+            }
+
+            .tc-tone-neutral {
+              display: inline-block;
+              animation: tc-tone-neutral 2.2s ease-in-out infinite;
+            }
+
         @keyframes tc-aggressive {
           0%,100% { transform: scale(1); }
           50% { transform: scale(1.12); }
