@@ -15,6 +15,7 @@ import { MINI_TOOLS, getToolConfigFromPath } from "./config/miniTools";
 import MiniToolGrid from "./components/layout/MiniToolGrid";
 import { getSendVerdict } from "./utils/sendDecision";
 import SeoContentBlock from "./components/layout/SeoContentBlock";
+import HeroSection from "./components/layout/HeroSection";
 
 
 function escapeHtml(value) {
@@ -749,238 +750,26 @@ https://trytonecheck.com`;
                     alignItems: "start",
                   }}
                 >
+              <div>
 
+              <HeroSection
+                    location={location}
+                    navigate={navigate}
+                    currentTool={currentTool}
+                    message={message}
+                    setMessage={setMessage}
+                    setResult={setResult}
+                    setCopyState={setCopyState}
+                    analyze={analyze}
+                    loading={loading}
+                    setExample={setExample}
+                    heroCardStyle={heroCardStyle}
+                    chipStyle={chipStyle}
+                    actionButtonStyle={actionButtonStyle}
+                    primaryButtonStyle={primaryButtonStyle}
+              />
 
-                    
-                
-                    <div>
-
-            
-            <div className="tc-hero" style={heroCardStyle}>
-              <div className="tc-light-sweep"></div>
-              <div style={glassOrb1} />
-              <div style={glassOrb2} />
-              <div style={glassOrb3} />
-
-              <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-                <button
-                  className="tc-chip-hover"
-                  onClick={() => navigate("/")}
-                  style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
-                >
-                  Home
-                </button>
-
-                {location.pathname !== "/" && (
-                  <div
-                    style={{
-                      ...chipStyle,
-                      background: "rgba(99,102,241,0.10)",
-                      color: "#4338ca",
-                      cursor: "default",
-                    }}
-                  >
-                    {currentTool.title}
-                  </div>
-                )}
-              </div>
-
-              <div style={{ position: "relative" }}>
-                <div
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "16px",
-                    marginBottom: "14px",
-                  }}
-                >
-                  <div
-                    style={{
-                      position: "relative",
-                      width: "74px",
-                      height: "74px",
-                      borderRadius: "24px",
-                      display: "grid",
-                      placeItems: "center",
-                      background:
-                        "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
-                      boxShadow:
-                        "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
-                      border: "1px solid rgba(255,255,255,0.28)",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div
-                      style={{
-                        position: "absolute",
-                        inset: "8px",
-                        borderRadius: "18px",
-                        border: "1px solid rgba(255,255,255,0.22)",
-                      }}
-                    />
-                    <div
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "baseline",
-                        gap: "1px",
-                        color: "#ffffff",
-                        fontWeight: 900,
-                        letterSpacing: "-0.08em",
-                        textShadow: "0 2px 10px rgba(0,0,0,0.16)",
-                      }}
-                    >
-                      <span style={{ fontSize: "28px", lineHeight: 1 }}>T</span>
-                      <span style={{ fontSize: "30px", lineHeight: 1 }}>✓</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 800,
-                        letterSpacing: "0.22em",
-                        color: "#6366f1",
-                        textTransform: "uppercase",
-                        marginBottom: "6px",
-                      }}
-                    >
-                      {currentTool.eyebrow}
-                    </div>
-
-                    <h1
-                      className="tc-title tc-shimmer"
-                      style={{
-                        margin: 0,
-                        fontSize: "76px",
-                        lineHeight: 0.92,
-                        letterSpacing: "-0.09em",
-                        fontWeight: 950,
-                        background:
-                          "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
-                        backgroundSize: "200% 200%",
-                        WebkitBackgroundClip: "text",
-                        WebkitTextFillColor: "transparent",
-                      }}
-                    >
-                      {location.pathname === "/" ? "ToneCheck" : currentTool.title}
-                    </h1>
-                  </div>
-                </div>
-
-                <p
-                  style={{
-                    margin: "10px 0 0 0",
-                    maxWidth: "820px",
-                    color: "#475569",
-                    fontSize: "19px",
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {currentTool.description}
-                </p>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "22px",
-                  display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                }}
-              >
-                {currentTool.examples.map((example) => (
-                  <button
-                    key={example.label}
-                    className="tc-chip-hover"
-                    style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
-                    onClick={() => setExample(example.text)}
-                  >
-                    {example.label}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ marginTop: "24px", position: "relative" }}>
-                <textarea
-                  className="tc-textarea"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={currentTool.placeholder}
-                  style={{
-                    width: "100%",
-                    minHeight: "240px",
-                    padding: "24px 24px 72px",
-                    fontSize: "24px",
-                    lineHeight: 1.6,
-                    borderRadius: "28px",
-                    background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
-                    color: "#0f172a",
-                    border: "1px solid rgba(99,102,241,0.10)",
-                    boxSizing: "border-box",
-                    outline: "none",
-                    resize: "vertical",
-                    boxShadow:
-                      "inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 34px rgba(15,23,42,0.04)",
-                  }}
-                />
-
-                <div
-                  style={{
-                    position: "absolute",
-                    right: "16px",
-                    bottom: "16px",
-                    display: "flex",
-                    gap: "10px",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <button
-                    className="tc-button-hover"
-                    onClick={() => {
-                      setMessage("");
-                      setResult(null);
-                      setCopyState("");
-                    }}
-                    style={actionButtonStyle}
-                  >
-                    Clear
-                  </button>
-
-                  <button
-                    className="tc-button-hover"
-                    onClick={analyze}
-                    disabled={loading || !message.trim()}
-                    style={{
-                      ...primaryButtonStyle,
-                      opacity: loading || !message.trim() ? 0.7 : 1,
-                    }}
-                  >
-                    {loading ? "Analyzing..." : currentTool.analyzeLabel}
-                  </button>
-                </div>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "14px",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  gap: "12px",
-                  flexWrap: "wrap",
-                  color: "#64748b",
-                  fontSize: "14px",
-                }}
-              >
-              </div>
-            {location.pathname === "/" && (
-              <div style={{ marginTop: "28px" }}>
-                <MiniToolGrid />
-              </div>
-            )}
-                          
-            </div>
+          
 
             {result?.error && (
               <div
