@@ -41,7 +41,24 @@ export default function RewriteCard({
           </div>
         </div>
 
-            <div
+        <div
+          style={{
+            padding: "18px",
+            borderRadius: "14px",
+            background: "rgba(255,255,255,0.95)",
+            border: "1px solid rgba(251,146,60,0.25)",
+          }}
+        >
+          <div style={{ fontSize: "12px", fontWeight: 800, color: "#9a3412" }}>
+             ✨ Better Version
+          </div>
+
+          <div style={{ marginTop: "10px", fontSize: "22px", fontWeight: 700 }}>
+            "{finalRewrite}"
+          </div>
+        </div>
+
+              <div
         style={{
           marginTop: "16px",
           padding: "14px",
@@ -60,25 +77,8 @@ export default function RewriteCard({
         <span style={{ color: "#15803d", fontWeight: 800 }}>
           ↑ {riskImprovement} points safer
         </span>
-      </div>
-
-
-        <div
-          style={{
-            padding: "18px",
-            borderRadius: "14px",
-            background: "rgba(255,255,255,0.95)",
-            border: "1px solid rgba(251,146,60,0.25)",
-          }}
-        >
-          <div style={{ fontSize: "12px", fontWeight: 800, color: "#9a3412" }}>
-             ✨ Better Version
-          </div>
-
-          <div style={{ marginTop: "10px", fontSize: "22px", fontWeight: 700 }}>
-            "{finalRewrite}"
-          </div>
-        </div>
+      </div>  
+      
       </div>
 
       <div style={{ marginTop: "20px", display: "flex", gap: "12px", flexWrap: "wrap" }}>
