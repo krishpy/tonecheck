@@ -10,142 +10,10 @@ import {
   AdvisoryCard,
   SendDecisionCard,
 } from "./components/results";
+import STAT_EXPLANATIONS from "./config/statExplanations";
+import { MINI_TOOLS, getToolConfigFromPath } from "./config/miniTools";
+import MiniToolGrid from "./components/layout/MiniToolGrid";
 
-
-const STAT_EXPLANATIONS = {
-  risk: "How risky your message sounds. Higher means it could upset someone or escalate the conversation.",
-  reply: "How likely the other person is to respond positively.",
-  regret: "Chance you may regret sending this later.",
-  manipulation: "Whether the message may pressure or guilt the other person.",
-};
-
-const MINI_TOOLS = {
-  home: {
-    slug: "home",
-    title: "ToneCheck",
-    eyebrow: "Think Before You Send",
-    description:
-      "Check how your message may sound, detect hidden communication risk, and get a calmer rewrite before you hit send.",
-    placeholder: "Paste your message, WhatsApp text, or email here...",
-    analyzeLabel: "Analyze Tone",
-    examples: [
-      { label: "😒 Passive aggressive", text: "Fine. Do whatever you want." },
-      { label: "😠 Angry text", text: "Why are you ignoring me?" },
-      { label: "🧾 Work message", text: "Send me the file ASAP." },
-      { label: "🤝 Constructive", text: "I disagree, but let’s discuss calmly." },
-    ],
-    badge: "Communication Intelligence Demo",
-    resultMode: "default",
-  },
-  "should-i-send-this": {
-    slug: "should-i-send-this",
-    title: "Should I Send This?",
-    eyebrow: "Send Decision Tool",
-    description:
-      "Check whether your message may come off too aggressive, risky, manipulative, or regrettable before you hit send.",
-    placeholder: "Paste the message you're thinking of sending...",
-    analyzeLabel: "Check Message",
-    examples: [
-      { label: "Ignored?", text: "You keep ignoring me." },
-      { label: "No reply", text: "Why haven’t you answered me???" },
-      { label: "Soft ask", text: "Can we talk when you get a chance?" },
-      { label: "Passive", text: "Fine. Do whatever you want." },
-    ],
-    badge: "Mini Tool",
-    resultMode: "send_decision",
-  },
-  "passive-aggressive-detector": {
-    slug: "passive-aggressive-detector",
-    title: "Passive Aggressive Detector",
-    eyebrow: "Tone Signal Tool",
-    description:
-      "See whether your message sounds cold, sarcastic, dismissive, guilt-tripping, or indirectly hostile.",
-    placeholder: "Paste a message to check for passive aggression...",
-    analyzeLabel: "Detect Tone",
-    examples: [
-      { label: "Classic passive", text: "Fine. Do whatever you want." },
-      { label: "Dismissive", text: "Thanks for nothing." },
-      { label: "Cold compliance", text: "I’ll just do it myself." },
-      { label: "Fake polite", text: "No worries. Clearly you're busy." },
-    ],
-    badge: "Mini Tool",
-    resultMode: "passive_aggressive",
-  },
-  "manipulation-detector": {
-    slug: "manipulation-detector",
-    title: "Manipulation Detector",
-    eyebrow: "Hidden Signal Tool",
-    description:
-      "Check for guilt pressure, emotional leverage, reassurance demands, blame shifting, and hidden control.",
-    placeholder: "Paste a message to check for manipulation...",
-    analyzeLabel: "Analyze Message",
-    examples: [
-      { label: "Guilt", text: "After all I’ve done for you..." },
-      { label: "Leverage", text: "If you cared, you’d reply." },
-      { label: "Gaslight", text: "You’re overreacting." },
-      { label: "Control", text: "I only say this because I care about you." },
-    ],
-    badge: "Mini Tool",
-    resultMode: "manipulation",
-  },
-  "rude-or-polite": {
-    slug: "rude-or-polite",
-    title: "Rude or Polite?",
-    eyebrow: "Politeness Tool",
-    description:
-      "See whether your message sounds respectful, blunt, rude, insulting, or hostile.",
-    placeholder: "Paste a message to check how it may come across...",
-    analyzeLabel: "Check Tone",
-    examples: [
-      { label: "Blunt", text: "Send me the file today." },
-      { label: "Polite", text: "Can you please send me the file today?" },
-      { label: "Rude", text: "Shut up." },
-      { label: "Constructive", text: "I disagree, but let’s discuss calmly." },
-    ],
-    badge: "Mini Tool",
-    resultMode: "politeness",
-  },
-  "desperate-text-checker": {
-    slug: "desperate-text-checker",
-    title: "Desperate Text Checker",
-    eyebrow: "Relationship Tone Tool",
-    description:
-      "Check whether your message sounds clingy, needy, pressuring, over-eager, or emotionally dependent.",
-    placeholder: "Paste your text message...",
-    analyzeLabel: "Check Text",
-    examples: [
-      { label: "Hello??", text: "Hello??" },
-      { label: "Are you there?", text: "Are you there?" },
-      { label: "No reply", text: "Why aren’t you replying?" },
-      { label: "Needy", text: "Please answer me." },
-    ],
-    badge: "Mini Tool",
-    resultMode: "desperation",
-  },
-};
-
-function getToolConfigFromPath(pathname) {
-  if (pathname === "/") return MINI_TOOLS.home;
-
-  const SEO_ROUTE_MAP = {
-    "/should-i-send-this": "should-i-send-this",
-    "/passive-aggressive-text": "passive-aggressive-detector",
-    "/manipulative-text-checker": "manipulation-detector",
-    "/is-this-message-rude": "rude-or-polite",
-    "/desperate-text-checker": "desperate-text-checker",
-  };
-
-  if (SEO_ROUTE_MAP[pathname]) {
-    return MINI_TOOLS[SEO_ROUTE_MAP[pathname]];
-  }
-
-  if (pathname.startsWith("/tools/")) {
-    const slug = pathname.replace("/tools/", "");
-    return MINI_TOOLS[slug] || null;
-  }
-
-  return null;
-}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -156,165 +24,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-
-function MiniToolGrid () {
-  const [showMore, setShowMore] = React.useState(false);
-
-  const featuredTools = [
-    MINI_TOOLS["desperate-text-checker"],
-    MINI_TOOLS["rude-or-polite"],
-  ];
-
-  const moreTools = [
-    MINI_TOOLS["should-i-send-this"],
-    MINI_TOOLS["passive-aggressive-detector"],
-    MINI_TOOLS["manipulation-detector"],
-  ];
-
-  const toolRouteMap = {
-    "should-i-send-this": "/should-i-send-this",
-    "passive-aggressive-detector": "/passive-aggressive-text",
-    "manipulation-detector": "/manipulative-text-checker",
-    "rude-or-polite": "/is-this-message-rude",
-    "desperate-text-checker": "/desperate-text-checker",
-  };
-
- return (
-  <div style={{ marginTop: "28px" }}>
-    <div
-      style={{
-        fontSize: "12px",
-        fontWeight: 800,
-        letterSpacing: "0.08em",
-        color: "#6366f1",
-        textTransform: "uppercase",
-        marginBottom: "12px",
-      }}
-    >
-      Try other checks
-    </div>
-
-    <div
-      style={{
-        color: "#64748b",
-        fontSize: "13px",
-        lineHeight: 1.5,
-        marginBottom: "14px",
-      }}
-    >
-      Quick shortcuts for the most-used checks.
-    </div>
-
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-        gap: "16px",
-      }}
-    >
-      {featuredTools.map((tool) => (
-        <Link
-          key={tool.slug}
-          to={toolRouteMap[tool.slug] || `/tools/${tool.slug}`}
-          style={{
-            textDecoration: "none",
-            padding: "18px",
-            borderRadius: "18px",
-            background: "rgba(255,255,255,0.85)",
-            border: "1px solid rgba(15,23,42,0.06)",
-            boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
-            color: "#0f172a",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "11px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              color: "#6366f1",
-              textTransform: "uppercase",
-            }}
-          >
-            {tool.eyebrow}
-          </div>
-
-          <div
-            style={{
-              marginTop: "7px",
-              fontSize: "18px",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-            }}
-          >
-            {tool.title}
-          </div>
-
-          <div
-            style={{
-              marginTop: "6px",
-              color: "#475569",
-              fontSize: "13px",
-              lineHeight: 1.55,
-            }}
-          >
-            {tool.description}
-          </div>
-        </Link>
-      ))}
-
-      <div
-        onClick={() => setShowMore(!showMore)}
-        style={{
-          padding: "18px",
-          borderRadius: "18px",
-          background: "rgba(99,102,241,0.05)",
-          border: "1px dashed rgba(99,102,241,0.35)",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontWeight: 700,
-          color: "#4338ca",
-          fontSize: "14px",
-        }}
-      >
-        + More tools
-      </div>
-    </div>
-
-    {showMore && (
-      <div
-        style={{
-          display: "grid",
-          gap: "10px",
-          marginTop: "14px",
-        }}
-      >
-        {moreTools.map((tool) => (
-          <Link
-            key={tool.slug}
-            to={toolRouteMap[tool.slug] || `/tools/${tool.slug}`}
-            style={{
-              textDecoration: "none",
-              display: "block",
-              padding: "13px 14px",
-              borderRadius: "16px",
-              background: "rgba(255,255,255,0.86)",
-              border: "1px solid rgba(15,23,42,0.06)",
-              color: "#0f172a",
-              fontWeight: 700,
-              boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
-            }}
-          >
-            {tool.title}
-          </Link>
-        ))}
-      </div>
-    )}
-  </div>
-);
-
-}
 
 function SeoContentBlock({ tool }) {
   if (!tool || tool.slug === "home") return null;
@@ -395,6 +104,41 @@ function RedirectHome() {
 
   return null;
 }
+
+
+function AppContent() {
+  const [message, setMessage] = useState("");
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [copyState, setCopyState] = useState("");
+  const [rewriteTone, setRewriteTone] = useState("default");
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentTool = useMemo(() => {
+    return getToolConfigFromPath(location.pathname) || MINI_TOOLS.home;
+  }, [location.pathname]);
+
+  const pageTitle =
+    location.pathname === "/"
+      ? "ToneCheck — Check how your message may land before you send it"
+      : `${currentTool.title} | ToneCheck`;
+
+  const pageDescription =
+    location.pathname === "/"
+      ? "Check tone, aggression, manipulation, reply chance, regret risk, and get a calmer rewrite before sending."
+      : currentTool.description;
+
+  const displayedRewrite = useMemo(() => {
+    return (
+      result?.rewrite_suggestion ||
+      result?.suggested_rewrite ||
+      result?.rewrite ||
+      result?.rewritten_text ||
+      ""
+    );
+  }, [result]);
 
 
   function getHiddenSignalLabel(signal) {
@@ -1613,7 +1357,7 @@ https://trytonecheck.com`;
                       useRewriteMessage={useRewriteMessage}
                       copyState={copyState}
                     />
-      )}
+                    )}
               
                
                       <div
@@ -1805,7 +1549,7 @@ https://trytonecheck.com`;
     </div>
   
   );
-
+}
 
 export default function App() {
   return (
