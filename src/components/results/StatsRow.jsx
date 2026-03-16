@@ -4,6 +4,12 @@ function getLevel(score = 0) {
   return "Low";
 }
 
+function getReplyVibe(score = 0) {
+  if (score >= 70) return "Good";
+  if (score >= 35) return "Mixed";
+  return "Poor";
+}
+
 function StatCard({ label, value, tooltip }) {
   return (
     <div
@@ -51,30 +57,45 @@ export default function StatsRow({
   manipulationRisk = 0,
 }) {
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-        gap: "16px",
-      }}
-    >
-      <StatCard
-        label="Reply Chance"
-        value={getLevel(replyLikelihood)}
-        tooltip="How likely the other person is to respond well."
-      />
+    <div style={{ marginTop: "4px" }}>
+      <div
+        style={{
+          fontSize: "12px",
+          fontWeight: 900,
+          letterSpacing: "0.12em",
+          textTransform: "uppercase",
+          color: "#64748b",
+          marginBottom: "12px",
+        }}
+      >
+        What could happen
+      </div>
 
-      <StatCard
-        label="Second Thoughts"
-        value={getLevel(regretRisk)}
-        tooltip="How likely you may wish you had worded this differently later."
-      />
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gap: "16px",
+        }}
+      >
+        <StatCard
+          label="Reply vibe"
+          value={getReplyVibe(replyLikelihood)}
+          tooltip="How likely the other person is to respond well."
+        />
 
-      <StatCard
-        label="Pressure Level"
-        value={getLevel(manipulationRisk)}
-        tooltip="How much emotional pressure the message may create."
-      />
+        <StatCard
+          label="Chance of regret"
+          value={getLevel(regretRisk)}
+          tooltip="How likely you may wish you had worded this differently later."
+        />
+
+        <StatCard
+          label="Tension risk"
+          value={getLevel(manipulationRisk)}
+          tooltip="How much tension or emotional pressure the message may create."
+        />
+      </div>
     </div>
   );
 }
