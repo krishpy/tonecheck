@@ -13,6 +13,7 @@ import {
 import STAT_EXPLANATIONS from "./config/statExplanations";
 import { MINI_TOOLS, getToolConfigFromPath } from "./config/miniTools";
 import MiniToolGrid from "./components/layout/MiniToolGrid";
+import { getSendVerdict } from "./utils/sendDecision";
 
 
 function escapeHtml(value) {
@@ -542,7 +543,7 @@ https://trytonecheck.com`;
   const replyLikelihood = Number(result?.reply_likelihood ?? 0);
   const manipulationRisk = Number(result?.manipulation_risk ?? 0);
   const toneTheme = getToneTheme();
-  const sendVerdict = getSendVerdict(riskScore);
+  const sendVerdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
 
   const pageStyle = {
     minHeight: "100vh",
