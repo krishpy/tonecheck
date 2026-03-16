@@ -1,3 +1,21 @@
+function getReadableSignal(signal) {
+  const map = {
+    polite_request_signal: "a polite ask",
+    accusatory_pressure_signal: "blame or pressure",
+    pressure_signal: "urgency or pressure",
+    passive_aggression_signal: "passive aggression",
+    hostility_signal: "hostility",
+    threat_signal: "a threat",
+    profanity_signal: "harsh language",
+    insult_signal: "an insult",
+    hostile_command_signal: "a harsh command",
+    constructive_disagreement_signal: "calm disagreement",
+    neutral_information: "neutral",
+  };
+
+  return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
+}
+
 export default function ToneSummaryCard({
   toneTheme,
   getToneLabel,
@@ -147,7 +165,7 @@ export default function ToneSummaryCard({
         }}
       >
         <div
-          title="The strongest communication pattern detected."
+          title="The main thing this message may feel like to the other person."
           style={{
             padding: "8px 12px",
             borderRadius: "999px",
@@ -158,8 +176,9 @@ export default function ToneSummaryCard({
             cursor: "help",
           }}
         >
-          Main signal: <strong>{String(primaryHiddenSignalLabel || "none").replaceAll("_", " ")}</strong>
+          Feels like: <strong>{getReadableSignal(primaryHiddenSignalLabel)}</strong>
         </div>
+        
       </div>
     </section>
   );

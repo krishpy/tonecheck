@@ -1,5 +1,24 @@
 import { getSendVerdict } from "../../utils/sendDecision";
 
+
+function getReadableSignal(signal) {
+  const map = {
+    polite_request_signal: "a polite ask",
+    accusatory_pressure_signal: "blame or pressure",
+    pressure_signal: "urgency or pressure",
+    passive_aggression_signal: "passive aggression",
+    hostility_signal: "hostility",
+    threat_signal: "a threat",
+    profanity_signal: "harsh language",
+    insult_signal: "an insult",
+    hostile_command_signal: "a harsh command",
+    constructive_disagreement_signal: "calm disagreement",
+    neutral_information: "neutral",
+  };
+
+  return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
+}
+
 function getVerdictTheme(toneClass) {
    
   if (toneClass === "safe") {
@@ -216,45 +235,39 @@ export default function SendDecisionCard({
         </div>
       </div>
 
-      <div
+     <div
         style={{
           marginTop: "18px",
           display: "flex",
+          alignItems: "center",
           gap: "10px",
           flexWrap: "wrap",
         }}
       >
-            {tone ? (
+          {tone ? (
+              <div
+                title="How your message emotionally comes across."
+                style={chipStyle}
+              >
+                Comes across as: <strong>{tone}</strong>
+              </div>
+            ) : null}
+
+            {hiddenSignal ? (
+              <div
+                title="The main feeling or pattern detected in the message."
+                style={chipStyle}
+              >
+                Feels like: <strong>{getReadableSignal(hiddenSignal)}</strong>
+              </div>
+            ) : null}
+
             <div
-              title="How your message emotionally comes across."
+              title="Chance you may wish you had worded this differently later."
               style={chipStyle}
             >
-              Mood: <strong>{tone}</strong>
+              Second thoughts: <strong>{regretLabel}</strong>
             </div>
-          ) : null}
-
-          {hiddenSignal ? (
-            <div
-              title="The main pattern detected in your message."
-              style={chipStyle}
-            >
-              Pattern: <strong>{hiddenSignal.replaceAll("_", " ")}</strong>
-            </div>
-          ) : null}
-
-          <div
-            title="Chance you may wish you had worded this differently later."
-            style={chipStyle}
-          >
-            Regret chance: <strong>{regretRisk}</strong>
-          </div>
-
-          <div
-            title="How much emotional pressure this message may create."
-            style={chipStyle}
-          >
-            Pressure level: <strong>{manipulationRisk}</strong>
-          </div>
 
       </div>
     </section>
