@@ -63,69 +63,97 @@ export default function SendDecisionCard({
           flexWrap: "wrap",
         }}
       >
-        <div>
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#64748b",
-            }}
-          >
-            Should I Send This?
-          </div>
+        <div style={{ flex: 1, minWidth: "280px" }}>
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      flexWrap: "wrap",
+    }}
+  >
+    <div
+      style={{
+        fontSize: "14px",
+        fontWeight: 900,
+        letterSpacing: "0.12em",
+        textTransform: "uppercase",
+        color: "#64748b",
+      }}
+    >
+      Should I Send This?
+    </div>
 
-          <div
-            style={{
-              marginTop: "8px",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              flexWrap: "wrap",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "30px",
-                fontWeight: 900,
-                letterSpacing: "-0.04em",
-                color: "#111827",
-              }}
-            >
-              {theme.title}
-            </div>
+    <div
+      title="This is the quick answer based on tone, emotional pressure, and chance of regret."
+      style={{
+        width: "18px",
+        height: "18px",
+        borderRadius: "999px",
+        display: "grid",
+        placeItems: "center",
+        fontSize: "11px",
+        fontWeight: 800,
+        color: "#475569",
+        background: "rgba(255,255,255,0.72)",
+        border: "1px solid rgba(15,23,42,0.08)",
+        cursor: "help",
+      }}
+    >
+      i
+    </div>
+  </div>
 
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "8px 12px",
-                borderRadius: "999px",
-                background: theme.pillBg,
-                color: theme.pillText,
-                fontWeight: 800,
-                fontSize: "14px",
-              }}
-            >
-              <span>{verdict.emoji}</span>
-              <span>{verdict.label}</span>
-            </div>
-          </div>
+  <div
+    style={{
+      marginTop: "12px",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+      flexWrap: "wrap",
+    }}
+  >
+    <div
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "8px 12px",
+        borderRadius: "999px",
+        background: theme.pillBg,
+        color: theme.pillText,
+        fontWeight: 800,
+        fontSize: "14px",
+      }}
+    >
+      <span>{verdict.emoji}</span>
+      <span>{theme.title}</span>
+    </div>
 
-          <div
-            style={{
-              marginTop: "10px",
-              color: "#475569",
-              fontSize: "15px",
-              lineHeight: 1.6,
-              maxWidth: "760px",
-            }}
-          >
-            {verdict.reason}
-          </div>
-        </div>
+    <div
+      style={{
+        fontSize: "18px",
+        fontWeight: 800,
+        letterSpacing: "-0.03em",
+        color: "#111827",
+      }}
+    >
+      {verdict.label}
+    </div>
+  </div>
+
+  <div
+    style={{
+      marginTop: "10px",
+      color: "#475569",
+      fontSize: "15px",
+      lineHeight: 1.6,
+      maxWidth: "760px",
+    }}
+  >
+    {verdict.reason}
+  </div>
+</div>
 
         <div
           style={{
@@ -138,16 +166,19 @@ export default function SendDecisionCard({
           }}
         >
           <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              color: "#64748b",
-              textTransform: "uppercase",
-            }}
-          >
-            Risk
-          </div>
+          title="Overall chance this message creates tension, regret, or a bad reaction."
+          style={{
+            fontSize: "12px",
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            color: "#64748b",
+            textTransform: "uppercase",
+            cursor: "help",
+          }}
+        >
+          Send Score
+        </div>
+
           <div
             style={{
               marginTop: "6px",
