@@ -1,103 +1,163 @@
 export default function ToneSummaryCard({
-  cardStyle,
   toneTheme,
   getToneLabel,
   getToneEmoji,
   riskScore,
   sendVerdict,
   primaryHiddenSignalLabel,
-  getMeterWidth,
-  getMeterColor,
-  getToneAccent,
 }) {
   return (
-    <div
+    <section
       className="tc-glow-card"
       style={{
-        ...cardStyle,
-        padding: "26px",
         background: toneTheme.bg,
         border: `1px solid ${toneTheme.border}`,
-        boxShadow: `0 12px 34px ${toneTheme.glow}, 0 1px 0 rgba(255,255,255,0.7) inset`,
-        backgroundSize: "200% 200%",
+        borderRadius: "30px",
+        padding: "24px",
+        boxShadow: "0 12px 30px rgba(15,23,42,0.06)",
       }}
     >
       <div
         style={{
-          fontSize: "13px",
-          color: "#64748b",
-          fontWeight: 800,
-          letterSpacing: "0.08em",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: "16px",
+          flexWrap: "wrap",
         }}
       >
-        TONE SUMMARY
+        <div style={{ flex: 1, minWidth: "280px" }}>
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: 900,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#64748b",
+            }}
+          >
+            Tone Summary
+          </div>
+
+          <div
+            style={{
+              marginTop: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              flexWrap: "wrap",
+            }}
+          >
+            <div
+              style={{
+                width: "56px",
+                height: "56px",
+                borderRadius: "18px",
+                display: "grid",
+                placeItems: "center",
+                background: toneTheme.iconBg,
+                color: "#fff",
+                fontSize: "28px",
+                boxShadow: "0 10px 24px rgba(15,23,42,0.10)",
+              }}
+            >
+              {getToneEmoji()}
+            </div>
+
+            <div>
+              <div
+                style={{
+                  fontSize: "32px",
+                  lineHeight: 1,
+                  fontWeight: 900,
+                  letterSpacing: "-0.05em",
+                  color: "#111827",
+                }}
+              >
+                {getToneLabel()}
+              </div>
+
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "15px",
+                  color: "#475569",
+                }}
+              >
+                This is how your message is likely to come across.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            minWidth: "180px",
+            padding: "16px 18px",
+            borderRadius: "22px",
+            background: "rgba(255,255,255,0.72)",
+            border: "1px solid rgba(15,23,42,0.06)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+              color: "#64748b",
+            }}
+          >
+            Overall
+          </div>
+
+          <div
+            style={{
+              marginTop: "8px",
+              fontSize: "22px",
+              fontWeight: 900,
+              letterSpacing: "-0.03em",
+              color: "#111827",
+            }}
+          >
+            {sendVerdict?.emoji} {sendVerdict?.label}
+          </div>
+
+          <div
+            style={{
+              marginTop: "8px",
+              fontSize: "14px",
+              color: "#64748b",
+            }}
+          >
+            Score: <strong style={{ color: "#111827" }}>{riskScore}</strong>
+          </div>
+        </div>
       </div>
 
       <div
         style={{
-          marginTop: "14px",
+          marginTop: "18px",
           display: "flex",
-          flexWrap: "wrap",
           gap: "10px",
-          alignItems: "center",
-          fontSize: "15px",
-          color: "#334155",
+          flexWrap: "wrap",
         }}
       >
-        <span>
-          <strong>{getToneLabel()}</strong> {getToneEmoji()}
-        </span>
-        <span>•</span>
-        <span>
-          <strong>Risk:</strong> {riskScore}/100
-        </span>
-        <span>•</span>
-        <span>
-          <strong>{sendVerdict.label}</strong>
-        </span>
-        <span>•</span>
-        <span>{primaryHiddenSignalLabel}</span>
-      </div>
-
-      <div style={{ marginTop: "22px" }}>
         <div
+          title="The strongest communication pattern detected."
           style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: "10px",
-            color: "#475569",
-            fontSize: "14px",
-            fontWeight: 700,
-          }}
-        >
-          <span>Overall Risk</span>
-          <span>{riskScore}/100</span>
-        </div>
-
-        <div
-          style={{
-            width: "100%",
-            height: "18px",
-            background:
-              "linear-gradient(180deg, rgba(226,232,240,0.78), rgba(241,245,249,0.9))",
+            padding: "8px 12px",
             borderRadius: "999px",
-            overflow: "hidden",
-            boxShadow: "inset 0 2px 6px rgba(15,23,42,0.06)",
+            background: "rgba(255,255,255,0.72)",
+            border: "1px solid rgba(15,23,42,0.06)",
+            fontSize: "13px",
+            color: "#334155",
+            cursor: "help",
           }}
         >
-          <div
-            className="tc-shimmer"
-            style={{
-              width: getMeterWidth(riskScore),
-              height: "100%",
-              background: getMeterColor(riskScore),
-              boxShadow: `0 0 26px ${getToneAccent(riskScore)}66`,
-              transition: "width 0.4s ease",
-              borderRadius: "999px",
-            }}
-          />
+          Main signal: <strong>{String(primaryHiddenSignalLabel || "none").replaceAll("_", " ")}</strong>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

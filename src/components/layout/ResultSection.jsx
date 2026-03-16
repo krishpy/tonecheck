@@ -308,18 +308,14 @@ export default function ResultSection({
       </div>
 
       <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-        <ToneSummaryCard
-          cardStyle={cardStyle}
-          toneTheme={toneTheme}
-          getToneLabel={getToneLabel}
-          getToneEmoji={getToneEmoji}
-          riskScore={riskScore}
-          sendVerdict={sendVerdict}
-          primaryHiddenSignalLabel={primaryHiddenSignalLabel}
-          getMeterWidth={getMeterWidth}
-          getMeterColor={getMeterColor}
-          getToneAccent={getToneAccent}
-        />
+          <ToneSummaryCard
+              toneTheme={toneTheme}
+              getToneLabel={getToneLabel}
+              getToneEmoji={getToneEmoji}
+              riskScore={riskScore}
+              sendVerdict={sendVerdict}
+              primaryHiddenSignalLabel={primaryHiddenSignalLabel}
+            />
 
         <SendDecisionCard
           riskScore={result.risk_score}
