@@ -62,24 +62,6 @@ export default function RewriteCard({
           </div>
         </div>
 
-
-
-      <div
-        style={{
-          fontSize: "13px",
-          color: "#9a3412",
-          fontWeight: 900,
-          letterSpacing: "0.1em",
-          textTransform: "uppercase",
-        }}
-      >
-        ✨ Better Version
-      </div>
-
-      
-
-      
-
         <div
           style={{
             padding: "18px",
