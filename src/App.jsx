@@ -626,6 +626,32 @@ https://trytonecheck.com`;
               80% { transform: translateX(1px) rotate(3deg); }
             }
 
+
+            @keyframes tc-logo-pulse {
+              0% {
+                box-shadow:
+                  0 14px 38px rgba(99,102,241,0.28),
+                  inset 0 1px 0 rgba(255,255,255,0.36);
+              }
+
+              50% {
+                box-shadow:
+                  0 20px 48px rgba(99,102,241,0.45),
+                  0 0 28px rgba(236,72,153,0.35),
+                  inset 0 1px 0 rgba(255,255,255,0.42);
+              }
+
+              100% {
+                box-shadow:
+                  0 14px 38px rgba(99,102,241,0.28),
+                  inset 0 1px 0 rgba(255,255,255,0.36);
+              }
+            }
+
+            .tc-logo-glow {
+              animation: tc-logo-pulse 4.5s ease-in-out infinite;
+            }
+
             @keyframes tc-tone-aggressive {
               0%, 100% { transform: scale(1) translateY(0); }
               30% { transform: scale(1.08) translateY(-1px); }

@@ -95,6 +95,7 @@ export default function HeroSection({
           }}
         >
           <div
+            className="tc-logo-glow"
             style={{
               position: "relative",
               width: "74px",
