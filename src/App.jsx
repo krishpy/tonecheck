@@ -907,6 +907,23 @@ https://trytonecheck.com`;
   );
 }
 
+
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<AppContent />} />
+      <Route path="/tools/:slug" element={<AppContent />} />
+      <Route path="/should-i-send-this" element={<AppContent />} />
+      <Route path="/passive-aggressive-text" element={<AppContent />} />
+      <Route path="/manipulative-text-checker" element={<AppContent />} />
+      <Route path="/is-this-message-rude" element={<AppContent />} />
+      <Route path="/desperate-text-checker" element={<AppContent />} />
+      <Route path="*" element={<RedirectHome />} />
+    </Routes>
+  );
+}
+
 function getResultBadge(result, riskImprovement) {
   if (!result) return null;
 
@@ -959,18 +976,3 @@ const resultBadge = getResultBadge(result, riskImprovement);
     {resultBadge.text}
   </div>
 )}
-
-export default function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<AppContent />} />
-      <Route path="/tools/:slug" element={<AppContent />} />
-      <Route path="/should-i-send-this" element={<AppContent />} />
-      <Route path="/passive-aggressive-text" element={<AppContent />} />
-      <Route path="/manipulative-text-checker" element={<AppContent />} />
-      <Route path="/is-this-message-rude" element={<AppContent />} />
-      <Route path="/desperate-text-checker" element={<AppContent />} />
-      <Route path="*" element={<RedirectHome />} />
-    </Routes>
-  );
-}
