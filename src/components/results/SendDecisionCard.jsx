@@ -148,7 +148,6 @@ export default function SendDecisionCard({
               flexWrap: "wrap",
             }}
           >
-            
             <div
               style={{
                 display: "inline-flex",
@@ -165,6 +164,7 @@ export default function SendDecisionCard({
               <span>{verdict.emoji}</span>
               <span>{theme.title}</span>
             </div>
+          </div>
 
           <div
             style={{
@@ -181,7 +181,7 @@ export default function SendDecisionCard({
 
         <div
           style={{
-            minWidth: "120px",
+            minWidth: "160px",
             padding: "14px 16px",
             borderRadius: "20px",
             background: theme.pillBg,
@@ -206,13 +206,14 @@ export default function SendDecisionCard({
           <div
             style={{
               marginTop: "6px",
-              fontSize: "30px",
+              fontSize: "24px",
               fontWeight: 900,
               letterSpacing: "-0.05em",
               color: "#111827",
+              lineHeight: 1.1,
             }}
           >
-            {verdict.title}
+            {theme.title}
           </div>
         </div>
       </div>
