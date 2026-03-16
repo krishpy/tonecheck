@@ -468,6 +468,7 @@ https://trytonecheck.com`;
   const manipulationRisk = Number(result?.manipulation_risk ?? 0);
   const toneTheme = getToneTheme();
   const sendVerdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
+  const resultBadge = getResultBadge(result, riskImprovement);
 
   const pageStyle = {
     minHeight: "100vh",
@@ -898,6 +899,7 @@ https://trytonecheck.com`;
               downloadCard={downloadCard}
               setResult={setResult}
               setCopyState={setCopyState}
+              resultBadge={resultBadge}
             />
           </div>
         </div>
@@ -952,27 +954,3 @@ function getResultBadge(result, riskImprovement) {
     border: "1px solid rgba(37,99,235,0.25)"
   };
 }
-
-const resultBadge = getResultBadge(result, riskImprovement);
-
-
-{resultBadge && (
-  <div
-    style={{
-      marginTop: "18px",
-      marginBottom: "12px",
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "10px",
-      padding: "10px 14px",
-      borderRadius: "999px",
-      fontWeight: 800,
-      fontSize: "14px",
-      color: resultBadge.color,
-      background: resultBadge.bg,
-      border: resultBadge.border,
-    }}
-  >
-    {resultBadge.text}
-  </div>
-)}

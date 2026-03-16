@@ -49,6 +49,7 @@ export default function ResultSection({
   downloadCard,
   setResult,
   setCopyState,
+  resultBadge,
 }) {
   if (!result || result.error) return null;
 
@@ -314,6 +315,27 @@ export default function ResultSection({
               getToneEmoji={getToneEmoji}
               sendVerdict={sendVerdict}
             />
+
+        {resultBadge && (
+              <div
+                style={{
+                  marginTop: "18px",
+                  marginBottom: "12px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  padding: "10px 14px",
+                  borderRadius: "999px",
+                  fontWeight: 800,
+                  fontSize: "14px",
+                  color: resultBadge.color,
+                  background: resultBadge.bg,
+                  border: resultBadge.border,
+                }}
+              >
+                {resultBadge.text}
+              </div>
+            )}
 
       
 
