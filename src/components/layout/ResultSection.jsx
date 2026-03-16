@@ -5,7 +5,6 @@ import {
   StatsRow,
   DetectedSignals,
   AdvisoryCard,
-  SendDecisionCard,
 } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
@@ -317,13 +316,7 @@ export default function ResultSection({
               primaryHiddenSignalLabel={primaryHiddenSignalLabel}
             />
 
-        <SendDecisionCard
-          riskScore={result.risk_score}
-          regretRisk={result.regret_risk}
-          manipulationRisk={result.manipulation_risk}
-          tone={result.tone}
-          hiddenSignal={result.primary_hidden_signal}
-        />
+      
 
         {finalRewrite && (
           <RewriteCard
