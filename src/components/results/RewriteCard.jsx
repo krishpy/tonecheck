@@ -68,93 +68,100 @@ export default function RewriteCard({
             style={{
               display: "flex",
               justifyContent: "space-between",
-              alignItems: "center",
-              gap: "12px",
+              alignItems: "flex-start",
+              gap: "16px",
               flexWrap: "wrap",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                flexWrap: "wrap",
-              }}
-            >
+            <div style={{ flex: 1, minWidth: "260px" }}>
               <div
                 style={{
-                  fontSize: "12px",
-                  fontWeight: 900,
-                  letterSpacing: "0.10em",
-                  textTransform: "uppercase",
-                  color: "#9a3412",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  flexWrap: "wrap",
                 }}
               >
-                ✨ Send this instead
+                <div
+                  style={{
+                    fontSize: "12px",
+                    fontWeight: 900,
+                    letterSpacing: "0.10em",
+                    textTransform: "uppercase",
+                    color: "#9a3412",
+                  }}
+                >
+                  ✨ Send this instead
+                </div>
               </div>
 
               <div
-                  title={`${riskImprovement} points safer than the original message`}
+                style={{
+                  marginTop: "8px",
+                  fontSize: "13px",
+                  color: "#64748b",
+                }}
+              >
+                Less likely to create tension
+              </div>
+
+              <div
+                style={{
+                  marginTop: "12px",
+                  fontSize: "30px",
+                  fontWeight: 800,
+                  lineHeight: 1.45,
+                  letterSpacing: "-0.03em",
+                  color: "#111827",
+                }}
+              >
+                “{finalRewrite}”
+              </div>
+            </div>
+
+            {riskImprovement > 8 && (
+              <div
+                title={`${riskImprovement} points safer than the original message`}
+                style={{
+                  width: "72px",
+                  height: "72px",
+                  borderRadius: "999px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background:
+                    "linear-gradient(135deg, rgba(34,197,94,0.18), rgba(134,239,172,0.28))",
+                  border: "1px solid rgba(34,197,94,0.30)",
+                  color: "#15803d",
+                  fontWeight: 900,
+                  boxShadow: "0 10px 28px rgba(34,197,94,0.16)",
+                  animation: "tc-safer-pop 0.7s ease-out",
+                  flexShrink: 0,
+                }}
+              >
+                <div
                   style={{
-                    width: "72px",
-                    height: "72px",
-                    borderRadius: "999px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background:
-                      "linear-gradient(135deg, rgba(34,197,94,0.18), rgba(134,239,172,0.28))",
-                    border: "1px solid rgba(34,197,94,0.30)",
-                    color: "#15803d",
-                    fontWeight: 900,
-                    boxShadow: "0 10px 28px rgba(34,197,94,0.16)",
-                    animation: "tc-safer-pop 0.7s ease-out",
+                    fontSize: "18px",
+                    lineHeight: 1,
+                    letterSpacing: "-0.04em",
                   }}
                 >
-                  <div
-                    style={{
-                      fontSize: "18px",
-                      lineHeight: 1,
-                      letterSpacing: "-0.04em",
-                    }}
-                  >
-                    ↑{riskImprovement}
-                  </div>
-
-                  <div
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: 800,
-                      opacity: 0.8,
-                      marginTop: "2px",
-                    }}
-                  >
-                    safer
-                  </div>
+                  ↑{riskImprovement}
                 </div>
 
-          <div
-            style={{
-              marginTop: "8px",
-              fontSize: "13px",
-              color: "#64748b",
-            }}
-          >
-            Less likely to create tension
-          </div>
-
-          <div
-            style={{
-              marginTop: "12px",
-              fontSize: "30px",
-              fontWeight: 800,
-              lineHeight: 1.45,
-              letterSpacing: "-0.03em",
-              color: "#111827",
-            }}
-          >
-            “{finalRewrite}”
+                <div
+                  style={{
+                    fontSize: "11px",
+                    fontWeight: 800,
+                    opacity: 0.8,
+                    marginTop: "2px",
+                  }}
+                >
+                  safer
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
