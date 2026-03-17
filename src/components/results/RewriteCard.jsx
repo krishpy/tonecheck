@@ -25,10 +25,11 @@ export default function RewriteCard({
       <div style={{ display: "grid", gap: "16px" }}>
         <div
           style={{
-            padding: "16px",
+           padding: "16px",
             borderRadius: "16px",
-            background: "rgba(248,250,252,0.88)",
-            border: "1px solid rgba(15,23,42,0.06)",
+            background: "rgba(254,226,226,0.55)",
+            border: "1px solid rgba(239,68,68,0.20)",
+            boxShadow: "0 6px 18px rgba(239,68,68,0.06)",
           }}
         >
           <div
@@ -40,7 +41,7 @@ export default function RewriteCard({
               color: "#64748b",
             }}
           >
-            Before
+            ⚠️ Original message
           </div>
 
           <div
@@ -48,7 +49,8 @@ export default function RewriteCard({
               marginTop: "8px",
               fontSize: "18px",
               lineHeight: 1.65,
-              color: "#334155",
+              color: "#7f1d1d",
+              fontWeight: 600,
             }}
           >
             “{message}”
@@ -91,7 +93,7 @@ export default function RewriteCard({
                     color: "#9a3412",
                   }}
                 >
-                  ✨ Send this instead
+                  ✨ Try saying it like this
                 </div>
               </div>
 
