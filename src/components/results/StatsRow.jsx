@@ -10,6 +10,27 @@ function getReplyVibe(score = 0) {
   return "Poor";
 }
 
+function formatHiddenSignal(signal = "") {
+  const map = {
+    threat_signal: "Threat",
+    hostile_command_signal: "Hostile command",
+    profanity_signal: "Profanity",
+    insult_signal: "Insult",
+    guilt_pressure: "Guilt pressure",
+    emotional_leverage: "Emotional leverage",
+    blame_shifting: "Blame shifting",
+    accusatory_pressure_signal: "Accusatory pressure",
+    pressure_signal: "Pressure",
+    passive_aggression_signal: "Passive aggression",
+    constructive_disagreement_signal: "Constructive disagreement",
+    polite_request_signal: "Polite request",
+    neutral_information: "Neutral",
+  };
+
+  if (!signal) return "Neutral";
+  return map[signal] || signal.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function StatCard({ label, value, tooltip }) {
   return (
     <div
@@ -55,6 +76,7 @@ export default function StatsRow({
   replyLikelihood = 0,
   regretRisk = 0,
   manipulationRisk = 0,
+  hiddenSignal = "Neutral",
 }) {
   return (
     <div style={{ marginTop: "4px" }}>
@@ -91,9 +113,15 @@ export default function StatsRow({
         />
 
         <StatCard
-          label="Tension risk"
+          label="Emotional pressure"
           value={getLevel(manipulationRisk)}
           tooltip="How much tension or emotional pressure the message may create."
+        />
+
+        <StatCard
+          label="Hidden signal"
+          value={formatHiddenSignal(hiddenSignal)}
+          tooltip="The underlying communication pattern detected in the message."
         />
       </div>
     </div>

@@ -338,6 +338,7 @@ export default function ResultSection({
           replyLikelihood={replyLikelihood}
           regretRisk={regretRisk}
           manipulationRisk={manipulationRisk}
+          hiddenSignal={result.hidden_signal || result.primary_hidden_signal}
         />
 
         <DetectedSignals
