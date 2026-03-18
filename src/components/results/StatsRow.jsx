@@ -113,7 +113,7 @@ export default function StatsRow({
         />
 
         <StatCard
-          label="Emotional pressure"
+          label="Emotional pressure "
           value={getLevel(manipulationRisk)}
           tooltip="How much tension or emotional pressure the message may create."
         />
