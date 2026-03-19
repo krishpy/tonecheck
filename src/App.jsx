@@ -4,7 +4,6 @@ import * as htmlToImage from "html-to-image";
 import { Helmet } from "react-helmet-async";
 import STAT_EXPLANATIONS from "./config/statExplanations";
 import { MINI_TOOLS, getToolConfigFromPath } from "./config/miniTools";
-import MiniToolGrid from "./components/layout/MiniToolGrid";
 import { getSendVerdict } from "./utils/sendDecision";
 import SeoContentBlock from "./components/layout/SeoContentBlock";
 import HeroSection from "./components/layout/HeroSection";
