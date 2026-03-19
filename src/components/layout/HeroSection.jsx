@@ -63,6 +63,7 @@ export default function HeroSection({
 
       <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
         <button
+         type="button"
           className="tc-chip-hover"
           onClick={() => navigate("/")}
           style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
@@ -194,6 +195,7 @@ export default function HeroSection({
       >
         {currentTool.examples.map((example) => (
           <button
+          type="button"
             key={example.label}
             className="tc-chip-hover"
             style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
@@ -241,6 +243,7 @@ export default function HeroSection({
           }}
         >
           <button
+          type="button"
             className="tc-button-hover"
             onClick={() => {
               setMessage("");
@@ -253,6 +256,7 @@ export default function HeroSection({
           </button>
 
           <button
+          type="button"
             className="tc-button-hover"
             onClick={analyze}
             disabled={loading || !message.trim()}

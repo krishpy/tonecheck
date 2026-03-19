@@ -128,6 +128,7 @@ export default function RewriteCard({
 
     return (
       <button
+      type="button"
         key={option.value}
         className="tc-chip-hover"
         onClick={() => setRewriteTone(option.value)}
@@ -225,6 +226,7 @@ export default function RewriteCard({
         }}
       >
         <button
+         type="button"
           onClick={useRewriteMessage}
           className="tc-button-hover"
           style={{
@@ -245,6 +247,7 @@ export default function RewriteCard({
         </button>
 
         <button
+        type="button"
           onClick={copyRewriteOnly}
           className="tc-button-hover"
           style={{
@@ -263,6 +266,7 @@ export default function RewriteCard({
         </button>
 
         <button
+        type="button"
           onClick={() => {
             if (!finalRewrite) return;
             window.open(
