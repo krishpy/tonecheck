@@ -380,7 +380,7 @@ https://trytonecheck.com`;
         },
         body: JSON.stringify({
           message_text: message,
-          rewrite_style: selectedStyle,
+          rewrite_style: rewriteTone,
         }),
       }
     );
