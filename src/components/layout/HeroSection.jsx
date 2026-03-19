@@ -61,15 +61,10 @@ export default function HeroSection({
       <div style={glassOrb2} />
       <div style={glassOrb3} />
 
+      
       <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        <button
-         type="button"
-          className="tc-chip-hover"
-          onClick={() => navigate("/")}
-          style={{ ...chipStyle, background: "rgba(255,255,255,0.82)" }}
-        >
-          Home
-        </button>
+     
+        
 
         {location.pathname !== "/" && (
           <div
