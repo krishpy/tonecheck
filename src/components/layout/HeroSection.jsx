@@ -219,12 +219,12 @@ export default function HeroSection({
             borderRadius: "28px",
             background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
             color: "#0f172a",
-            border: "1px solid rgba(99,102,241,0.10)",
+            border: "1px solid rgba(99,102,241,0.18)",
             boxSizing: "border-box",
             outline: "none",
             resize: "vertical",
             boxShadow:
-              "inset 0 1px 0 rgba(255,255,255,0.86), 0 14px 34px rgba(15,23,42,0.04)",
+              "inset 0 1px 0 rgba(255,255,255,0.86), 0 16px 38px rgba(15,23,42,0.06)",
           }}
         />
 
@@ -276,6 +276,16 @@ export default function HeroSection({
 >
   Used before sending by thousands of messages every week
    </div>
+   <div
+  style={{
+    marginTop: "10px",
+    fontSize: "13px",
+    fontWeight: 700,
+    color: "#b45309",
+  }}
+>
+  ⚠️ Messages are often misunderstood without context
+</div>
    <div
   style={{
     marginTop: "14px",

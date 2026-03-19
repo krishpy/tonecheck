@@ -573,7 +573,7 @@ https://trytonecheck.com`;
     background:
       "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
     boxShadow:
-      "0 16px 36px rgba(79,70,229,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
+      "0 18px 44px rgba(79,70,229,0.30), 0 8px 22px rgba(236,72,153,0.16), inset 0 1px 0 rgba(255,255,255,0.18)",
   };
 
   const cardStyle = {
