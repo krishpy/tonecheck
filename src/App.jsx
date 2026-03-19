@@ -220,32 +220,8 @@ function AppContent() {
     return "linear-gradient(90deg,#34d399,#22c55e,#14b8a6)";
   }
 
-  function adjustRewriteTone(text, tone) {
-    if (!text) return text;
-
-    if (tone === "calmer") {
-      return text.replace(/\?+/g, ".").replace(/!/g, ".");
-    }
-
-    if (tone === "professional") {
-      return `Hi,\n\n${text}\n\nThank you.`;
-    }
-
-    if (tone === "friendlier") {
-      if (text.endsWith(".")) return text.replace(/\.$/, " 🙂");
-      return `${text} 🙂`;
-    }
-
-    if (tone === "direct") {
-      return text
-        .replace("Could you please", "Please")
-        .replace("when you get a chance", "today");
-    }
-
-    return text;
-  }
-
-  const finalRewrite = adjustRewriteTone(displayedRewrite, rewriteTone);
+ 
+const finalRewrite = displayedRewrite;
 
   const primaryHiddenSignalLabel = getHiddenSignalLabel(
     result?.primary_hidden_signal || result?.primary_manipulation_signal

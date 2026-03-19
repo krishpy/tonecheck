@@ -1,3 +1,11 @@
+const rewriteOptions = [
+  { value: "balanced", label: "Balanced" },
+  { value: "softer", label: "Softer" },
+  { value: "warmer", label: "Warmer" },
+  { value: "professional", label: "Professional" },
+  { value: "direct", label: "More Direct" },
+];
+
 export default function RewriteCard({
   cardStyle,
   chipStyle,
@@ -106,6 +114,45 @@ export default function RewriteCard({
               >
                 Less likely to create tension
               </div>
+
+              <div
+  style={{
+    marginTop: "14px",
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+  }}
+>
+  {rewriteOptions.map((option) => {
+    const active = rewriteTone === option.value;
+
+    return (
+      <button
+        key={option.value}
+        className="tc-chip-hover"
+        onClick={() => setRewriteTone(option.value)}
+        style={{
+          ...chipStyle,
+          padding: "10px 14px",
+          fontSize: "13px",
+          fontWeight: 800,
+          background: active ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.82)",
+          color: active ? "#4338ca" : "#111827",
+          border: active
+            ? "1px solid rgba(99,102,241,0.24)"
+            : "1px solid rgba(15,23,42,0.08)",
+          boxShadow: active
+            ? "0 8px 20px rgba(99,102,241,0.10)"
+            : "0 4px 12px rgba(15,23,42,0.04)",
+        }}
+      >
+        {option.label}
+      </button>
+    );
+  })}
+</div>
+
+              
 
               <div
                 style={{
