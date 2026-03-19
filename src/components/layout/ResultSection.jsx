@@ -315,6 +315,45 @@ export default function ResultSection({
               sendVerdict={sendVerdict}
             />
 
+            <div
+    style={{
+      ...cardStyle,
+      background: "rgba(255,255,255,0.82)",
+    }}
+  >
+    <div
+      style={{
+        fontSize: "12px",
+        fontWeight: 800,
+        letterSpacing: "0.16em",
+        textTransform: "uppercase",
+        color: "#6366f1",
+        marginBottom: "10px",
+      }}
+    >
+      Why this was flagged
+    </div>
+
+    <div
+      style={{
+        display: "grid",
+        gap: "10px",
+      }}
+    >
+      <div style={{ color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
+        Tone detected: {getToneEmoji()} {getToneLabel()}
+      </div>
+
+      <div style={{ color: "#334155", fontSize: "15px", lineHeight: 1.6 }}>
+        Hidden signal: <strong>{primaryHiddenSignalLabel}</strong>
+      </div>
+
+      <div style={{ color: "#334155", fontSize: "15px", lineHeight: 1.6 }}>
+        {result.advisory || "This message may create tension or be misunderstood."}
+      </div>
+    </div>
+  </div>
+
       
 
         {finalRewrite && (
