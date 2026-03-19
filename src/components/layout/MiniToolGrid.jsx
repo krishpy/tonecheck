@@ -24,7 +24,7 @@ export default function MiniToolGrid() {
     "desperate-text-checker": "/desperate-text-checker",
   };
 
-  return (
+  /*return (
     <div style={{ marginTop: "28px" }}>
       <div
         style={{
@@ -125,7 +125,7 @@ export default function MiniToolGrid() {
         >
           + More tools
         </div>
-      </div>
+      </div> 
 
       {showMore && (
         <div
@@ -157,5 +157,5 @@ export default function MiniToolGrid() {
         </div>
       )}
     </div>
-  );
+  );*/
 }
