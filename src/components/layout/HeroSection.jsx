@@ -1,5 +1,5 @@
 import React from "react";
-
+import MiniToolGrid from "./MiniToolGrid";
 
 export default function HeroSection({
   location,
