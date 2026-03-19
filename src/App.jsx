@@ -438,52 +438,6 @@ https://trytonecheck.com`;
     }
   }
 
-  async function analyze() {
-    try {
-      setLoading(true);
-      setResult(null);
-      setCopyState("");
-
-      const response = await fetch(
-        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "test-default-key",
-          },
-          body: JSON.stringify({
-            message_text: message,
-            rewrite_style: rewriteTone,
-          }),
-        }
-      );
-
-      const rawText = await response.text();
-
-      let data = {};
-      try {
-        data = JSON.parse(rawText);
-      } catch {
-        data = {};
-      }
-
-      if (!response.ok) {
-        throw new Error(data?.detail || "Something went wrong. Please try again.");
-      }
-
-      setResult(data);
-      setRewriteTone("balanced");
-    } catch (error) {
-      console.error("Analyze failed:", error);
-      setResult({
-        error: "Something went wrong while analyzing the message. Please try again.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  }
-
   function setExample(text) {
     setMessage(text);
     setCopyState("");
