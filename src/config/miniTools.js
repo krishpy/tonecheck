@@ -6,7 +6,7 @@ export const MINI_TOOLS = {
     description:
       "Check how your message may sound, detect hidden communication risk, and get a calmer rewrite before you hit send.",
     placeholder: "Paste your message, WhatsApp text, or email here...",
-    analyzeLabel: "Analyze Tone",
+    analyzeLabel: "Check Before Sending",
     examples: [
       { label: "😒 Passive aggressive", text: "Fine. Do whatever you want." },
       { label: "😠 Angry text", text: "Why are you ignoring me?" },
@@ -22,7 +22,7 @@ export const MINI_TOOLS = {
     title: "Should I Send This?",
     eyebrow: "Send Decision Tool",
     description:
-      "Check whether your message may come off too aggressive, risky, manipulative, or regrettable before you hit send.",
+      "Don’t send a message you’ll regret.",
     placeholder: "Paste the message you're thinking of sending...",
     analyzeLabel: "Check Message",
     examples: [
