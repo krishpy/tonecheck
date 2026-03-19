@@ -4,7 +4,7 @@ export const MINI_TOOLS = {
     title: "ToneCheck",
     eyebrow: "Think Before You Send",
     description:
-      "Check how your message may sound, detect hidden communication risk, and get a calmer rewrite before you hit send.",
+      "Don't send a message you’ll regret. Check the tone of your texts, emails, or WhatsApp messages before you hit send.",
     placeholder: "Paste your message, WhatsApp text, or email here...",
     analyzeLabel: "Check Before Sending",
     examples: [

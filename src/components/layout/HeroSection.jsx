@@ -1,5 +1,5 @@
 import React from "react";
-import MiniToolGrid from "./MiniToolGrid";
+
 
 export default function HeroSection({
   location,
@@ -228,6 +228,8 @@ export default function HeroSection({
           }}
         />
 
+ 
+
         <div
           style={{
             position: "absolute",
@@ -263,12 +265,67 @@ export default function HeroSection({
           </button>
         </div>
       </div>
+             <div
+  style={{
+    marginTop: "14px",
+    fontSize: "13px",
+    fontWeight: 600,
+    color: "rgba(71,85,105,0.78)",
+    letterSpacing: "0.01em",
+  }}
+>
+  Used before sending by thousands of messages every week
+   </div>
+   <div
+  style={{
+    marginTop: "14px",
+    display: "flex",
+    gap: "10px",
+    flexWrap: "wrap",
+  }}
+>
+  <div
+    style={{
+      padding: "10px 14px",
+      borderRadius: "999px",
+      background: "rgba(245,158,11,0.10)",
+      border: "1px solid rgba(245,158,11,0.20)",
+      color: "#b45309",
+      fontSize: "13px",
+      fontWeight: 700,
+    }}
+  >
+    ⚠️ May sound: passive aggressive
+  </div>
 
-      {location.pathname === "/" && (
-        <div style={{ marginTop: "28px" }}>
-          <MiniToolGrid />
-        </div>
-      )}
+  <div
+    style={{
+      padding: "10px 14px",
+      borderRadius: "999px",
+      background: "rgba(59,130,246,0.10)",
+      border: "1px solid rgba(59,130,246,0.20)",
+      color: "#1d4ed8",
+      fontSize: "13px",
+      fontWeight: 700,
+    }}
+  >
+    💬 Reply chance: low
+  </div>
+
+  <div
+    style={{
+      padding: "10px 14px",
+      borderRadius: "999px",
+      background: "rgba(236,72,153,0.10)",
+      border: "1px solid rgba(236,72,153,0.20)",
+      color: "#be185d",
+      fontSize: "13px",
+      fontWeight: 700,
+    }}
+  >
+    😬 Regret risk: high
+  </div>
+</div>
     </div>
   );
 }
