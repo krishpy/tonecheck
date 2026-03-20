@@ -23,7 +23,7 @@ export default function ResultSection({
   finalRewrite,
   riskScore,
   rewriteRiskScore,
-  rewriteloading,
+  rewriteLoading,
   riskImprovement,
   rewriteTone,
   setRewriteTone,
