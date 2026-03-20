@@ -369,6 +369,7 @@ https://trytonecheck.com`;
   }
 
 async function analyze(selectedStyleArg = rewriteTone, options = {}) {
+  const startedAt = Date.now();
   const selectedStyle =
     typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
 
@@ -419,9 +420,19 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
       error: "Something went wrong while analyzing the message. Please try again.",
     });
   } finally {
+  const elapsed = Date.now() - startedAt;
+  const minVisible = 300;
+  const remaining = Math.max(0, minVisible - elapsed);
+
+  if (isRewriteOnly) {
+    setTimeout(() => {
+      setRewriteLoading(false);
+    }, remaining);
+  } else {
     setLoading(false);
     setRewriteLoading(false);
   }
+ }
 }
 
   async function downloadCard() {

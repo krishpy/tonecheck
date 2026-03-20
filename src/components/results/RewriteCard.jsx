@@ -165,6 +165,7 @@ export default function RewriteCard({
                       fontSize: "13px",
                       fontWeight: 700,
                       color: "#6366f1",
+                      minWidth: "86px",
                     }}
                   >
                     Rewriting...
