@@ -36,15 +36,18 @@ function AppContent() {
   const [loading, setLoading] = useState(false);
   const [copyState, setCopyState] = useState("");
   const [rewriteTone, setRewriteTone] = useState("balanced");
+  const [rewriteLoading, setRewriteLoading] = useState(false);
 
   useEffect(() => {
   if (!result || !message.trim()) return;
+  analyze(rewriteTone, { isRewriteOnly: true });
 
-  analyze(rewriteTone);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [rewriteTone]);
 
   // prevent dependency loop warning
   // eslint-disable-next-line react-hooks/exhaustive-deps
- }, [rewriteTone]);
+ 
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -365,9 +368,20 @@ https://trytonecheck.com`;
     );
   }
 
-  async function analyze(selectedStyle = rewriteTone) {
+sync function analyze(selectedStyleArg = rewriteTone, options = {}) {
+  const selectedStyle =
+    typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
+
+  const { isRewriteOnly = false } = options;
+
   try {
-    setLoading(true);
+    if (isRewriteOnly) {
+      setRewriteLoading(true);
+    } else {
+      setLoading(true);
+      setResult(null);
+    }
+
     setCopyState("");
 
     const response = await fetch(
@@ -380,7 +394,7 @@ https://trytonecheck.com`;
         },
         body: JSON.stringify({
           message_text: message,
-          rewrite_style: rewriteTone,
+          rewrite_style: selectedStyle,
         }),
       }
     );
@@ -406,6 +420,7 @@ https://trytonecheck.com`;
     });
   } finally {
     setLoading(false);
+    setRewriteLoading(false);
   }
 }
 
@@ -874,6 +889,7 @@ https://trytonecheck.com`;
               riskImprovement={riskImprovement}
               rewriteTone={rewriteTone}
               setRewriteTone={setRewriteTone}
+              rewriteLoading={rewriteLoading}
               copyRewriteOnly={copyRewriteOnly}
               useRewriteMessage={useRewriteMessage}
               copyState={copyState}

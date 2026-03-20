@@ -253,7 +253,7 @@ export default function HeroSection({
           <button
           type="button"
             className="tc-button-hover"
-            onClick={analyze}
+            onClick={() => analyze()}
             disabled={loading || !message.trim()}
             style={{
               ...primaryButtonStyle,

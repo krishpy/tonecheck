@@ -16,6 +16,7 @@ export default function RewriteCard({
   riskImprovement,
   rewriteTone,
   setRewriteTone,
+  rewriteLoading,
   copyRewriteOnly,
   useRewriteMessage,
   copyState,
@@ -33,7 +34,7 @@ export default function RewriteCard({
       <div style={{ display: "grid", gap: "16px" }}>
         <div
           style={{
-           padding: "16px",
+            padding: "16px",
             borderRadius: "16px",
             background: "rgba(254,226,226,0.55)",
             border: "1px solid rgba(239,68,68,0.20)",
@@ -116,44 +117,60 @@ export default function RewriteCard({
               </div>
 
               <div
-  style={{
-    marginTop: "14px",
-    display: "flex",
-    gap: "10px",
-    flexWrap: "wrap",
-  }}
->
-  {rewriteOptions.map((option) => {
-    const active = rewriteTone === option.value;
+                style={{
+                  marginTop: "14px",
+                  display: "flex",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                }}
+              >
+                {rewriteOptions.map((option) => {
+                  const active = rewriteTone === option.value;
 
-    return (
-      <button
-      type="button"
-        key={option.value}
-        className="tc-chip-hover"
-        onClick={() => setRewriteTone(option.value)}
-        style={{
-          ...chipStyle,
-          padding: "10px 14px",
-          fontSize: "13px",
-          fontWeight: 800,
-          background: active ? "rgba(99,102,241,0.12)" : "rgba(255,255,255,0.82)",
-          color: active ? "#4338ca" : "#111827",
-          border: active
-            ? "1px solid rgba(99,102,241,0.24)"
-            : "1px solid rgba(15,23,42,0.08)",
-          boxShadow: active
-            ? "0 8px 20px rgba(99,102,241,0.10)"
-            : "0 4px 12px rgba(15,23,42,0.04)",
-        }}
-      >
-        {option.label}
-      </button>
-    );
-  })}
-</div>
+                  return (
+                    <button
+                      type="button"
+                      key={option.value}
+                      className="tc-chip-hover"
+                      onClick={() => setRewriteTone(option.value)}
+                      disabled={rewriteLoading}
+                      style={{
+                        ...chipStyle,
+                        padding: "10px 14px",
+                        fontSize: "13px",
+                        fontWeight: 800,
+                        opacity: rewriteLoading ? 0.7 : 1,
+                        cursor: rewriteLoading ? "wait" : "pointer",
+                        background: active
+                          ? "linear-gradient(135deg, rgba(99,102,241,0.16), rgba(236,72,153,0.12))"
+                          : "rgba(255,255,255,0.82)",
+                        color: active ? "#312e81" : "#111827",
+                        border: active
+                          ? "1px solid rgba(99,102,241,0.30)"
+                          : "1px solid rgba(15,23,42,0.08)",
+                        boxShadow: active
+                          ? "0 10px 24px rgba(99,102,241,0.16)"
+                          : "0 4px 12px rgba(15,23,42,0.04)",
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
 
-              
+                {rewriteLoading && (
+                  <div
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 700,
+                      color: "#6366f1",
+                    }}
+                  >
+                    Rewriting...
+                  </div>
+                )}
+              </div>
 
               <div
                 style={{
@@ -163,6 +180,8 @@ export default function RewriteCard({
                   lineHeight: 1.45,
                   letterSpacing: "-0.03em",
                   color: "#111827",
+                  opacity: rewriteLoading ? 0.72 : 1,
+                  transition: "opacity 0.18s ease",
                 }}
               >
                 “{finalRewrite}”
@@ -226,7 +245,7 @@ export default function RewriteCard({
         }}
       >
         <button
-         type="button"
+          type="button"
           onClick={useRewriteMessage}
           className="tc-button-hover"
           style={{
@@ -247,7 +266,7 @@ export default function RewriteCard({
         </button>
 
         <button
-        type="button"
+          type="button"
           onClick={copyRewriteOnly}
           className="tc-button-hover"
           style={{
@@ -266,7 +285,7 @@ export default function RewriteCard({
         </button>
 
         <button
-        type="button"
+          type="button"
           onClick={() => {
             if (!finalRewrite) return;
             window.open(

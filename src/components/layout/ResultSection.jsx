@@ -366,6 +366,7 @@ export default function ResultSection({
             rewriteRiskScore={rewriteRiskScore}
             riskImprovement={riskImprovement}
             rewriteTone={rewriteTone}
+            rewriteloading={rewriteLoading}
             setRewriteTone={setRewriteTone}
             copyRewriteOnly={copyRewriteOnly}
             useRewriteMessage={useRewriteMessage}
