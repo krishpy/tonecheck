@@ -368,7 +368,7 @@ https://trytonecheck.com`;
     );
   }
 
-sync function analyze(selectedStyleArg = rewriteTone, options = {}) {
+async function analyze(selectedStyleArg = rewriteTone, options = {}) {
   const selectedStyle =
     typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
 
