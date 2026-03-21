@@ -20,31 +20,40 @@ export default function RewriteCard({
   copyState,
   whatsappIcon,
 }) {
+  const isMobile = useIsMobile();
+
   if (!finalRewrite && !rewriteloading) return null;
 
-  const isMobile = useIsMobile();
+  const actionButtonBase = {
+    width: isMobile ? "100%" : "auto",
+    justifyContent: "center",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+  };
 
   return (
     <div
       style={{
         ...cardStyle,
         background:
-          "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,247,237,0.98))",
-        border: "1px solid rgba(251,146,60,0.16)",
+          "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.98))",
+        border: "1px solid rgba(251,146,60,0.18)",
         boxShadow:
-          "0 12px 32px rgba(15,23,42,0.05), 0 1px 0 rgba(255,255,255,0.7) inset",
+          "0 16px 40px rgba(15,23,42,0.05), 0 1px 0 rgba(255,255,255,0.72) inset",
         display: "grid",
-        gap: "18px",
+        gap: "16px",
+        padding: isMobile ? "14px" : "20px",
       }}
     >
       <div style={{ display: "grid", gap: "8px" }}>
         <div
           style={{
-            fontSize: "13px",
-            fontWeight: 800,
-            letterSpacing: "0.12em",
+            fontSize: "12px",
+            fontWeight: 900,
+            letterSpacing: "0.16em",
             textTransform: "uppercase",
-            color: "#9a3412",
+            color: "#c2410c",
           }}
         >
           Suggested rewrite
@@ -52,24 +61,84 @@ export default function RewriteCard({
 
         <div
           style={{
-            color: "#64748b",
-            fontSize: "14px",
+            color: "#7c2d12",
+            fontSize: "15px",
             lineHeight: 1.6,
+            fontWeight: 700,
           }}
         >
-          Cleaner, calmer, and easier to receive.
+          Here’s a safer version you can send.
         </div>
       </div>
 
       <div
         style={{
-          borderRadius: "22px",
-          padding: "18px",
-          background: "rgba(255,255,255,0.88)",
-          border: "1px solid rgba(15,23,42,0.06)",
-          minHeight: "112px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "8px",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "8px 12px",
+            borderRadius: "999px",
+            background: "rgba(34,197,94,0.10)",
+            border: "1px solid rgba(34,197,94,0.16)",
+            color: "#166534",
+            fontWeight: 800,
+            fontSize: "13px",
+          }}
+        >
+          Lower risk
+        </div>
+
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "8px 12px",
+            borderRadius: "999px",
+            background: "rgba(249,115,22,0.08)",
+            border: "1px solid rgba(249,115,22,0.14)",
+            color: "#9a3412",
+            fontWeight: 800,
+            fontSize: "13px",
+          }}
+        >
+          Clearer tone
+        </div>
+
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            padding: "8px 12px",
+            borderRadius: "999px",
+            background: "rgba(99,102,241,0.08)",
+            border: "1px solid rgba(99,102,241,0.14)",
+            color: "#4338ca",
+            fontWeight: 800,
+            fontSize: "13px",
+          }}
+        >
+          Easier to receive
+        </div>
+      </div>
+
+      <div
+        style={{
+          borderRadius: "24px",
+          padding: isMobile ? "16px" : "22px",
+          background:
+            "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,251,235,0.98))",
+          border: "1px solid rgba(251,146,60,0.16)",
+          minHeight: isMobile ? "120px" : "140px",
           display: "flex",
           alignItems: "center",
+          boxShadow:
+            "0 10px 28px rgba(251,146,60,0.06), inset 0 1px 0 rgba(255,255,255,0.80)",
         }}
       >
         {rewriteloading ? (
@@ -77,7 +146,7 @@ export default function RewriteCard({
             style={{
               color: "#64748b",
               fontSize: "15px",
-              fontWeight: 600,
+              fontWeight: 700,
             }}
           >
             Rewriting...
@@ -86,10 +155,11 @@ export default function RewriteCard({
           <div
             style={{
               color: "#111827",
-              fontSize: isMobile ? "20px" : "26px",
+              fontSize: isMobile ? "20px" : "28px",
               lineHeight: 1.7,
-              fontWeight: 700,
+              fontWeight: 800,
               whiteSpace: "pre-wrap",
+              letterSpacing: "-0.02em",
             }}
           >
             “{finalRewrite}”
@@ -97,12 +167,95 @@ export default function RewriteCard({
         )}
       </div>
 
+      <div
+        style={{
+          display: "flex",
+          gap: "12px",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <button
+          type="button"
+          className="tc-button-hover"
+          onClick={useRewriteMessage}
+          style={{
+            ...actionButtonBase,
+            padding: "15px 20px",
+            borderRadius: "16px",
+            border: "1px solid rgba(255,255,255,0.26)",
+            cursor: "pointer",
+            fontWeight: 800,
+            fontSize: "15px",
+            color: "#ffffff",
+            background:
+              "linear-gradient(135deg, #16a34a 0%, #22c55e 50%, #4ade80 100%)",
+            boxShadow:
+              "0 14px 34px rgba(34,197,94,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
+          }}
+        >
+          Use This Message
+        </button>
+
+        <button
+          type="button"
+          className="tc-button-hover"
+          onClick={sendRewriteWhatsApp}
+          style={{
+            ...actionButtonBase,
+            padding: "15px 18px",
+            borderRadius: "16px",
+            border: "1px solid rgba(34,197,94,0.16)",
+            cursor: "pointer",
+            fontWeight: 800,
+            fontSize: "15px",
+            background: "rgba(240,253,244,0.95)",
+            color: "#166534",
+            boxShadow: "0 8px 22px rgba(34,197,94,0.08)",
+          }}
+        >
+          {whatsappIcon}
+          <span>Send on WhatsApp</span>
+        </button>
+
+        <button
+          type="button"
+          className="tc-button-hover"
+          onClick={copyRewriteOnly}
+          style={{
+            ...actionButtonBase,
+            padding: "15px 18px",
+            borderRadius: "16px",
+            border: "1px solid rgba(15,23,42,0.08)",
+            cursor: "pointer",
+            fontWeight: 750,
+            fontSize: "15px",
+            background: "rgba(255,255,255,0.90)",
+            color: "#111827",
+            boxShadow: "0 8px 22px rgba(15,23,42,0.05)",
+          }}
+        >
+          Copy
+        </button>
+
+        <div
+          style={{
+            minHeight: "20px",
+            color: copyState ? "#2563eb" : "#94a3b8",
+            fontSize: "14px",
+            fontWeight: 700,
+          }}
+        >
+          {copyState === "Rewrite copied" ? copyState : ""}
+        </div>
+      </div>
+
       <div style={{ display: "grid", gap: "10px" }}>
         <div
           style={{
-            fontSize: "12px",
+            fontSize: "11px",
             fontWeight: 800,
-            letterSpacing: "0.08em",
+            letterSpacing: "0.10em",
             color: "#64748b",
             textTransform: "uppercase",
           }}
@@ -128,11 +281,11 @@ export default function RewriteCard({
                 onClick={() => setRewriteTone(option.value)}
                 style={{
                   ...chipStyle,
-                  padding: "10px 14px",
+                  padding: isMobile ? "9px 12px" : "10px 14px",
                   fontSize: "14px",
                   background: isActive
                     ? "linear-gradient(135deg, rgba(79,70,229,0.12), rgba(236,72,153,0.10))"
-                    : "rgba(255,255,255,0.78)",
+                    : "rgba(255,255,255,0.82)",
                   color: isActive ? "#312e81" : "#334155",
                   border: isActive
                     ? "1px solid rgba(99,102,241,0.22)"
@@ -147,95 +300,6 @@ export default function RewriteCard({
               </button>
             );
           })}
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          flexWrap: "wrap",
-          alignItems: "center",
-        }}
-      >
-        <button
-          type="button"
-          className="tc-button-hover"
-          onClick={useRewriteMessage}
-          style={{
-            padding: "15px 20px",
-            borderRadius: "16px",
-            width: isMobile ? "100%" : "auto",
-             justifyContent: "center",
-            border: "1px solid rgba(255,255,255,0.26)",
-            cursor: "pointer",
-            fontWeight: 800,
-            fontSize: "15px",
-            color: "#ffffff",
-            background:
-              "linear-gradient(135deg, #16a34a 0%, #22c55e 50%, #4ade80 100%)",
-            boxShadow:
-              "0 14px 34px rgba(34,197,94,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
-          }}
-        >
-          Use This Message
-        </button>
-
-        <button
-          type="button"
-          className="tc-button-hover"
-          onClick={copyRewriteOnly}
-          style={{
-            padding: "15px 18px",
-            borderRadius: "16px",
-            width: isMobile ? "100%" : "auto",
-justifyContent: "center",
-            border: "1px solid rgba(15,23,42,0.08)",
-            cursor: "pointer",
-            fontWeight: 750,
-            fontSize: "15px",
-            background: "rgba(255,255,255,0.86)",
-            color: "#111827",
-            boxShadow: "0 8px 22px rgba(15,23,42,0.05)",
-          }}
-        >
-          Copy
-        </button>
-
-        <button
-          type="button"
-          className="tc-button-hover"
-          onClick={sendRewriteWhatsApp}
-          style={{
-            padding: "15px 18px",
-            borderRadius: "16px",
-            width: isMobile ? "100%" : "auto",
-justifyContent: "center",
-            border: "1px solid rgba(34,197,94,0.16)",
-            cursor: "pointer",
-            fontWeight: 750,
-            fontSize: "15px",
-            background: "rgba(240,253,244,0.95)",
-            color: "#166534",
-            boxShadow: "0 8px 22px rgba(34,197,94,0.08)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-        >
-          {whatsappIcon}
-          <span>Send on WhatsApp</span>
-        </button>
-
-        <div
-          style={{
-            minHeight: "20px",
-            color: copyState ? "#2563eb" : "#94a3b8",
-            fontSize: "14px",
-            fontWeight: 700,
-          }}
-        >
-          {copyState === "Rewrite copied" ? copyState : ""}
         </div>
       </div>
     </div>
