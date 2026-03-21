@@ -1,6 +1,13 @@
 import React, { useMemo } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
+const TOOLTIP_MAP = {
+  "Reply vibe": "How the other person may emotionally react to your message.",
+  "Chance of regret": "How likely you may regret sending this later.",
+  "Emotional pressure": "Whether the message puts pressure or guilt on the other person.",
+  "Hidden signal": "Subtle meaning your message may carry beyond what you intended.",
+};
+
 function getLevel(score = 0) {
   if (score >= 70) return "High";
   if (score >= 35) return "Medium";
@@ -139,26 +146,153 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
 }
 
 function MiniOutcomeChip({ item }) {
+  const [showTip, setShowTip] = React.useState(false);
+  const [tipPinned, setTipPinned] = React.useState(false);
+  const [tipPos, setTipPos] = React.useState({ x: 0, y: 0 });
+  const chipRef = React.useRef(null);
+  const tooltip = TOOLTIP_MAP[item.label] || "";
+
+  React.useEffect(() => {
+    if (!tipPinned || !showTip) return;
+
+    const timer = setTimeout(() => {
+      setShowTip(false);
+      setTipPinned(false);
+    }, 2200);
+
+    return () => clearTimeout(timer);
+  }, [tipPinned, showTip]);
+
+  function updateTooltipPosition(clientX, clientY) {
+    const rect = chipRef.current?.getBoundingClientRect();
+    if (!rect) return;
+
+    setTipPos({
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    });
+  }
+
+  function handleMouseEnter(e) {
+    if (!tooltip) return;
+    updateTooltipPosition(e.clientX, e.clientY);
+    setShowTip(true);
+  }
+
+  function handleMouseMove(e) {
+    if (!tooltip || !showTip || tipPinned) return;
+    updateTooltipPosition(e.clientX, e.clientY);
+  }
+
+  function handleMouseLeave() {
+    if (tipPinned) return;
+    setShowTip(false);
+  }
+
+  function handleInfoClick(e) {
+    e.stopPropagation();
+    if (!tooltip) return;
+
+    const rect = chipRef.current?.getBoundingClientRect();
+    if (rect) {
+      setTipPos({
+        x: rect.width / 2,
+        y: 0,
+      });
+    }
+
+    setTipPinned((prev) => {
+      const next = !prev;
+      setShowTip(next);
+      return next;
+    });
+  }
+
   return (
     <div
+      ref={chipRef}
       style={{
-        padding: "10px 14px",
+        position: "relative",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "8px 12px",
         borderRadius: "999px",
         background: item.bg,
         border: item.border,
         color: item.color,
+        fontWeight: 700,
         fontSize: "13px",
-        fontWeight: 800,
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "8px",
-        whiteSpace: "nowrap",
-        shadow: "0 4px 12px rgba(239,68,68,0.12)",
+        cursor: "default",
+        boxShadow: item.shadow || "none",
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       <span>{item.emoji}</span>
-      <span style={{ opacity: 0.9 }}>{item.label}:</span>
-      <span>{item.value}</span>
+
+      <span>
+        {item.label}: {item.value}
+      </span>
+
+      <button
+        type="button"
+        onClick={handleInfoClick}
+        aria-label={`More info about ${item.label}`}
+        style={{
+          border: "none",
+          background: "transparent",
+          padding: 0,
+          marginLeft: "2px",
+          opacity: 0.68,
+          fontSize: "12px",
+          lineHeight: 1,
+          cursor: "pointer",
+          color: "inherit",
+        }}
+      >
+        ℹ
+      </button>
+
+      <div
+        style={{
+          position: "absolute",
+          left: `${tipPos.x}px`,
+          top: `${tipPos.y - 12}px`,
+          transform: showTip
+            ? "translate(-50%, -100%) scale(1)"
+            : "translate(-50%, -96%) scale(0.96)",
+          transformOrigin: "bottom center",
+          background: "#111827",
+          color: "#fff",
+          padding: "8px 10px",
+          borderRadius: "10px",
+          fontSize: "12px",
+          whiteSpace: "nowrap",
+          zIndex: 10,
+          boxShadow: "0 10px 26px rgba(0,0,0,0.22)",
+          opacity: showTip && tooltip ? 1 : 0,
+          pointerEvents: "none",
+          transition:
+            "opacity 160ms ease, transform 180ms ease, left 80ms linear, top 80ms linear",
+        }}
+      >
+        {tooltip}
+
+        <div
+          style={{
+            position: "absolute",
+            left: "50%",
+            bottom: "-5px",
+            width: "10px",
+            height: "10px",
+            background: "#111827",
+            transform: "translateX(-50%) rotate(45deg)",
+            borderRadius: "2px",
+          }}
+        />
+      </div>
     </div>
   );
 }
