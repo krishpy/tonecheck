@@ -506,25 +506,6 @@ const subDescription =
         >
           {subDescription}
         </p>
-
-        <div
-          style={{
-            marginTop: "10px",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(239,68,68,0.08)",
-            border: "1px solid rgba(239,68,68,0.14)",
-            color: "#b91c1c",
-            fontSize: "13px",
-            fontWeight: 800,
-          }}
-        >
-          <span>⚠️</span>
-          <span>Texts are easy to misread — especially when emotions are high</span>
-        </div>
       </div>
 
       <div
