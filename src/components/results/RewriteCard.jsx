@@ -18,6 +18,7 @@ export default function RewriteCard({
   useRewriteMessage,
   sendRewriteWhatsApp,
   copyState,
+  rewriteIntro,
   whatsappIcon,
 }) {
   const isMobile = useIsMobile();
@@ -67,7 +68,7 @@ export default function RewriteCard({
             fontWeight: 700,
           }}
         >
-          Here’s a safer version you can send.
+          {rewriteIntro || "Here’s a safer version you can send."}
         </div>
       </div>
 

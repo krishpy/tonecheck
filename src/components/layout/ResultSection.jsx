@@ -415,42 +415,6 @@ export default function ResultSection({
         </div>
 
         {finalRewrite && (
-          <div style={{ display: "grid", gap: "10px" }}>
-            <div
-              style={{
-                ...cardStyle,
-                background:
-                  "linear-gradient(135deg, rgba(255,250,245,0.98), rgba(255,242,229,0.98))",
-                border: "1px solid rgba(251,146,60,0.26)",
-                boxShadow:
-                  "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.8) inset",
-                padding: "18px 20px",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 900,
-                  letterSpacing: "0.18em",
-                  textTransform: "uppercase",
-                  color: "#c2410c",
-                  marginBottom: "8px",
-                }}
-              >
-                Better version to send
-              </div>
-
-              <div
-                style={{
-                  color: "#7c2d12",
-                  fontSize: "15px",
-                  fontWeight: 600,
-                }}
-              >
-                {rewriteIntro}
-              </div>
-            </div>
-
             <RewriteCard
               cardStyle={cardStyle}
               chipStyle={chipStyle}
@@ -465,16 +429,18 @@ export default function ResultSection({
               useRewriteMessage={useRewriteMessage}
               sendRewriteWhatsApp={sendRewriteWhatsApp}
               copyState={copyState}
+              rewriteIntro={rewriteIntro}
               whatsappIcon={
                 <img
                   src="/whatsapp.svg"
                   alt=""
                   style={{ width: 18, height: 18, display: "block" }}
                 />
-              }
-            />
-          </div>
+            }
+          />
         )}
+
+        
 
         {!!result.top_manipulation_signals?.length && (
           <DetectedSignals
