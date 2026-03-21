@@ -25,6 +25,7 @@ function formatHiddenSignal(signal = "") {
     constructive_disagreement_signal: "Constructive disagreement",
     polite_request_signal: "Polite request",
     neutral_information: "Neutral",
+    none: "Neutral",
   };
 
   if (!signal) return "Neutral";
@@ -36,22 +37,27 @@ function StatCard({ label, value, tooltip }) {
     <div
       title={tooltip}
       style={{
-        background: "rgba(255,255,255,0.78)",
-        backdropFilter: "blur(18px)",
-        border: "1px solid rgba(255,255,255,0.7)",
-        borderRadius: "24px",
-        padding: "18px",
-        boxShadow: "0 10px 30px rgba(15,23,42,0.05)",
+        background: "rgba(255,255,255,0.82)",
+        backdropFilter: "blur(16px)",
+        border: "1px solid rgba(15,23,42,0.05)",
+        borderRadius: "20px",
+        padding: "16px 18px",
+        boxShadow: "0 8px 24px rgba(15,23,42,0.04)",
+        minHeight: "108px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
         cursor: "help",
       }}
     >
       <div
         style={{
-          fontSize: "12px",
+          fontSize: "11px",
           fontWeight: 900,
           letterSpacing: "0.10em",
           textTransform: "uppercase",
           color: "#64748b",
+          lineHeight: 1.4,
         }}
       >
         {label}
@@ -60,10 +66,11 @@ function StatCard({ label, value, tooltip }) {
       <div
         style={{
           marginTop: "10px",
-          fontSize: "28px",
+          fontSize: "24px",
           fontWeight: 900,
           letterSpacing: "-0.04em",
           color: "#111827",
+          lineHeight: 1.1,
         }}
       >
         {value}
@@ -79,51 +86,36 @@ export default function StatsRow({
   hiddenSignal = "Neutral",
 }) {
   return (
-    <div style={{ marginTop: "4px" }}>
-      <div
-        style={{
-          fontSize: "12px",
-          fontWeight: 900,
-          letterSpacing: "0.12em",
-          textTransform: "uppercase",
-          color: "#64748b",
-          marginBottom: "12px",
-        }}
-      >
-        What could happen
-      </div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+        gap: "14px",
+      }}
+    >
+      <StatCard
+        label="Reply vibe"
+        value={getReplyVibe(replyLikelihood)}
+        tooltip="How likely the other person is to respond well."
+      />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "16px",
-        }}
-      >
-        <StatCard
-          label="Reply vibe"
-          value={getReplyVibe(replyLikelihood)}
-          tooltip="How likely the other person is to respond well."
-        />
+      <StatCard
+        label="Chance of regret"
+        value={getLevel(regretRisk)}
+        tooltip="How likely you may wish you had worded this differently later."
+      />
 
-        <StatCard
-          label="Chance of regret"
-          value={getLevel(regretRisk)}
-          tooltip="How likely you may wish you had worded this differently later."
-        />
+      <StatCard
+        label="Emotional pressure"
+        value={getLevel(manipulationRisk)}
+        tooltip="How much tension or emotional pressure the message may create."
+      />
 
-        <StatCard
-          label="Emotional pressure "
-          value={getLevel(manipulationRisk)}
-          tooltip="How much tension or emotional pressure the message may create."
-        />
-
-        <StatCard
-          label="Hidden signal"
-          value={formatHiddenSignal(hiddenSignal)}
-          tooltip="The underlying communication pattern detected in the message."
-        />
-      </div>
+      <StatCard
+        label="Hidden signal"
+        value={formatHiddenSignal(hiddenSignal)}
+        tooltip="The underlying communication pattern detected in the message."
+      />
     </div>
   );
 }
