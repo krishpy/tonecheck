@@ -8,6 +8,7 @@ import { getSendVerdict } from "./utils/sendDecision";
 import SeoContentBlock from "./components/layout/SeoContentBlock";
 import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
+import TestLab from "./pages/TestLab";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -669,7 +670,9 @@ export default function App() {
       <Route path="/manipulative-text-checker" element={<AppContent />} />
       <Route path="/is-this-message-rude" element={<AppContent />} />
       <Route path="/desperate-text-checker" element={<AppContent />} />
+      <Route path="/test-lab" element={<TestLab />} />
       <Route path="*" element={<RedirectHome />} />
+      
     </Routes>
   );
 }
