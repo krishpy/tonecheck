@@ -223,7 +223,6 @@ export default function RewriteCard({
       </div>
 
       <div style={{ display: "grid", gap: "10px" }}>
-       
 
         <div
           style={{
