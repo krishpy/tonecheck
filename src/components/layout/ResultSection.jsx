@@ -4,6 +4,121 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 
+function getAdaptiveVerdict({
+  sendVerdict,
+  toneLabel,
+  hiddenSignalLabel,
+  riskScore,
+}) {
+  const tone = String(toneLabel || "").toLowerCase();
+  const hidden = String(hiddenSignalLabel || "").toLowerCase();
+  const verdictTone = sendVerdict?.tone || "neutral";
+
+  if (
+    verdictTone === "danger" ||
+    riskScore >= 85 ||
+    hidden.includes("threat") ||
+    hidden.includes("hostile")
+  ) {
+    return {
+      title: "Don’t send this yet",
+      sublabel: "Likely to escalate quickly.",
+      tip: "Pause and use the rewrite below before sending anything.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  if (
+    verdictTone === "warning" ||
+    riskScore >= 65 ||
+    hidden.includes("profanity") ||
+    hidden.includes("insult")
+  ) {
+    return {
+      title: "Risky — rethink before sending",
+      sublabel: "This can trigger defensiveness fast.",
+      tip: "Strip out harsh wording and send the calmer version below.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  if (
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt") ||
+    hidden.includes("blame") ||
+    hidden.includes("accus")
+  ) {
+    return {
+      title: "Careful — may be misunderstood",
+      sublabel: "Your intent may land as pressure or blame.",
+      tip: "Make the message clearer and more direct before sending.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  if (tone.includes("neutral") || verdictTone === "neutral" || riskScore >= 40) {
+    return {
+      title: "Safe — but could be clearer",
+      sublabel: "This may come across differently than you intend.",
+      tip: "Try the rewrite below to make it warmer or clearer.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  return {
+    title: "Safe to send",
+    sublabel: "Clear and unlikely to cause issues.",
+    tip: "You can still use the rewrite below if you want a smoother version.",
+    chipLabel: hiddenSignalLabel,
+  };
+}
+
+function getToneCardStyle({
+  isMobile,
+  toneTheme,
+  hiddenSignalLabel,
+  toneLabel,
+  riskScore,
+}) {
+  const hidden = String(hiddenSignalLabel || "").toLowerCase();
+  const tone = String(toneLabel || "").toLowerCase();
+
+  const shouldWarmNeutral =
+    (tone.includes("neutral") && riskScore >= 40) ||
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt") ||
+    hidden.includes("blame") ||
+    hidden.includes("accus");
+
+  if (shouldWarmNeutral) {
+    return {
+      background: "rgba(254,249,195,0.85)",
+      color: "#a16207",
+      border: "rgba(245,158,11,0.28)",
+      glow: "rgba(245,158,11,0.16)",
+      chipText: "#a16207",
+      padding: isMobile ? "10px 12px" : "12px 14px",
+      minWidth: isMobile ? "100%" : "132px",
+      width: isMobile ? "100%" : "auto",
+      marginTop: isMobile ? "12px" : "0",
+    };
+  }
+
+  return {
+    background: toneTheme.chipBg,
+    color: toneTheme.chipText,
+    border: toneTheme.border,
+    glow: toneTheme.glow,
+    chipText: toneTheme.chipText,
+    padding: isMobile ? "10px 12px" : "12px 14px",
+    minWidth: isMobile ? "100%" : "132px",
+    width: isMobile ? "100%" : "auto",
+    marginTop: isMobile ? "12px" : "0",
+  };
+}
+
 export default function ResultSection({
   result,
   location,
@@ -59,6 +174,13 @@ export default function ResultSection({
     safe: "#16a34a",
   };
 
+  const adaptiveVerdict = getAdaptiveVerdict({
+    sendVerdict,
+    toneLabel,
+    hiddenSignalLabel,
+    riskScore,
+  });
+
   const rewriteIntro =
     riskScore >= 70
       ? "A calmer version that lowers the chance of escalation."
@@ -80,20 +202,13 @@ export default function ResultSection({
   };
 
   const verdictColor = verdictColors[sendVerdict?.tone] || "#111827";
-  const verdictSubLabel =
-    sendVerdict?.sublabel || "Use the rewrite below for a safer version.";
-
-  const toneCardStyle = {
-    background: toneTheme.chipBg,
-    color: toneTheme.chipText,
-    border: `1px solid ${toneTheme.border}`,
-    borderRadius: "16px",
-    padding: isMobile ? "10px 12px" : "12px 14px",
-    minWidth: isMobile ? "100%" : "132px",
-    width: isMobile ? "100%" : "auto",
-    marginTop: isMobile ? "12px" : "0",
-    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
-  };
+  const toneCard = getToneCardStyle({
+    isMobile,
+    toneTheme,
+    hiddenSignalLabel,
+    toneLabel,
+    riskScore,
+  });
 
   return (
     <>
@@ -330,7 +445,7 @@ export default function ResultSection({
                       flexWrap: "wrap",
                     }}
                   >
-                    <div style={{ minWidth: 0 }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
                       <div
                         style={{
                           fontSize: isMobile ? "22px" : "30px",
@@ -340,51 +455,61 @@ export default function ResultSection({
                           lineHeight: 1,
                         }}
                       >
-                        {sendVerdict.label}
+                        {adaptiveVerdict.title}
                       </div>
 
-                      {!!sendVerdict.sublabel && (
-                        <div
-                          style={{
-                            marginTop: "7px",
-                            fontSize: "13px",
-                            color: "#64748b",
-                            fontWeight: 600,
-                            lineHeight: 1.45,
-                          }}
-                        >
-                          {sendVerdict.sublabel}
-                        </div>
-                      )}
+                      <div
+                        style={{
+                          marginTop: "7px",
+                          fontSize: "14px",
+                          color: "#64748b",
+                          fontWeight: 600,
+                          lineHeight: 1.45,
+                        }}
+                      >
+                        {adaptiveVerdict.sublabel}
+                      </div>
                     </div>
 
-                    <div style={signalChipStyle}>{hiddenSignalLabel}</div>
+                    <div style={signalChipStyle}>{adaptiveVerdict.chipLabel}</div>
                   </div>
 
                   <div
                     style={{
-                      marginTop: "10px",
+                      marginTop: "12px",
                       display: "inline-flex",
                       alignItems: "center",
                       gap: "8px",
                       flexWrap: "wrap",
-                      padding: "8px 12px",
+                      padding: "9px 12px",
                       borderRadius: "999px",
-                      background: "rgba(255,255,255,0.56)",
-                      border: "1px solid rgba(15,23,42,0.06)",
-                      color: "#475569",
+                      background: "rgba(59,130,246,0.08)",
+                      border: "1px solid rgba(59,130,246,0.16)",
+                      color: "#1d4ed8",
                       fontSize: "12px",
-                      fontWeight: 700,
+                      fontWeight: 800,
                     }}
                   >
-                    <span>💡</span>
-                    <span>{verdictSubLabel}</span>
+                    <span>✨</span>
+                    <span>{adaptiveVerdict.tip}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div style={toneCardStyle}>
+            <div
+              style={{
+                background: toneCard.background,
+                color: toneCard.color,
+                border: `1px solid ${toneCard.border}`,
+                borderRadius: "16px",
+                padding: toneCard.padding,
+                minWidth: toneCard.minWidth,
+                width: toneCard.width,
+                marginTop: toneCard.marginTop,
+                boxShadow: `0 8px 22px ${toneCard.glow || "rgba(15,23,42,0.08)"}`,
+              }}
+            >
               <div
                 style={{
                   fontSize: "11px",
@@ -401,7 +526,7 @@ export default function ResultSection({
                   marginTop: "6px",
                   fontSize: "18px",
                   fontWeight: 800,
-                  color: toneTheme.chipText,
+                  color: toneCard.chipText,
                 }}
               >
                 {toneEmoji} {toneLabel}
