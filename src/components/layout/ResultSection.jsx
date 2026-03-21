@@ -4,12 +4,7 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 
-function getAdaptiveVerdict({
-  sendVerdict,
-  toneLabel,
-  hiddenSignalLabel,
-  riskScore,
-}) {
+function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskScore }) {
   const tone = String(toneLabel || "").toLowerCase();
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
   const verdictTone = sendVerdict?.tone || "neutral";
@@ -74,13 +69,7 @@ function getAdaptiveVerdict({
   };
 }
 
-function getToneCardStyle({
-  isMobile,
-  toneTheme,
-  hiddenSignalLabel,
-  toneLabel,
-  riskScore,
-}) {
+function getToneCardStyle({ isMobile, toneTheme, hiddenSignalLabel, toneLabel, riskScore }) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
   const tone = String(toneLabel || "").toLowerCase();
 
@@ -94,13 +83,14 @@ function getToneCardStyle({
 
   if (shouldWarmNeutral) {
     return {
-      background: "rgba(254,249,195,0.85)",
+      background: "linear-gradient(135deg, rgba(254,249,195,0.92), rgba(255,251,235,0.9))",
       color: "#a16207",
-      border: "rgba(245,158,11,0.28)",
-      glow: "rgba(245,158,11,0.16)",
+      border: "rgba(245,158,11,0.24)",
+      glow: "rgba(245,158,11,0.14)",
       chipText: "#a16207",
+      titleText: "#8a6407",
       padding: isMobile ? "10px 12px" : "12px 14px",
-      minWidth: isMobile ? "100%" : "132px",
+      minWidth: isMobile ? "100%" : "148px",
       width: isMobile ? "100%" : "auto",
       marginTop: isMobile ? "12px" : "0",
     };
@@ -112,11 +102,55 @@ function getToneCardStyle({
     border: toneTheme.border,
     glow: toneTheme.glow,
     chipText: toneTheme.chipText,
+    titleText: "#64748b",
     padding: isMobile ? "10px 12px" : "12px 14px",
-    minWidth: isMobile ? "100%" : "132px",
+    minWidth: isMobile ? "100%" : "148px",
     width: isMobile ? "100%" : "auto",
     marginTop: isMobile ? "12px" : "0",
   };
+}
+
+function getVerdictTheme(tone) {
+  const map = {
+    danger: {
+      title: "#c81e1e",
+      subtitle: "#7f1d1d",
+      iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
+      iconGlow: "rgba(239,68,68,0.26)",
+      tipBg: "rgba(254,242,242,0.92)",
+      tipBorder: "1px solid rgba(239,68,68,0.18)",
+      tipColor: "#b91c1c",
+    },
+    warning: {
+      title: "#d97706",
+      subtitle: "#9a3412",
+      iconBg: "linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%)",
+      iconGlow: "rgba(249,115,22,0.24)",
+      tipBg: "rgba(255,247,237,0.94)",
+      tipBorder: "1px solid rgba(249,115,22,0.18)",
+      tipColor: "#c2410c",
+    },
+    neutral: {
+      title: "#475569",
+      subtitle: "#64748b",
+      iconBg: "linear-gradient(135deg, #94a3b8 0%, #64748b 55%, #475569 100%)",
+      iconGlow: "rgba(100,116,139,0.22)",
+      tipBg: "rgba(239,246,255,0.92)",
+      tipBorder: "1px solid rgba(59,130,246,0.16)",
+      tipColor: "#1d4ed8",
+    },
+    safe: {
+      title: "#15803d",
+      subtitle: "#166534",
+      iconBg: "linear-gradient(135deg, #4ade80 0%, #22c55e 55%, #16a34a 100%)",
+      iconGlow: "rgba(34,197,94,0.24)",
+      tipBg: "rgba(240,253,244,0.94)",
+      tipBorder: "1px solid rgba(34,197,94,0.16)",
+      tipColor: "#15803d",
+    },
+  };
+
+  return map[tone] || map.neutral;
 }
 
 export default function ResultSection({
@@ -167,13 +201,6 @@ export default function ResultSection({
   const toneEmoji = getToneEmoji();
   const isMobile = useIsMobile();
 
-  const verdictColors = {
-    danger: "#dc2626",
-    warning: "#ea580c",
-    neutral: "#64748b",
-    safe: "#16a34a",
-  };
-
   const adaptiveVerdict = getAdaptiveVerdict({
     sendVerdict,
     toneLabel,
@@ -201,7 +228,6 @@ export default function ResultSection({
     fontSize: isMobile ? "13px" : "14px",
   };
 
-  const verdictColor = verdictColors[sendVerdict?.tone] || "#111827";
   const toneCard = getToneCardStyle({
     isMobile,
     toneTheme,
@@ -209,6 +235,11 @@ export default function ResultSection({
     toneLabel,
     riskScore,
   });
+
+  const verdictTheme = getVerdictTheme(sendVerdict?.tone);
+  const shouldShowSignalChip = !["neutral", "none", "none detected"].includes(
+    String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
+  );
 
   return (
     <>
@@ -283,7 +314,7 @@ export default function ResultSection({
                 </div>
               </div>
 
-              <div style={signalChipStyle}>{hiddenSignalLabel}</div>
+              {shouldShowSignalChip ? <div style={signalChipStyle}>{hiddenSignalLabel}</div> : null}
             </div>
 
             <div
@@ -384,9 +415,25 @@ export default function ResultSection({
         <div
           style={{
             ...cardStyle,
-            background: toneTheme.bg,
-            border: `1px solid ${toneTheme.border}`,
-            boxShadow: `0 10px 30px ${toneTheme.glow || "rgba(15,23,42,0.06)"}`,
+            background:
+              sendVerdict?.tone === "safe"
+                ? "linear-gradient(135deg, rgba(240,253,244,0.94), rgba(254,252,232,0.88))"
+                : sendVerdict?.tone === "neutral"
+                ? "linear-gradient(135deg, rgba(248,250,252,0.96), rgba(254,252,232,0.88))"
+                : toneTheme.bg,
+            border: `1px solid ${
+              sendVerdict?.tone === "safe"
+                ? "rgba(34,197,94,0.18)"
+                : sendVerdict?.tone === "neutral"
+                ? "rgba(245,158,11,0.18)"
+                : toneTheme.border
+            }`,
+            boxShadow:
+              sendVerdict?.tone === "safe"
+                ? "0 12px 30px rgba(34,197,94,0.08)"
+                : sendVerdict?.tone === "neutral"
+                ? "0 12px 30px rgba(245,158,11,0.08)"
+                : `0 10px 30px ${toneTheme.glow || "rgba(15,23,42,0.06)"}`,
             padding: isMobile ? "14px" : "20px",
           }}
         >
@@ -412,24 +459,26 @@ export default function ResultSection({
 
               <div
                 style={{
-                  marginTop: "12px",
+                  marginTop: "14px",
                   display: "flex",
                   alignItems: "flex-start",
-                  gap: "12px",
+                  gap: isMobile ? "12px" : "14px",
                 }}
               >
                 <div
                   style={{
-                    width: "44px",
-                    height: "44px",
-                    borderRadius: "14px",
-                    background: verdictColor,
+                    width: isMobile ? "48px" : "56px",
+                    height: isMobile ? "48px" : "56px",
+                    borderRadius: isMobile ? "16px" : "18px",
+                    background: verdictTheme.iconBg,
                     display: "grid",
                     placeItems: "center",
                     color: "#fff",
-                    fontSize: "22px",
+                    fontSize: isMobile ? "24px" : "28px",
                     flexShrink: 0,
-                    boxShadow: `0 12px 24px ${toneTheme.glow || "rgba(15,23,42,0.10)"}`,
+                    boxShadow: `0 16px 30px ${verdictTheme.iconGlow}`,
+                    border: "1px solid rgba(255,255,255,0.28)",
+                    transform: "translateY(1px)",
                   }}
                 >
                   {sendVerdict.emoji}
@@ -451,8 +500,8 @@ export default function ResultSection({
                           fontSize: isMobile ? "22px" : "30px",
                           fontWeight: 900,
                           letterSpacing: "-0.04em",
-                          color: verdictColor,
-                          lineHeight: 1,
+                          color: verdictTheme.title,
+                          lineHeight: 1.02,
                         }}
                       >
                         {adaptiveVerdict.title}
@@ -460,10 +509,10 @@ export default function ResultSection({
 
                       <div
                         style={{
-                          marginTop: "7px",
-                          fontSize: "14px",
-                          color: "#64748b",
-                          fontWeight: 600,
+                          marginTop: "8px",
+                          fontSize: isMobile ? "14px" : "15px",
+                          color: verdictTheme.subtitle,
+                          fontWeight: 650,
                           lineHeight: 1.45,
                         }}
                       >
@@ -471,7 +520,16 @@ export default function ResultSection({
                       </div>
                     </div>
 
-                    <div style={signalChipStyle}>{adaptiveVerdict.chipLabel}</div>
+                    {shouldShowSignalChip ? (
+                      <div
+                        style={{
+                          ...signalChipStyle,
+                          background: "rgba(255,255,255,0.56)",
+                        }}
+                      >
+                        {adaptiveVerdict.chipLabel}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div
@@ -481,16 +539,16 @@ export default function ResultSection({
                       alignItems: "center",
                       gap: "8px",
                       flexWrap: "wrap",
-                      padding: "9px 12px",
+                      padding: "10px 13px",
                       borderRadius: "999px",
-                      background: "rgba(59,130,246,0.08)",
-                      border: "1px solid rgba(59,130,246,0.16)",
-                      color: "#1d4ed8",
+                      background: verdictTheme.tipBg,
+                      border: verdictTheme.tipBorder,
+                      color: verdictTheme.tipColor,
                       fontSize: "12px",
                       fontWeight: 800,
                     }}
                   >
-                    <span>✨</span>
+                    <span style={{ fontSize: "14px" }}>✨</span>
                     <span>{adaptiveVerdict.tip}</span>
                   </div>
                 </div>
@@ -502,7 +560,7 @@ export default function ResultSection({
                 background: toneCard.background,
                 color: toneCard.color,
                 border: `1px solid ${toneCard.border}`,
-                borderRadius: "16px",
+                borderRadius: "18px",
                 padding: toneCard.padding,
                 minWidth: toneCard.minWidth,
                 width: toneCard.width,
@@ -516,14 +574,14 @@ export default function ResultSection({
                   fontWeight: 800,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: "#64748b",
+                  color: toneCard.titleText,
                 }}
               >
                 Tone
               </div>
               <div
                 style={{
-                  marginTop: "6px",
+                  marginTop: "7px",
                   fontSize: "18px",
                   fontWeight: 800,
                   color: toneCard.chipText,
