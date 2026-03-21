@@ -237,9 +237,26 @@ export default function ResultSection({
   });
 
   const verdictTheme = getVerdictTheme(sendVerdict?.tone);
-  const shouldShowSignalChip = !["neutral", "none", "none detected"].includes(
-    String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
-  );
+const topCardChipHiddenLabels = new Set([
+  "neutral",
+  "none",
+  "none detected",
+  "profanity",
+  "accusation",
+  "accusatory pressure",
+  "guilt pressure",
+  "emotional leverage",
+  "blame shifting",
+  "pressure",
+  "passive aggression",
+  "hostile command",
+  "insult",
+  "threat",
+]);
+
+const shouldShowSignalChip = !topCardChipHiddenLabels.has(
+  String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
+);
 
   return (
     <>
@@ -519,17 +536,6 @@ export default function ResultSection({
                         {adaptiveVerdict.sublabel}
                       </div>
                     </div>
-
-                    {shouldShowSignalChip ? (
-                      <div
-                        style={{
-                          ...signalChipStyle,
-                          background: "rgba(255,255,255,0.56)",
-                        }}
-                      >
-                        {adaptiveVerdict.chipLabel}
-                      </div>
-                    ) : null}
                   </div>
 
                   <div
