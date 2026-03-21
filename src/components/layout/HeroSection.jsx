@@ -353,7 +353,7 @@ const displayDescription =
       ? "Pause. This message might escalate."
       : heroRiskScore >= 50
       ? "Think before you send this."
-      : "Check how this message may sound."
+      : "Check how your message may sound before you send"
     : currentTool.description;
 
 const subDescription =

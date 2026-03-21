@@ -59,63 +59,45 @@ export default function RewriteCard({
 >
   Better version to send
 </div>
-      </div>
+</div>
 
-      <div
+<div
+  style={{
+    marginTop: "10px",
+    display: "flex",
+    gap: "8px",
+    flexWrap: "wrap",
+  }}
+>
+  {["balanced", "softer", "direct", "professional"].map((style) => {
+    const isActive = rewriteTone === style;
+    return (
+      <button
+        key={style}
+        onClick={() => setRewriteTone(style)}
         style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px",
+          padding: "8px 14px",
+          borderRadius: "999px",
+          border: isActive
+            ? "1px solid #6366f1"
+            : "1px solid rgba(0,0,0,0.08)",
+          background: isActive
+            ? "rgba(99,102,241,0.12)"
+            : "rgba(255,255,255,0.7)",
+          color: isActive ? "#4338ca" : "#374151",
+          fontWeight: 700,
+          fontSize: "13px",
+          cursor: "pointer",
+          transition: "all 0.2s ease",
         }}
       >
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(34,197,94,0.10)",
-            border: "1px solid rgba(34,197,94,0.16)",
-            color: "#166534",
-            fontWeight: 800,
-            fontSize: "13px",
-          }}
-        >
-          Lower risk
-        </div>
+        {style.charAt(0).toUpperCase() + style.slice(1)}
+      </button>
+    );
+  })}
+</div>
 
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(249,115,22,0.08)",
-            border: "1px solid rgba(249,115,22,0.14)",
-            color: "#9a3412",
-            fontWeight: 800,
-            fontSize: "13px",
-          }}
-        >
-          Clearer tone
-        </div>
 
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            padding: "8px 12px",
-            borderRadius: "999px",
-            background: "rgba(99,102,241,0.08)",
-            border: "1px solid rgba(99,102,241,0.14)",
-            color: "#4338ca",
-            fontWeight: 800,
-            fontSize: "13px",
-          }}
-        >
-          Easier to receive
-        </div>
-      </div>
 
       <div
         style={{
