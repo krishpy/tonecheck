@@ -70,15 +70,17 @@ export default function ResultSection({
       ? "A cleaner version that sounds easier to receive."
       : "A polished version that keeps your meaning but sounds smoother.";
 
-  const tonePillStyle = {
+  const signalChipStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "10px 14px",
+    borderRadius: "999px",
     background: toneTheme.chipBg,
-    color: toneTheme.chipText,
     border: `1px solid ${toneTheme.border}`,
-    borderRadius: "16px",
-    padding: "12px 14px",
-    minWidth: "120px",
-    textAlign: "left",
-    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
+    color: toneTheme.chipText,
+    fontWeight: 800,
+    fontSize: "14px",
   };
 
   return (
@@ -153,36 +155,7 @@ export default function ResultSection({
                 </div>
               </div>
 
-              <div
-                style={{
-                  minWidth: "220px",
-                  borderRadius: "22px",
-                  padding: "16px 18px",
-                  background: toneTheme.chipBg,
-                  border: `1px solid ${toneTheme.border}`,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                    color: "#64748b",
-                  }}
-                >
-                  What’s Coming Through
-                </div>
-                <div
-                  style={{
-                    marginTop: "8px",
-                    fontSize: "24px",
-                    fontWeight: 800,
-                    color: toneTheme.chipText,
-                  }}
-                >
-                  {hiddenSignalLabel}
-                </div>
-              </div>
+              <div style={signalChipStyle}>{hiddenSignalLabel}</div>
             </div>
 
             <div
@@ -279,14 +252,14 @@ export default function ResultSection({
         </div>
       </div>
 
-      <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-        {/* 1. Should I send this? */}
+      <div style={{ marginTop: "24px", display: "grid", gap: "18px" }}>
         <div
           style={{
             ...cardStyle,
             background: toneTheme.bg,
             border: `1px solid ${toneTheme.border}`,
             boxShadow: `0 10px 30px ${toneTheme.glow || "rgba(15,23,42,0.06)"}`,
+            padding: "20px",
           }}
         >
           <div
@@ -298,12 +271,11 @@ export default function ResultSection({
               flexWrap: "wrap",
             }}
           >
-            <div style={{ flex: "1 1 340px" }}>
+            <div style={{ flex: "1 1 420px" }}>
               <div
                 style={{
                   fontSize: "14px",
                   fontWeight: 900,
-                  letterSpacing: "-0.02em",
                   color: "#0f172a",
                 }}
               >
@@ -312,23 +284,23 @@ export default function ResultSection({
 
               <div
                 style={{
-                  marginTop: "10px",
+                  marginTop: "12px",
                   display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  flexWrap: "wrap",
+                  alignItems: "flex-start",
+                  gap: "12px",
                 }}
               >
                 <div
                   style={{
-                    width: "40px",
-                    height: "40px",
+                    width: "44px",
+                    height: "44px",
                     borderRadius: "14px",
                     background: toneTheme.iconBg,
                     display: "grid",
                     placeItems: "center",
                     color: "#fff",
-                    fontSize: "20px",
+                    fontSize: "22px",
+                    flexShrink: 0,
                     boxShadow: `0 12px 24px ${toneTheme.glow || "rgba(15,23,42,0.10)"}`,
                   }}
                 >
@@ -338,21 +310,34 @@ export default function ResultSection({
                 <div>
                   <div
                     style={{
-                      fontSize: "28px",
-                      fontWeight: 900,
-                      letterSpacing: "-0.04em",
-                      color: "#111827",
-                      lineHeight: 1,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      flexWrap: "wrap",
                     }}
                   >
-                    {sendVerdict.label}
+                    <div
+                      style={{
+                        fontSize: "30px",
+                        fontWeight: 900,
+                        letterSpacing: "-0.04em",
+                        color: "#111827",
+                        lineHeight: 1,
+                      }}
+                    >
+                      {sendVerdict.label}
+                    </div>
+
+                    <div style={signalChipStyle}>{hiddenSignalLabel}</div>
                   </div>
+
                   <div
                     style={{
-                      marginTop: "6px",
+                      marginTop: "8px",
                       fontSize: "14px",
+                      lineHeight: 1.6,
                       color: "#475569",
-                      lineHeight: 1.5,
+                      maxWidth: "720px",
                     }}
                   >
                     {dynamicAdvisory}
@@ -361,7 +346,17 @@ export default function ResultSection({
               </div>
             </div>
 
-            <div style={tonePillStyle}>
+            <div
+              style={{
+                background: toneTheme.chipBg,
+                color: toneTheme.chipText,
+                border: `1px solid ${toneTheme.border}`,
+                borderRadius: "16px",
+                padding: "12px 14px",
+                minWidth: "120px",
+                boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
+              }}
+            >
               <div
                 style={{
                   fontSize: "11px",
@@ -387,100 +382,30 @@ export default function ResultSection({
           </div>
         </div>
 
-        {/* 2. Merged compact insight card */}
-        <div style={cardStyle}>
+        <div style={{ ...cardStyle, padding: "18px" }}>
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(0, 1.35fr) minmax(280px, 1fr)",
-              gap: "16px",
-              alignItems: "stretch",
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#6366f1",
+              marginBottom: "12px",
             }}
           >
-            <div
-              style={{
-                borderRadius: "22px",
-                padding: "18px",
-                background: "rgba(248,250,252,0.9)",
-                border: "1px solid rgba(15,23,42,0.06)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 800,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "#6366f1",
-                }}
-              >
-                What’s coming through
-              </div>
-
-              <div
-                style={{
-                  marginTop: "10px",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  padding: "10px 14px",
-                  borderRadius: "999px",
-                  background: toneTheme.chipBg,
-                  border: `1px solid ${toneTheme.border}`,
-                  color: toneTheme.chipText,
-                  fontWeight: 800,
-                  fontSize: "15px",
-                }}
-              >
-                {hiddenSignalLabel}
-              </div>
-
-              <div
-                style={{
-                  marginTop: "12px",
-                  fontSize: "15px",
-                  lineHeight: 1.7,
-                  color: "#475569",
-                }}
-              >
-                {dynamicAdvisory}
-              </div>
-            </div>
-
-            <div
-              style={{
-                borderRadius: "22px",
-                padding: "18px",
-                background: "rgba(255,255,255,0.92)",
-                border: "1px solid rgba(15,23,42,0.06)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 800,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "#6366f1",
-                  marginBottom: "12px",
-                }}
-              >
-                What could happen
-              </div>
-
-              <StatsRow
-                replyLikelihood={replyLikelihood}
-                regretRisk={regretRisk}
-                manipulationRisk={manipulationRisk}
-                hiddenSignal={hiddenSignalKey}
-              />
-            </div>
+            What could happen
           </div>
+
+          <StatsRow
+            replyLikelihood={replyLikelihood}
+            regretRisk={regretRisk}
+            manipulationRisk={manipulationRisk}
+            hiddenSignal={hiddenSignalKey}
+          />
         </div>
 
-        {/* 3. Better version to send */}
         {finalRewrite && (
-          <div style={{ display: "grid", gap: "12px" }}>
+          <div style={{ display: "grid", gap: "10px" }}>
             <div
               style={{
                 ...cardStyle,
@@ -489,6 +414,7 @@ export default function ResultSection({
                 border: "1px solid rgba(251,146,60,0.26)",
                 boxShadow:
                   "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.8) inset",
+                padding: "18px 20px",
               }}
             >
               <div
@@ -498,7 +424,7 @@ export default function ResultSection({
                   letterSpacing: "0.18em",
                   textTransform: "uppercase",
                   color: "#c2410c",
-                  marginBottom: "10px",
+                  marginBottom: "8px",
                 }}
               >
                 Better version to send
@@ -540,10 +466,12 @@ export default function ResultSection({
           </div>
         )}
 
-        <DetectedSignals
-          signals={result.top_manipulation_signals}
-          getHiddenSignalLabel={getHiddenSignalLabel}
-        />
+        {!!result.top_manipulation_signals?.length && (
+          <DetectedSignals
+            signals={result.top_manipulation_signals}
+            getHiddenSignalLabel={getHiddenSignalLabel}
+          />
+        )}
 
         <div style={cardStyle}>
           <div
