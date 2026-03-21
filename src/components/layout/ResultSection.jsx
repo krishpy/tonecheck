@@ -55,7 +55,7 @@ function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskSco
   if (tone.includes("neutral") || verdictTone === "neutral" || riskScore >= 40) {
     return {
       title: "Safe — but could be clearer",
-      sublabel: "This may come across differently than you intend.",
+      sublabel: "This may come across as unclear or emotionally distant.",
       tip: "Try the rewrite below to make it warmer or clearer.",
       chipLabel: hiddenSignalLabel,
     };
@@ -131,22 +131,23 @@ function getVerdictTheme(tone) {
       tipColor: "#c2410c",
     },
     neutral: {
-      title: "#475569",
-      subtitle: "#64748b",
-      iconBg: "linear-gradient(135deg, #94a3b8 0%, #64748b 55%, #475569 100%)",
-      iconGlow: "rgba(100,116,139,0.22)",
-      tipBg: "rgba(239,246,255,0.92)",
-      tipBorder: "1px solid rgba(59,130,246,0.16)",
-      tipColor: "#1d4ed8",
+      title: "#374151", // darker, sharper
+      subtitle: "#6b7280",
+      iconBg: "linear-gradient(135deg, #eab308 0%, #f59e0b 55%, #d97706 100%)",
+      iconGlow: "rgba(245,158,11,0.25)",
+      tipBg: "rgba(255,251,235,0.9)",
+      tipBorder: "1px solid rgba(245,158,11,0.2)",
+      tipColor: "#b45309",
     },
+
     safe: {
-      title: "#15803d",
-      subtitle: "#166534",
-      iconBg: "linear-gradient(135deg, #4ade80 0%, #22c55e 55%, #16a34a 100%)",
-      iconGlow: "rgba(34,197,94,0.24)",
-      tipBg: "rgba(240,253,244,0.94)",
-      tipBorder: "1px solid rgba(34,197,94,0.16)",
-      tipColor: "#15803d",
+      title: "#166534",
+      subtitle: "#15803d",
+      iconBg: "linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%)",
+      iconGlow: "rgba(34,197,94,0.28)",
+      tipBg: "rgba(240,253,244,0.9)",
+      tipBorder: "1px solid rgba(34,197,94,0.2)",
+      tipColor: "#166534",
     },
   };
 
@@ -482,25 +483,27 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
                   gap: isMobile ? "12px" : "14px",
                 }}
               >
-                <div
-                  style={{
-                    width: isMobile ? "48px" : "56px",
-                    height: isMobile ? "48px" : "56px",
-                    borderRadius: isMobile ? "16px" : "18px",
-                    background: verdictTheme.iconBg,
-                    display: "grid",
-                    placeItems: "center",
-                    color: "#fff",
-                    fontSize: isMobile ? "24px" : "28px",
-                    flexShrink: 0,
-                    boxShadow: `0 16px 30px ${verdictTheme.iconGlow}`,
-                    border: "1px solid rgba(255,255,255,0.28)",
-                    transform: "translateY(1px)",
-                  }}
-                >
-                  {sendVerdict.emoji}
-                </div>
-
+               <div
+              style={{
+                width: isMobile ? "52px" : "60px",
+                height: isMobile ? "52px" : "60px",
+                borderRadius: "20px",
+                background: verdictTheme.iconBg,
+                display: "grid",
+                placeItems: "center",
+                color: "#fff",
+                fontSize: isMobile ? "26px" : "30px",
+                flexShrink: 0,
+                boxShadow: `0 18px 34px ${verdictTheme.iconGlow}`,
+                border: "1px solid rgba(255,255,255,0.35)",
+                transform: "translateY(1px)",
+                animation: "tc-breathe 2.6s ease-in-out infinite",
+              }}
+            >
+              <span style={{ transform: "translateY(1px)" }}>
+                {sendVerdict.emoji}
+              </span>
+            </div>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div
                     style={{

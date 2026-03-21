@@ -98,6 +98,21 @@
   100% { transform: translateY(0); }
 }
 
+@keyframes tc-breathe {
+  0% {
+    transform: translateY(1px) scale(1);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.08);
+  }
+  50% {
+    transform: translateY(-1px) scale(1.04);
+    box-shadow: 0 22px 38px rgba(0,0,0,0.12);
+  }
+  100% {
+    transform: translateY(1px) scale(1);
+    box-shadow: 0 16px 30px rgba(0,0,0,0.08);
+  }
+}
+
 .read-the-docs {
   color: #888;
 }
