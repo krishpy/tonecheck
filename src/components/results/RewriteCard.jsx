@@ -194,7 +194,7 @@ export default function RewriteCard({
           Copy
         </button>
 
-        <button
+       <button
           type="button"
           className="tc-button-hover"
           onClick={sendRewriteWhatsApp}
@@ -208,9 +208,13 @@ export default function RewriteCard({
             background: "rgba(240,253,244,0.95)",
             color: "#166534",
             boxShadow: "0 8px 22px rgba(34,197,94,0.08)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
           }}
         >
-          Send on WhatsApp
+          {whatsappIcon}
+          <span>Send on WhatsApp</span>
         </button>
 
         <div

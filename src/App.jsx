@@ -647,6 +647,7 @@ https://trytonecheck.com`;
               downloadCard={downloadCard}
               setResult={setResult}
               setCopyState={setCopyState}
+              setMessage={setMessage}
               resultBadge={resultBadge}
             />
           </div>

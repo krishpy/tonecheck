@@ -45,8 +45,48 @@ export default function ResultSection({
   downloadCard,
   setResult,
   setCopyState,
+  setMessage,
 }) {
   if (!result || result.error) return null;
+
+  const hiddenSignalKey =
+    result.primary_hidden_signal ||
+    result.hidden_signal ||
+    result.primary_manipulation_signal ||
+    "none";
+
+  const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
+
+  const toneLabel = getToneLabel();
+  const toneEmoji = getToneEmoji();
+
+  const tonePillStyle = {
+    background: toneTheme.chipBg,
+    color: toneTheme.chipText,
+    border: `1px solid ${toneTheme.border}`,
+    borderRadius: "16px",
+    padding: "12px 14px",
+    minWidth: "116px",
+    textAlign: "left",
+    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
+  };
+
+  const dynamicAdvisory =
+    result.advisory ||
+    (riskScore >= 85
+      ? "This message may escalate the situation quickly and can be perceived as threatening."
+      : riskScore >= 70
+      ? "This message may come across as aggressive or insulting and could trigger a defensive reaction."
+      : riskScore >= 40
+      ? "This message may create friction or misunderstanding depending on timing and relationship context."
+      : "This message is relatively safe, but wording can still be refined for clarity and warmth.");
+
+  const rewriteIntro =
+    riskScore >= 70
+      ? "A calmer version that lowers the chance of escalation."
+      : riskScore >= 40
+      ? "A cleaner version that sounds clearer and easier to receive."
+      : "A polished version that keeps your meaning but sounds smoother.";
 
   return (
     <>
@@ -147,7 +187,7 @@ export default function ResultSection({
                     color: toneTheme.chipText,
                   }}
                 >
-                  {primaryHiddenSignalLabel}
+                  {hiddenSignalLabel}
                 </div>
               </div>
             </div>
@@ -203,8 +243,15 @@ export default function ResultSection({
                 <div style={{ fontSize: "12px", fontWeight: 800, color: "#64748b" }}>
                   Tone
                 </div>
-                <div style={{ marginTop: "8px", fontSize: "28px", fontWeight: 800 }}>
-                  {getToneEmoji()} {getToneLabel()}
+                <div
+                  style={{
+                    marginTop: "8px",
+                    fontSize: "28px",
+                    fontWeight: 800,
+                    color: toneTheme.chipText,
+                  }}
+                >
+                  {toneEmoji} {toneLabel}
                 </div>
               </div>
 
@@ -304,7 +351,6 @@ export default function ResultSection({
       </div>
 
       <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-        {/* 1. Should I send this? */}
         <ToneSummaryCard
           toneTheme={toneTheme}
           getToneLabel={getToneLabel}
@@ -312,64 +358,94 @@ export default function ResultSection({
           sendVerdict={sendVerdict}
         />
 
-        {/* 2. What could happen? */}
         <div style={cardStyle}>
           <div
             style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "#6366f1",
-              marginBottom: "12px",
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "14px",
+              alignItems: "stretch",
+              flexWrap: "wrap",
+              marginBottom: "14px",
             }}
           >
-            What could happen
-          </div>
-
-          <StatsRow
-            replyLikelihood={replyLikelihood}
-            regretRisk={regretRisk}
-            manipulationRisk={manipulationRisk}
-            hiddenSignal={result.hidden_signal || result.primary_hidden_signal}
-          />
-
-          {!!result.advisory && (
-            <div
-              style={{
-                marginTop: "14px",
-                padding: "14px 16px",
-                borderRadius: "18px",
-                background: "rgba(248,250,252,0.9)",
-                border: "1px solid rgba(15,23,42,0.06)",
-                color: "#334155",
-                fontSize: "15px",
-                lineHeight: 1.6,
-              }}
-            >
-              {result.advisory}
-            </div>
-          )}
-        </div>
-
-        {/* 3. Better version to send */}
-        {finalRewrite && (
-          <div style={{ display: "grid", gap: "14px" }}>
-            <div
-              style={{
-                ...cardStyle,
-                background:
-                  "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-                border: "1px solid rgba(251,146,60,0.18)",
-              }}
-            >
+            <div style={{ flex: "1 1 280px" }}>
               <div
                 style={{
                   fontSize: "12px",
                   fontWeight: 800,
                   letterSpacing: "0.16em",
                   textTransform: "uppercase",
-                  color: "#9a3412",
+                  color: "#6366f1",
+                  marginBottom: "8px",
+                }}
+              >
+                What could happen
+              </div>
+
+              <div
+                style={{
+                  color: "#475569",
+                  fontSize: "14px",
+                  lineHeight: 1.6,
+                }}
+              >
+                {dynamicAdvisory}
+              </div>
+            </div>
+
+            <div style={tonePillStyle}>
+              <div
+                style={{
+                  fontSize: "11px",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                  color: "#64748b",
+                }}
+              >
+                Tone
+              </div>
+              <div
+                style={{
+                  marginTop: "6px",
+                  fontSize: "18px",
+                  fontWeight: 800,
+                  color: toneTheme.chipText,
+                }}
+              >
+                {toneLabel}
+              </div>
+            </div>
+          </div>
+
+          <StatsRow
+            replyLikelihood={replyLikelihood}
+            regretRisk={regretRisk}
+            manipulationRisk={manipulationRisk}
+            hiddenSignal={hiddenSignalKey}
+          />
+        </div>
+
+        {finalRewrite && (
+          <div style={{ display: "grid", gap: "12px" }}>
+            <div
+              style={{
+                ...cardStyle,
+                background:
+                  "linear-gradient(135deg, rgba(255,250,245,0.98), rgba(255,242,229,0.98))",
+                border: "1px solid rgba(251,146,60,0.26)",
+                boxShadow:
+                  "0 12px 34px rgba(251,146,60,0.08), 0 1px 0 rgba(255,255,255,0.8) inset",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 900,
+                  letterSpacing: "0.18em",
+                  textTransform: "uppercase",
+                  color: "#c2410c",
                   marginBottom: "10px",
                 }}
               >
@@ -378,29 +454,37 @@ export default function ResultSection({
 
               <div
                 style={{
-                  color: "#475569",
-                  fontSize: "14px",
-                  marginBottom: "6px",
+                  color: "#7c2d12",
+                  fontSize: "15px",
+                  fontWeight: 600,
                 }}
               >
-                Safer, clearer, and easier to receive.
+                {rewriteIntro}
               </div>
             </div>
-          <RewriteCard
-            cardStyle={cardStyle}
-            chipStyle={chipStyle}
-            finalRewrite={finalRewrite}
-            rewriteRiskScore={rewriteRiskScore}
-            riskScore={riskScore}
-            riskImprovement={riskImprovement}
-            rewriteTone={rewriteTone}
-            rewriteloading={rewriteLoading}
-            setRewriteTone={setRewriteTone}
-            copyRewriteOnly={copyRewriteOnly}
-            useRewriteMessage={useRewriteMessage}
-            sendRewriteWhatsApp={sendRewriteWhatsApp}
-            copyState={copyState}
-          />
+
+            <RewriteCard
+              cardStyle={cardStyle}
+              chipStyle={chipStyle}
+              finalRewrite={finalRewrite}
+              rewriteRiskScore={rewriteRiskScore}
+              riskScore={riskScore}
+              riskImprovement={riskImprovement}
+              rewriteTone={rewriteTone}
+              rewriteloading={rewriteLoading}
+              setRewriteTone={setRewriteTone}
+              copyRewriteOnly={copyRewriteOnly}
+              useRewriteMessage={useRewriteMessage}
+              sendRewriteWhatsApp={sendRewriteWhatsApp}
+              copyState={copyState}
+              whatsappIcon={
+                <img
+                  src="/whatsapp.svg"
+                  alt=""
+                  style={{ width: 18, height: 18, display: "block" }}
+                />
+              }
+            />
           </div>
         )}
 
@@ -548,7 +632,8 @@ export default function ResultSection({
               onClick={() => {
                 setResult(null);
                 setCopyState("");
-                setRewriteTone("default");
+                setRewriteTone("balanced");
+                if (setMessage) setMessage("");
                 setTimeout(() => {
                   const textarea = document.querySelector(".tc-textarea");
                   if (textarea) textarea.focus();
