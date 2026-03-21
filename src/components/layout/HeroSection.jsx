@@ -434,18 +434,6 @@ export default function HeroSection({
         </div>
       </div>
 
-      <div
-        style={{
-          marginTop: "14px",
-          fontSize: "13px",
-          fontWeight: 600,
-          color: "rgba(71,85,105,0.78)",
-          letterSpacing: "0.01em",
-        }}
-      >
-        Used before sending by thousands of messages every week
-      </div>
-
       {result && (
         <div
           style={{
