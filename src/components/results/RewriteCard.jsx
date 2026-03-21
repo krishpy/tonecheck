@@ -225,36 +225,7 @@ export default function RewriteCard({
             flexWrap: "wrap",
           }}
         >
-          {TONE_OPTIONS.map((option) => {
-            const isActive = rewriteTone === option.value;
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                className="tc-button-hover"
-                onClick={() => setRewriteTone(option.value)}
-                style={{
-                  ...chipStyle,
-                  padding: isMobile ? "9px 12px" : "10px 14px",
-                  fontSize: "14px",
-                  background: isActive
-                    ? "linear-gradient(135deg, rgba(79,70,229,0.12), rgba(236,72,153,0.10))"
-                    : "rgba(255,255,255,0.82)",
-                  color: isActive ? "#312e81" : "#334155",
-                  border: isActive
-                    ? "1px solid rgba(99,102,241,0.22)"
-                    : "1px solid rgba(15,23,42,0.08)",
-                  boxShadow: isActive
-                    ? "0 10px 24px rgba(99,102,241,0.10)"
-                    : "0 4px 14px rgba(15,23,42,0.04)",
-                  fontWeight: isActive ? 800 : 700,
-                }}
-              >
-                {option.label}
-              </button>
-            );
-          })}
+         
         </div>
       </div>
     </div>
