@@ -223,17 +223,7 @@ export default function RewriteCard({
       </div>
 
       <div style={{ display: "grid", gap: "10px" }}>
-        <div
-          style={{
-            fontSize: "11px",
-            fontWeight: 800,
-            letterSpacing: "0.10em",
-            color: "#64748b",
-            textTransform: "uppercase",
-          }}
-        >
-          Change the style
-        </div>
+       
 
         <div
           style={{
