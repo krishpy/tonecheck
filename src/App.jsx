@@ -9,7 +9,6 @@ import SeoContentBlock from "./components/layout/SeoContentBlock";
 import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
 
-
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -29,7 +28,6 @@ function RedirectHome() {
   return null;
 }
 
-
 function AppContent() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState(null);
@@ -39,15 +37,11 @@ function AppContent() {
   const [rewriteLoading, setRewriteLoading] = useState(false);
 
   useEffect(() => {
-  if (!result || !message.trim()) return;
-  analyze(rewriteTone, { isRewriteOnly: true });
+    if (!result || !message.trim()) return;
+    analyze(rewriteTone, { isRewriteOnly: true });
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [rewriteTone]);
-
-  // prevent dependency loop warning
-  // eslint-disable-next-line react-hooks/exhaustive-deps
- 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rewriteTone]);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -75,7 +69,6 @@ function AppContent() {
       ""
     );
   }, [result]);
-
 
   function getHiddenSignalLabel(signal) {
     const map = {
@@ -232,18 +225,11 @@ function AppContent() {
     return "linear-gradient(90deg,#34d399,#22c55e,#14b8a6)";
   }
 
- 
-const finalRewrite = displayedRewrite;
+  const finalRewrite = displayedRewrite;
 
   const primaryHiddenSignalLabel = getHiddenSignalLabel(
     result?.primary_hidden_signal || result?.primary_manipulation_signal
   );
-
-  function getClampedMessage(text, max = 180) {
-    const value = String(text || "").trim();
-    if (value.length <= max) return value;
-    return `${value.slice(0, max).trim()}…`;
-  }
 
   async function copyResult() {
     try {
@@ -368,72 +354,72 @@ https://trytonecheck.com`;
     );
   }
 
-async function analyze(selectedStyleArg = rewriteTone, options = {}) {
-  const startedAt = Date.now();
-  const selectedStyle =
-    typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
+  async function analyze(selectedStyleArg = rewriteTone, options = {}) {
+    const startedAt = Date.now();
+    const selectedStyle =
+      typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
 
-  const { isRewriteOnly = false } = options;
-
-  try {
-    if (isRewriteOnly) {
-      setRewriteLoading(true);
-    } else {
-      setLoading(true);
-      setResult(null);
-    }
-
-    setCopyState("");
-
-    const response = await fetch(
-      "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "test-default-key",
-        },
-        body: JSON.stringify({
-          message_text: message,
-          rewrite_style: selectedStyle,
-        }),
-      }
-    );
-
-    const rawText = await response.text();
-    let data = {};
+    const { isRewriteOnly = false } = options;
 
     try {
-      data = JSON.parse(rawText);
-    } catch {
-      data = {};
+      if (isRewriteOnly) {
+        setRewriteLoading(true);
+      } else {
+        setLoading(true);
+        setResult(null);
+      }
+
+      setCopyState("");
+
+      const response = await fetch(
+        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "test-default-key",
+          },
+          body: JSON.stringify({
+            message_text: message,
+            rewrite_style: selectedStyle,
+          }),
+        }
+      );
+
+      const rawText = await response.text();
+      let data = {};
+
+      try {
+        data = JSON.parse(rawText);
+      } catch {
+        data = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.detail || "Something went wrong. Please try again.");
+      }
+
+      setResult(data);
+    } catch (error) {
+      console.error("Analyze failed:", error);
+      setResult({
+        error: "Something went wrong while analyzing the message. Please try again.",
+      });
+    } finally {
+      const elapsed = Date.now() - startedAt;
+      const minVisible = 300;
+      const remaining = Math.max(0, minVisible - elapsed);
+
+      if (isRewriteOnly) {
+        setTimeout(() => {
+          setRewriteLoading(false);
+        }, remaining);
+      } else {
+        setLoading(false);
+        setRewriteLoading(false);
+      }
     }
-
-    if (!response.ok) {
-      throw new Error(data?.detail || "Something went wrong. Please try again.");
-    }
-
-    setResult(data);
-  } catch (error) {
-    console.error("Analyze failed:", error);
-    setResult({
-      error: "Something went wrong while analyzing the message. Please try again.",
-    });
-  } finally {
-  const elapsed = Date.now() - startedAt;
-  const minVisible = 300;
-  const remaining = Math.max(0, minVisible - elapsed);
-
-  if (isRewriteOnly) {
-    setTimeout(() => {
-      setRewriteLoading(false);
-    }, remaining);
-  } else {
-    setLoading(false);
-    setRewriteLoading(false);
   }
- }
-}
 
   async function downloadCard() {
     try {
@@ -510,43 +496,6 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
       "0 14px 40px rgba(15,23,42,0.06), 0 35px 90px rgba(99,102,241,0.10), inset 0 1px 0 rgba(255,255,255,0.70)",
   };
 
-  const glassOrb1 = {
-    position: "absolute",
-    top: "-90px",
-    right: "-70px",
-    width: "300px",
-    height: "300px",
-    borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(99,102,241,0.24), rgba(99,102,241,0) 70%)",
-    pointerEvents: "none",
-    filter: "blur(6px)",
-  };
-
-  const glassOrb2 = {
-    position: "absolute",
-    bottom: "-110px",
-    left: "-70px",
-    width: "320px",
-    height: "320px",
-    borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(236,72,153,0.20), rgba(236,72,153,0) 70%)",
-    pointerEvents: "none",
-    filter: "blur(8px)",
-  };
-
-  const glassOrb3 = {
-    position: "absolute",
-    top: "35%",
-    left: "42%",
-    transform: "translate(-50%, -50%)",
-    width: "180px",
-    height: "180px",
-    borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(56,189,248,0.15), rgba(56,189,248,0) 72%)",
-    pointerEvents: "none",
-    filter: "blur(8px)",
-  };
-
   const chipStyle = {
     border: "1px solid rgba(15,23,42,0.06)",
     borderRadius: "999px",
@@ -608,267 +557,35 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={pageTitle} />
         <meta name="twitter:description" content={pageDescription} />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            name: location.pathname === "/" ? "ToneCheck" : currentTool.title,
-            applicationCategory: "Communication Tool",
-            operatingSystem: "Any",
-            url: `https://trytonecheck.com${location.pathname}`,
-            description: pageDescription,
-          })}
-        </script>
       </Helmet>
 
-      <style>{`
-
-                  @keyframes tc-tone-friendly {
-              0%, 100% { transform: translateY(0px) scale(1); }
-              50% { transform: translateY(-2px) scale(1.06); }
-            }
-
-            @keyframes tc-tone-tense {
-              0%, 100% { transform: translateX(0px) rotate(0deg); }
-              20% { transform: translateX(-1px) rotate(-4deg); }
-              40% { transform: translateX(1px) rotate(4deg); }
-              60% { transform: translateX(-1px) rotate(-3deg); }
-              80% { transform: translateX(1px) rotate(3deg); }
-            }
-
-            @keyframes tc-safer-pop {
-              0% {
-                transform: scale(0.6);
-                opacity: 0;
-              }
-              70% {
-                transform: scale(1.05);
-              }
-              100% {
-                transform: scale(1);
-                opacity: 1;
-              }
-            }
-
-
-            @keyframes tc-logo-pulse {
-              0% {
-                box-shadow:
-                  0 14px 38px rgba(99,102,241,0.28),
-                  inset 0 1px 0 rgba(255,255,255,0.36);
-              }
-
-              50% {
-                box-shadow:
-                  0 20px 48px rgba(99,102,241,0.45),
-                  0 0 28px rgba(236,72,153,0.35),
-                  inset 0 1px 0 rgba(255,255,255,0.42);
-              }
-
-              100% {
-                box-shadow:
-                  0 14px 38px rgba(99,102,241,0.28),
-                  inset 0 1px 0 rgba(255,255,255,0.36);
-              }
-            }
-
-            .tc-logo-glow {
-              animation: tc-logo-pulse 4.5s ease-in-out infinite;
-            }
-
-            @keyframes tc-tone-aggressive {
-              0%, 100% { transform: scale(1) translateY(0); }
-              30% { transform: scale(1.08) translateY(-1px); }
-              60% { transform: scale(1.02) translateY(1px); }
-            }
-
-            @keyframes tc-tone-passive {
-              0%, 100% { transform: rotate(0deg) translateY(0px); }
-              25% { transform: rotate(-4deg) translateY(-1px); }
-              75% { transform: rotate(4deg) translateY(0px); }
-            }
-
-            @keyframes tc-tone-neutral {
-              0%, 100% { transform: scale(1); }
-              50% { transform: scale(1.03); }
-            }
-
-            .tc-tone-friendly {
-              display: inline-block;
-              animation: tc-tone-friendly 1.8s ease-in-out infinite;
-            }
-
-            .tc-tone-tense {
-              display: inline-block;
-              animation: tc-tone-tense 1.15s ease-in-out infinite;
-            }
-
-            .tc-tone-aggressive {
-              display: inline-block;
-              animation: tc-tone-aggressive 0.9s ease-in-out infinite;
-            }
-
-            .tc-tone-passive {
-              display: inline-block;
-              animation: tc-tone-passive 2s ease-in-out infinite;
-            }
-
-            .tc-tone-neutral {
-              display: inline-block;
-              animation: tc-tone-neutral 2.2s ease-in-out infinite;
-            }
-
-        @keyframes tc-aggressive {
-          0%,100% { transform: scale(1); }
-          50% { transform: scale(1.12); }
-        }
-
-        @keyframes tc-light-sweep {
-          0% { transform: translateX(-120%); opacity: 0; }
-          40% { opacity: 0.5; }
-          100% { transform: translateX(120%); opacity: 0; }
-        }
-
-        .tc-light-sweep {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 40%;
-          height: 100%;
-          background: linear-gradient(
-            110deg,
-            transparent,
-            rgba(255,255,255,0.35),
-            transparent
-          );
-          filter: blur(10px);
-          animation: tc-light-sweep 8s linear infinite;
-          pointer-events: none;
-        }
-
-        @keyframes tc-threat {
-          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(239,68,68,0.0)); }
-          50% { transform: scale(1.08); filter: drop-shadow(0 0 10px rgba(239,68,68,0.5)); }
-        }
-
-        @keyframes tc-tense {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(-2deg); }
-          75% { transform: rotate(2deg); }
-        }
-
-        @keyframes tc-passive {
-          0%, 100% { transform: translateY(0px); opacity: 1; }
-          50% { transform: translateY(-3px); opacity: 0.9; }
-        }
-
-        @keyframes tc-neutral {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-2px); }
-        }
-
-        @keyframes tc-gradient-move {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 100% 50%; }
-        }
-
-        .tc-tone-emoji {
-          animation-duration: 1.8s;
-          animation-iteration-count: infinite;
-          animation-timing-function: ease-in-out;
-          transform-origin: center;
-        }
-
-        .tc-glow-card {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .tc-glow-card::before {
-          content: "";
-          position: absolute;
-          inset: -1px;
-          border-radius: inherit;
-          background: linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.08), rgba(255,255,255,0.5));
-          opacity: 0.45;
-          pointer-events: none;
-        }
-
-        .tc-shimmer {
-          background-size: 200% 200%;
-          animation: tc-gradient-move 4.5s linear infinite;
-        }
-
-        .tc-chip-hover {
-          transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
-        }
-
-        .tc-chip-hover:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 22px rgba(15,23,42,0.08);
-        }
-
-        .tc-button-hover {
-          transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
-        }
-
-        .tc-button-hover:hover {
-          transform: translateY(-2px);
-          filter: saturate(1.05);
-        }
-
-        @media (max-width: 980px) {
-          .tc-grid-main {
-            grid-template-columns: 1fr !important;
-          }
-        }
-
-        @media (max-width: 720px) {
-          .tc-title {
-            font-size: 52px !important;
-          }
-
-          .tc-hero {
-            padding: 24px !important;
-          }
-
-          .tc-textarea {
-            min-height: 220px !important;
-            font-size: 20px !important;
-          }
-        }
-      `}</style>
-
-     <div style={shellStyle}>
-                 <div
-                  className="tc-grid-main"
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr",
-                    gap: "28px",
-                    alignItems: "start",
-                  }}
-                >
-              <div>
-
-              <HeroSection
-                    location={location}
-                    navigate={navigate}
-                    currentTool={currentTool}
-                    message={message}
-                    setMessage={setMessage}
-                    setResult={setResult}
-                    setCopyState={setCopyState}
-                    analyze={analyze}
-                    loading={loading}
-                    setExample={setExample}
-                    heroCardStyle={heroCardStyle}
-                    chipStyle={chipStyle}
-                    actionButtonStyle={actionButtonStyle}
-                    primaryButtonStyle={primaryButtonStyle}
-              />
-
-          
+      <div style={shellStyle}>
+        <div
+          className="tc-grid-main"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: "28px",
+            alignItems: "start",
+          }}
+        >
+          <div>
+            <HeroSection
+              location={location}
+              navigate={navigate}
+              currentTool={currentTool}
+              message={message}
+              setMessage={setMessage}
+              setResult={setResult}
+              setCopyState={setCopyState}
+              analyze={analyze}
+              loading={loading}
+              setExample={setExample}
+              heroCardStyle={heroCardStyle}
+              chipStyle={chipStyle}
+              actionButtonStyle={actionButtonStyle}
+              primaryButtonStyle={primaryButtonStyle}
+            />
 
             {result?.error && (
               <div
@@ -883,6 +600,7 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
                 Error: {result.error}
               </div>
             )}
+
             <ResultSection
               result={result}
               location={location}
@@ -929,11 +647,8 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
         </div>
       </div>
     </div>
-  
   );
 }
-
-
 
 export default function App() {
   return (
@@ -958,7 +673,7 @@ function getResultBadge(result, riskImprovement) {
       text: "⚠️ High-risk message caught",
       color: "#ef4444",
       bg: "rgba(239,68,68,0.10)",
-      border: "1px solid rgba(239,68,68,0.25)"
+      border: "1px solid rgba(239,68,68,0.25)",
     };
   }
 
@@ -967,7 +682,7 @@ function getResultBadge(result, riskImprovement) {
       text: "✨ Safer rewrite found",
       color: "#16a34a",
       bg: "rgba(34,197,94,0.10)",
-      border: "1px solid rgba(34,197,94,0.25)"
+      border: "1px solid rgba(34,197,94,0.25)",
     };
   }
 
@@ -975,6 +690,6 @@ function getResultBadge(result, riskImprovement) {
     text: "✅ Message already safe",
     color: "#2563eb",
     bg: "rgba(37,99,235,0.10)",
-    border: "1px solid rgba(37,99,235,0.25)"
+    border: "1px solid rgba(37,99,235,0.25)",
   };
 }

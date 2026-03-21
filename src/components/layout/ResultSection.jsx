@@ -7,7 +7,6 @@ import {
 } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
-import { getDecisionTheme } from "../../utils/sendDecision";
 
 export default function ResultSection({
   result,
@@ -33,13 +32,9 @@ export default function ResultSection({
   sendVerdict,
   getToneLabel,
   getToneEmoji,
-  getMeterWidth,
-  getMeterColor,
-  getToneAccent,
   replyLikelihood,
   regretRisk,
   manipulationRisk,
-  statExplanations,
   getHiddenSignalLabel,
   shareWhatsApp,
   copyResult,
@@ -49,7 +44,6 @@ export default function ResultSection({
   downloadCard,
   setResult,
   setCopyState,
-  resultBadge,
 }) {
   if (!result || result.error) return null;
 
@@ -309,78 +303,106 @@ export default function ResultSection({
       </div>
 
       <div style={{ marginTop: "24px", display: "grid", gap: "20px" }}>
-          <ToneSummaryCard
-              toneTheme={toneTheme}
-              getToneLabel={getToneLabel}
-              getToneEmoji={getToneEmoji}
-              sendVerdict={sendVerdict}
-            />
-
-            <div
-    style={{
-      ...cardStyle,
-      background: "rgba(255,255,255,0.82)",
-    }}
-  >
-    <div
-      style={{
-        fontSize: "12px",
-        fontWeight: 800,
-        letterSpacing: "0.16em",
-        textTransform: "uppercase",
-        color: "#6366f1",
-        marginBottom: "10px",
-      }}
-    >
-      Why this was flagged
-    </div>
-
-    <div
-      style={{
-        display: "grid",
-        gap: "10px",
-      }}
-    >
-      <div style={{ color: "#0f172a", fontSize: "15px", fontWeight: 700 }}>
-        Tone detected: {getToneEmoji()} {getToneLabel()}
-      </div>
-
-      <div style={{ color: "#334155", fontSize: "15px", lineHeight: 1.6 }}>
-        Hidden signal: <strong>{primaryHiddenSignalLabel}</strong>
-      </div>
-
-      <div style={{ color: "#334155", fontSize: "15px", lineHeight: 1.6 }}>
-        {result.advisory || "This message may create tension or be misunderstood."}
-      </div>
-    </div>
-  </div>
-
-      
-
-        {finalRewrite && (
-          <RewriteCard
-            cardStyle={cardStyle}
-            chipStyle={chipStyle}
-            message={message}
-            finalRewrite={finalRewrite}
-            riskScore={riskScore}
-            rewriteRiskScore={rewriteRiskScore}
-            riskImprovement={riskImprovement}
-            rewriteTone={rewriteTone}
-            rewriteloading={rewriteLoading}
-            setRewriteTone={setRewriteTone}
-            copyRewriteOnly={copyRewriteOnly}
-            useRewriteMessage={useRewriteMessage}
-            copyState={copyState}
-          />
-        )}
-
-        <StatsRow
-          replyLikelihood={replyLikelihood}
-          regretRisk={regretRisk}
-          manipulationRisk={manipulationRisk}
-          hiddenSignal={result.hidden_signal || result.primary_hidden_signal}
+        {/* 1. Should I send this? */}
+        <ToneSummaryCard
+          toneTheme={toneTheme}
+          getToneLabel={getToneLabel}
+          getToneEmoji={getToneEmoji}
+          sendVerdict={sendVerdict}
         />
+
+        {/* 2. What could happen? */}
+        <div style={cardStyle}>
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: 800,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#6366f1",
+              marginBottom: "12px",
+            }}
+          >
+            What could happen
+          </div>
+
+          <StatsRow
+            replyLikelihood={replyLikelihood}
+            regretRisk={regretRisk}
+            manipulationRisk={manipulationRisk}
+            hiddenSignal={result.hidden_signal || result.primary_hidden_signal}
+          />
+
+          {!!result.advisory && (
+            <div
+              style={{
+                marginTop: "14px",
+                padding: "14px 16px",
+                borderRadius: "18px",
+                background: "rgba(248,250,252,0.9)",
+                border: "1px solid rgba(15,23,42,0.06)",
+                color: "#334155",
+                fontSize: "15px",
+                lineHeight: 1.6,
+              }}
+            >
+              {result.advisory}
+            </div>
+          )}
+        </div>
+
+        {/* 3. Better version to send */}
+        {finalRewrite && (
+          <div style={{ display: "grid", gap: "14px" }}>
+            <div
+              style={{
+                ...cardStyle,
+                background:
+                  "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+                border: "1px solid rgba(251,146,60,0.18)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 800,
+                  letterSpacing: "0.16em",
+                  textTransform: "uppercase",
+                  color: "#9a3412",
+                  marginBottom: "10px",
+                }}
+              >
+                Better version to send
+              </div>
+
+              <div
+                style={{
+                  color: "#475569",
+                  fontSize: "14px",
+                  marginBottom: "6px",
+                }}
+              >
+                Safer, clearer, and easier to receive.
+              </div>
+            </div>
+
+            <RewriteCard
+              cardStyle={cardStyle}
+              chipStyle={chipStyle}
+              message={message}
+              finalRewrite={finalRewrite}
+              riskScore={riskScore}
+              rewriteRiskScore={rewriteRiskScore}
+              riskImprovement={riskImprovement}
+              rewriteTone={rewriteTone}
+              rewriteloading={rewriteLoading}
+              setRewriteTone={setRewriteTone}
+              copyRewriteOnly={copyRewriteOnly}
+              useRewriteMessage={useRewriteMessage}
+              copyState={copyState}
+            />
+          </div>
+        )}
 
         <DetectedSignals
           signals={result.top_manipulation_signals}
@@ -438,7 +460,13 @@ export default function ResultSection({
             <ShareButton
               onClick={shareWhatsApp}
               label="WhatsApp"
-              icon={<img src="/whatsapp.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+              icon={
+                <img
+                  src="/whatsapp.svg"
+                  alt=""
+                  style={{ width: 18, height: 18, display: "block" }}
+                />
+              }
             />
             <button className="tc-button-hover" onClick={copyResult} style={actionButtonStyle}>
               📋 Copy result
@@ -446,13 +474,25 @@ export default function ResultSection({
             <ShareButton
               onClick={shareFacebook}
               label="Facebook"
-              icon={<img src="/facebook.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+              icon={
+                <img
+                  src="/facebook.svg"
+                  alt=""
+                  style={{ width: 18, height: 18, display: "block" }}
+                />
+              }
             />
             <ShareButton onClick={shareX} label="X" icon="𝕏" />
             <ShareButton
               onClick={shareLinkedIn}
               label="LinkedIn"
-              icon={<img src="/linkedin.svg" alt="" style={{ width: 18, height: 18, display: "block" }} />}
+              icon={
+                <img
+                  src="/linkedin.svg"
+                  alt=""
+                  style={{ width: 18, height: 18, display: "block" }}
+                />
+              }
             />
             <button className="tc-button-hover" onClick={downloadCard} style={primaryButtonStyle}>
               📸 Download Share Card
