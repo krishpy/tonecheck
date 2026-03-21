@@ -54,6 +54,12 @@ export default function ResultSection({
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
   const isMobile = useIsMobile();
+  const verdictColors = {
+  danger: "#dc2626",
+  warning: "#ea580c",
+  neutral: "#64748b",
+  safe: "#16a34a",
+   };
 
   const dynamicAdvisory =
     result.advisory ||
@@ -298,7 +304,7 @@ export default function ResultSection({
                     width: "44px",
                     height: "44px",
                     borderRadius: "14px",
-                    background: toneTheme.iconBg,
+                    background: verdictColors[sendVerdict.tone] || toneTheme.iconBg,
                     display: "grid",
                     placeItems: "center",
                     color: "#fff",
@@ -324,13 +330,12 @@ export default function ResultSection({
                         fontSize: isMobile ? "22px" : "30px",
                         fontWeight: 900,
                         letterSpacing: "-0.04em",
-                        color: "#111827",
+                        color: verdictColors[sendVerdict.tone] || "#111827",
                         lineHeight: 1,
                       }}
                     >
                       {sendVerdict.label}
                     </div>
-
                     <div style={signalChipStyle}>{hiddenSignalLabel}</div>
                   </div>
 
