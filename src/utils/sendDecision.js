@@ -14,7 +14,7 @@ export function getSendVerdict(risk, regret, manipulation) {
   return { label: "Safe to send", emoji: "✅", tone: "safe" };
 }
 
-const combined = risk + regret * 0.3 + manipulation * 0.3;
+/*const combined = risk + regret * 0.3 + manipulation * 0.3;*/
 
 export function getDecisionTheme(toneClass) {
 
