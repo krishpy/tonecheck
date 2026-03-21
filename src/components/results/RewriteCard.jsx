@@ -49,27 +49,16 @@ export default function RewriteCard({
     >
       <div style={{ display: "grid", gap: "8px" }}>
         <div
-          style={{
-            fontSize: "12px",
-            fontWeight: 900,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            color: "#c2410c",
-          }}
-        >
-          Suggested rewrite
-        </div>
-
-        <div
-          style={{
-            color: "#7c2d12",
-            fontSize: "15px",
-            lineHeight: 1.6,
-            fontWeight: 700,
-          }}
-        >
-          {rewriteIntro || "Here’s a safer version you can send."}
-        </div>
+  style={{
+    fontSize: "12px",
+    fontWeight: 900,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase",
+    color: "#c2410c",
+  }}
+>
+  Better version to send
+</div>
       </div>
 
       <div

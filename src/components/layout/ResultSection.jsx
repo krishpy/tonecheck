@@ -535,6 +535,17 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
                       >
                         {adaptiveVerdict.sublabel}
                       </div>
+                      <div
+                      style={{
+                        marginTop: "5px",
+                        fontSize: "12px",
+                        color: "#94a3b8",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Based on tone + hidden signals detected
+                    </div>
+
                     </div>
                   </div>
 

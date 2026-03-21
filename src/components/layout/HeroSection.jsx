@@ -24,6 +24,7 @@ function getReplyMeta(score = 0) {
       bg: "rgba(34,197,94,0.10)",
       border: "1px solid rgba(34,197,94,0.20)",
       color: "#166534",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -35,6 +36,7 @@ function getReplyMeta(score = 0) {
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -45,6 +47,7 @@ function getReplyMeta(score = 0) {
     bg: "rgba(239,68,68,0.10)",
     border: "1px solid rgba(239,68,68,0.20)",
     color: "#b91c1c",
+    shadow: "0 4px 12px rgba(239,68,68,0.12)",
   };
 }
 
@@ -59,6 +62,7 @@ function getRiskMeta(label, score = 0, lowEmoji = "✅", mediumEmoji = "😐", h
       bg: "rgba(236,72,153,0.10)",
       border: "1px solid rgba(236,72,153,0.20)",
       color: "#be185d",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -70,6 +74,7 @@ function getRiskMeta(label, score = 0, lowEmoji = "✅", mediumEmoji = "😐", h
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -80,6 +85,7 @@ function getRiskMeta(label, score = 0, lowEmoji = "✅", mediumEmoji = "😐", h
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
     color: "#166534",
+    shadow: "0 4px 12px rgba(239,68,68,0.12)",
   };
 }
 
@@ -99,6 +105,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
       bg: "rgba(239,68,68,0.10)",
       border: "1px solid rgba(239,68,68,0.20)",
       color: "#b91c1c",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -116,6 +123,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
     };
   }
 
@@ -126,6 +134,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
     color: "#166534",
+    shadow: "0 4px 12px rgba(239,68,68,0.12)",
   };
 }
 
@@ -144,6 +153,7 @@ function MiniOutcomeChip({ item }) {
         alignItems: "center",
         gap: "8px",
         whiteSpace: "nowrap",
+        shadow: "0 4px 12px rgba(239,68,68,0.12)",
       }}
     >
       <span>{item.emoji}</span>
@@ -314,15 +324,46 @@ export default function HeroSection({
 
   const livePreview = useMemo(() => getLivePreview(message), [message]);
 
-  const displayDescription =
-    location.pathname === "/"
-      ? "Pause. This message might backfire."
-      : currentTool.description;
+  {!result && (
+  <div
+    style={{
+      marginTop: "12px",
+      padding: "10px 14px",
+      borderRadius: "16px",
+      background: livePreview.bg,
+      border: livePreview.border,
+      color: livePreview.color,
+      fontSize: "13px",
+      fontWeight: 700,
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+    }}
+  >
+    <span>{livePreview.emoji}</span>
+    <span>{livePreview.text}</span>
+  </div>
+)}
 
-  const subDescription =
-    location.pathname === "/"
+  const heroRiskScore = Number(result?.risk_score ?? 0);
+
+const displayDescription =
+  location.pathname === "/"
+    ? heroRiskScore >= 80
+      ? "Pause. This message might escalate."
+      : heroRiskScore >= 50
+      ? "Think before you send this."
+      : "Check how this message may sound."
+    : currentTool.description;
+
+const subDescription =
+  location.pathname === "/"
+    ? heroRiskScore >= 80
+      ? "This wording may trigger conflict, defensiveness, or regret."
+      : heroRiskScore >= 50
       ? "Check tone, emotional pressure, and hidden signals before you hit send."
-      : "Get instant feedback before your message lands the wrong way.";
+      : "Get quick feedback on tone, clarity, and hidden meaning before you send."
+    : "Get instant feedback before your message lands the wrong way.";
 
   return (
     <div
@@ -595,7 +636,7 @@ export default function HeroSection({
         </div>
       </div>
 
-      <div
+    <div
         style={{
           marginTop: "10px",
           display: "flex",
@@ -607,9 +648,9 @@ export default function HeroSection({
           fontWeight: 700,
         }}
       >
-        <span>🧠 Checking tone, pressure, and hidden signals</span>
+        <span>🧠 Live tone check</span>
         <span style={{ opacity: 0.45 }}>•</span>
-        <span>⚡ Instant result</span>
+        <span>⚡ Instant feedback</span>
         <span style={{ opacity: 0.45 }}>•</span>
         <span>🔒 No signup</span>
       </div>
