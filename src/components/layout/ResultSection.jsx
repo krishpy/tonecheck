@@ -28,6 +28,7 @@ export default function ResultSection({
   setRewriteTone,
   copyRewriteOnly,
   useRewriteMessage,
+  sendRewriteWhatsApp,
   copyState,
   sendVerdict,
   getToneLabel,
@@ -385,22 +386,21 @@ export default function ResultSection({
                 Safer, clearer, and easier to receive.
               </div>
             </div>
-
-            <RewriteCard
-              cardStyle={cardStyle}
-              chipStyle={chipStyle}
-              message={message}
-              finalRewrite={finalRewrite}
-              riskScore={riskScore}
-              rewriteRiskScore={rewriteRiskScore}
-              riskImprovement={riskImprovement}
-              rewriteTone={rewriteTone}
-              rewriteloading={rewriteLoading}
-              setRewriteTone={setRewriteTone}
-              copyRewriteOnly={copyRewriteOnly}
-              useRewriteMessage={useRewriteMessage}
-              copyState={copyState}
-            />
+          <RewriteCard
+            cardStyle={cardStyle}
+            chipStyle={chipStyle}
+            finalRewrite={finalRewrite}
+            rewriteRiskScore={rewriteRiskScore}
+            riskScore={riskScore}
+            riskImprovement={riskImprovement}
+            rewriteTone={rewriteTone}
+            rewriteloading={rewriteLoading}
+            setRewriteTone={setRewriteTone}
+            copyRewriteOnly={copyRewriteOnly}
+            useRewriteMessage={useRewriteMessage}
+            sendRewriteWhatsApp={sendRewriteWhatsApp}
+            copyState={copyState}
+          />
           </div>
         )}
 

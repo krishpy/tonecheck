@@ -1,244 +1,153 @@
-const rewriteOptions = [
+import React from "react";
+
+const TONE_OPTIONS = [
   { value: "balanced", label: "Balanced" },
   { value: "softer", label: "Softer" },
-  { value: "warmer", label: "Warmer" },
-  { value: "professional", label: "Professional" },
-  { value: "direct", label: "More Direct" },
+  { value: "more_direct", label: "More Direct" },
 ];
 
 export default function RewriteCard({
   cardStyle,
   chipStyle,
-  message,
   finalRewrite,
-  riskScore,
-  rewriteRiskScore,
-  riskImprovement,
   rewriteTone,
+  rewriteloading,
   setRewriteTone,
-  rewriteLoading,
   copyRewriteOnly,
   useRewriteMessage,
+  sendRewriteWhatsApp,
   copyState,
 }) {
+  if (!finalRewrite && !rewriteloading) return null;
+
   return (
     <div
       style={{
         ...cardStyle,
         background:
-          "linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,247,237,0.98) 55%, rgba(255,237,213,0.92) 100%)",
-        border: "1px solid rgba(251,146,60,0.28)",
-        padding: "30px",
+          "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,247,237,0.98))",
+        border: "1px solid rgba(251,146,60,0.16)",
+        boxShadow:
+          "0 12px 32px rgba(15,23,42,0.05), 0 1px 0 rgba(255,255,255,0.7) inset",
+        display: "grid",
+        gap: "18px",
       }}
     >
-      <div style={{ display: "grid", gap: "16px" }}>
+      <div style={{ display: "grid", gap: "8px" }}>
         <div
           style={{
-            padding: "16px",
-            borderRadius: "16px",
-            background: "rgba(254,226,226,0.55)",
-            border: "1px solid rgba(239,68,68,0.20)",
-            boxShadow: "0 6px 18px rgba(239,68,68,0.06)",
+            fontSize: "13px",
+            fontWeight: 800,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#9a3412",
           }}
         >
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-              color: "#64748b",
-            }}
-          >
-            ⚠️ Original message
-          </div>
-
-          <div
-            style={{
-              marginTop: "8px",
-              fontSize: "18px",
-              lineHeight: 1.65,
-              color: "#7f1d1d",
-              fontWeight: 600,
-            }}
-          >
-            “{message}”
-          </div>
+          Suggested rewrite
         </div>
 
         <div
           style={{
-            padding: "20px",
-            borderRadius: "18px",
-            background: "rgba(255,255,255,0.96)",
-            border: "1px solid rgba(251,146,60,0.24)",
-            boxShadow: "0 10px 24px rgba(251,146,60,0.06)",
+            color: "#64748b",
+            fontSize: "14px",
+            lineHeight: 1.6,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: "16px",
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ flex: 1, minWidth: "260px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 900,
-                    letterSpacing: "0.10em",
-                    textTransform: "uppercase",
-                    color: "#9a3412",
-                  }}
-                >
-                  ✨ Try saying it like this
-                </div>
-              </div>
-
-              <div
-                style={{
-                  marginTop: "8px",
-                  fontSize: "13px",
-                  color: "#64748b",
-                }}
-              >
-                Less likely to create tension
-              </div>
-
-              <div
-                style={{
-                  marginTop: "14px",
-                  display: "flex",
-                  gap: "10px",
-                  flexWrap: "wrap",
-                  alignItems: "center",
-                }}
-              >
-                {rewriteOptions.map((option) => {
-                  const active = rewriteTone === option.value;
-
-                  return (
-                    <button
-                      type="button"
-                      key={option.value}
-                      className="tc-chip-hover"
-                      onClick={() => setRewriteTone(option.value)}
-                      disabled={rewriteLoading}
-                      style={{
-                        ...chipStyle,
-                        padding: "10px 14px",
-                        fontSize: "13px",
-                        fontWeight: 800,
-                        opacity: rewriteLoading ? 0.7 : 1,
-                        cursor: rewriteLoading ? "wait" : "pointer",
-                        background: active
-                          ? "linear-gradient(135deg, rgba(99,102,241,0.16), rgba(236,72,153,0.12))"
-                          : "rgba(255,255,255,0.82)",
-                        color: active ? "#312e81" : "#111827",
-                        border: active
-                          ? "1px solid rgba(99,102,241,0.30)"
-                          : "1px solid rgba(15,23,42,0.08)",
-                        boxShadow: active
-                          ? "0 10px 24px rgba(99,102,241,0.16)"
-                          : "0 4px 12px rgba(15,23,42,0.04)",
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-
-                {rewriteLoading && (
-                  <div
-                    style={{
-                      fontSize: "13px",
-                      fontWeight: 700,
-                      color: "#6366f1",
-                      minWidth: "86px",
-                    }}
-                  >
-                    Rewriting...
-                  </div>
-                )}
-              </div>
-
-              <div
-                style={{
-                  marginTop: "12px",
-                  fontSize: "30px",
-                  fontWeight: 800,
-                  lineHeight: 1.45,
-                  letterSpacing: "-0.03em",
-                  color: "#111827",
-                  opacity: rewriteLoading ? 0.72 : 1,
-                  transition: "opacity 0.18s ease",
-                }}
-              >
-                “{finalRewrite}”
-              </div>
-            </div>
-
-            {riskImprovement > 8 && (
-              <div
-                title={`${riskImprovement} points safer than the original message`}
-                style={{
-                  width: "72px",
-                  height: "72px",
-                  borderRadius: "999px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  background:
-                    "linear-gradient(135deg, rgba(34,197,94,0.18), rgba(134,239,172,0.28))",
-                  border: "1px solid rgba(34,197,94,0.30)",
-                  color: "#15803d",
-                  fontWeight: 900,
-                  boxShadow: "0 10px 28px rgba(34,197,94,0.16)",
-                  animation: "tc-safer-pop 0.7s ease-out",
-                  flexShrink: 0,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "18px",
-                    lineHeight: 1,
-                    letterSpacing: "-0.04em",
-                  }}
-                >
-                  ↑{riskImprovement}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "11px",
-                    fontWeight: 800,
-                    opacity: 0.8,
-                    marginTop: "2px",
-                  }}
-                >
-                  safer
-                </div>
-              </div>
-            )}
-          </div>
+          Cleaner, calmer, and easier to receive.
         </div>
       </div>
 
       <div
         style={{
-          marginTop: "20px",
+          borderRadius: "22px",
+          padding: "18px",
+          background: "rgba(255,255,255,0.88)",
+          border: "1px solid rgba(15,23,42,0.06)",
+          minHeight: "112px",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {rewriteloading ? (
+          <div
+            style={{
+              color: "#64748b",
+              fontSize: "15px",
+              fontWeight: 600,
+            }}
+          >
+            Rewriting...
+          </div>
+        ) : (
+          <div
+            style={{
+              color: "#111827",
+              fontSize: "26px",
+              lineHeight: 1.7,
+              fontWeight: 700,
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            “{finalRewrite}”
+          </div>
+        )}
+      </div>
+
+      <div style={{ display: "grid", gap: "10px" }}>
+        <div
+          style={{
+            fontSize: "12px",
+            fontWeight: 800,
+            letterSpacing: "0.08em",
+            color: "#64748b",
+            textTransform: "uppercase",
+          }}
+        >
+          Change the style
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          {TONE_OPTIONS.map((option) => {
+            const isActive = rewriteTone === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                className="tc-button-hover"
+                onClick={() => setRewriteTone(option.value)}
+                style={{
+                  ...chipStyle,
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                  background: isActive
+                    ? "linear-gradient(135deg, rgba(79,70,229,0.12), rgba(236,72,153,0.10))"
+                    : "rgba(255,255,255,0.78)",
+                  color: isActive ? "#312e81" : "#334155",
+                  border: isActive
+                    ? "1px solid rgba(99,102,241,0.22)"
+                    : "1px solid rgba(15,23,42,0.08)",
+                  boxShadow: isActive
+                    ? "0 10px 24px rgba(99,102,241,0.10)"
+                    : "0 4px 14px rgba(15,23,42,0.04)",
+                  fontWeight: isActive ? 800 : 700,
+                }}
+              >
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div
+        style={{
           display: "flex",
           gap: "12px",
           flexWrap: "wrap",
@@ -247,83 +156,73 @@ export default function RewriteCard({
       >
         <button
           type="button"
+          className="tc-button-hover"
           onClick={useRewriteMessage}
-          className="tc-button-hover"
           style={{
-            padding: "16px 22px",
-            borderRadius: "18px",
-            border: "1px solid rgba(255,255,255,0.28)",
-            cursor: "pointer",
-            fontWeight: 900,
-            fontSize: "15px",
-            color: "#ffffff",
-            background:
-              "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
-            boxShadow:
-              "0 16px 36px rgba(79,70,229,0.32), inset 0 1px 0 rgba(255,255,255,0.22)",
-          }}
-        >
-          ✏️ Use This Message
-        </button>
-
-        <button
-          type="button"
-          onClick={copyRewriteOnly}
-          className="tc-button-hover"
-          style={{
-            padding: "15px 22px",
-            borderRadius: "18px",
-            border: "1px solid rgba(15,23,42,0.12)",
-            cursor: "pointer",
-            fontWeight: 750,
-            fontSize: "15px",
-            background: "rgba(255,255,255,0.9)",
-            color: "#111827",
-            boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
-          }}
-        >
-          ✍️ Copy rewrite
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            if (!finalRewrite) return;
-            window.open(
-              `https://wa.me/?text=${encodeURIComponent(finalRewrite)}`,
-              "_blank"
-            );
-          }}
-          className="tc-button-hover"
-          style={{
-            padding: "16px 22px",
-            borderRadius: "18px",
-            border: "1px solid rgba(255,255,255,0.28)",
+            padding: "15px 20px",
+            borderRadius: "16px",
+            border: "1px solid rgba(255,255,255,0.26)",
             cursor: "pointer",
             fontWeight: 800,
             fontSize: "15px",
             color: "#ffffff",
             background:
-              "linear-gradient(135deg, #16a34a 0%, #22c55e 45%, #4ade80 100%)",
+              "linear-gradient(135deg, #16a34a 0%, #22c55e 50%, #4ade80 100%)",
             boxShadow:
-              "0 12px 28px rgba(34,197,94,0.28), inset 0 1px 0 rgba(255,255,255,0.25)",
+              "0 14px 34px rgba(34,197,94,0.22), inset 0 1px 0 rgba(255,255,255,0.18)",
           }}
         >
-          Send via WhatsApp
+          Use This Message
         </button>
 
-        {copyState && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              fontWeight: 700,
-              color: "#2563eb",
-            }}
-          >
-            ✓ {copyState}
-          </div>
-        )}
+        <button
+          type="button"
+          className="tc-button-hover"
+          onClick={copyRewriteOnly}
+          style={{
+            padding: "15px 18px",
+            borderRadius: "16px",
+            border: "1px solid rgba(15,23,42,0.08)",
+            cursor: "pointer",
+            fontWeight: 750,
+            fontSize: "15px",
+            background: "rgba(255,255,255,0.86)",
+            color: "#111827",
+            boxShadow: "0 8px 22px rgba(15,23,42,0.05)",
+          }}
+        >
+          Copy
+        </button>
+
+        <button
+          type="button"
+          className="tc-button-hover"
+          onClick={sendRewriteWhatsApp}
+          style={{
+            padding: "15px 18px",
+            borderRadius: "16px",
+            border: "1px solid rgba(34,197,94,0.16)",
+            cursor: "pointer",
+            fontWeight: 750,
+            fontSize: "15px",
+            background: "rgba(240,253,244,0.95)",
+            color: "#166534",
+            boxShadow: "0 8px 22px rgba(34,197,94,0.08)",
+          }}
+        >
+          Send on WhatsApp
+        </button>
+
+        <div
+          style={{
+            minHeight: "20px",
+            color: copyState ? "#2563eb" : "#94a3b8",
+            fontSize: "14px",
+            fontWeight: 700,
+          }}
+        >
+          {copyState === "Rewrite copied" ? copyState : ""}
+        </div>
       </div>
     </div>
   );

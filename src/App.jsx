@@ -328,6 +328,11 @@ https://trytonecheck.com`;
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
+  function sendRewriteWhatsApp() {
+  if (!finalRewrite) return;
+  openShare(`https://wa.me/?text=${encodeURIComponent(finalRewrite)}`);
+}
+
   function shareWhatsApp() {
     openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`);
   }
@@ -633,6 +638,7 @@ https://trytonecheck.com`;
               manipulationRisk={manipulationRisk}
               statExplanations={STAT_EXPLANATIONS}
               getHiddenSignalLabel={getHiddenSignalLabel}
+              sendRewriteWhatsApp={sendRewriteWhatsApp}
               shareWhatsApp={shareWhatsApp}
               copyResult={copyResult}
               shareFacebook={shareFacebook}
