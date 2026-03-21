@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
 function getLevel(score = 0) {
@@ -153,6 +153,89 @@ function MiniOutcomeChip({ item }) {
   );
 }
 
+function getLivePreview(message = "") {
+  const text = String(message || "").trim().toLowerCase();
+
+  if (!text) {
+    return {
+      emoji: "🧠",
+      text: "Live typing analysis will appear here as you type.",
+      color: "#64748b",
+      bg: "rgba(255,255,255,0.70)",
+      border: "1px solid rgba(15,23,42,0.06)",
+    };
+  }
+
+  if (
+    text.includes("fuck") ||
+    text.includes("stupid") ||
+    text.includes("idiot") ||
+    text.includes("moron")
+  ) {
+    return {
+      emoji: "🔥",
+      text: "This may be read as hostile or insulting.",
+      color: "#b91c1c",
+      bg: "rgba(239,68,68,0.08)",
+      border: "1px solid rgba(239,68,68,0.16)",
+    };
+  }
+
+  if (
+    text.includes("whatever") ||
+    text.includes("fine.") ||
+    text.includes("fine,") ||
+    text.includes("do whatever") ||
+    text.includes("forget it")
+  ) {
+    return {
+      emoji: "😒",
+      text: "This may sound passive-aggressive.",
+      color: "#b45309",
+      bg: "rgba(245,158,11,0.08)",
+      border: "1px solid rgba(245,158,11,0.16)",
+    };
+  }
+
+  if (
+    text.includes("you always") ||
+    text.includes("you never") ||
+    text.includes("did you even") ||
+    text.includes("as usual")
+  ) {
+    return {
+      emoji: "⚠️",
+      text: "This may sound accusatory and trigger defensiveness.",
+      color: "#b45309",
+      bg: "rgba(245,158,11,0.08)",
+      border: "1px solid rgba(245,158,11,0.16)",
+    };
+  }
+
+  if (
+    text.includes("can we talk") ||
+    text.includes("i feel") ||
+    text.includes("i'm upset") ||
+    text.includes("i am upset")
+  ) {
+    return {
+      emoji: "🤝",
+      text: "This sounds more constructive and easier to receive.",
+      color: "#166534",
+      bg: "rgba(34,197,94,0.08)",
+      border: "1px solid rgba(34,197,94,0.16)",
+    };
+  }
+
+  return {
+    emoji: "💬",
+    text: "Checking tone, emotional pressure, and hidden signals…",
+    color: "#475569",
+    bg: "rgba(255,255,255,0.76)",
+    border: "1px solid rgba(15,23,42,0.06)",
+  };
+}
+
 export default function HeroSection({
   location,
   navigate,
@@ -229,8 +312,27 @@ export default function HeroSection({
       ]
     : [];
 
+  const livePreview = useMemo(() => getLivePreview(message), [message]);
+
+  const displayDescription =
+    location.pathname === "/"
+      ? "Pause. This message might backfire."
+      : currentTool.description;
+
+  const subDescription =
+    location.pathname === "/"
+      ? "Check tone, emotional pressure, and hidden signals before you hit send."
+      : "Get instant feedback before your message lands the wrong way.";
+
   return (
-    <div className="tc-hero" style={heroCardStyle}>
+    <div
+      className="tc-hero"
+      style={{
+        ...heroCardStyle,
+        background:
+          "radial-gradient(circle at top right, rgba(99,102,241,0.10), rgba(99,102,241,0) 24%), radial-gradient(circle at bottom left, rgba(236,72,153,0.10), rgba(236,72,153,0) 28%), rgba(255,255,255,0.68)",
+      }}
+    >
       <div className="tc-light-sweep" />
       <div style={glassOrb1} />
       <div style={glassOrb2} />
@@ -340,15 +442,48 @@ export default function HeroSection({
         <p
           style={{
             margin: "10px 0 0 0",
-            maxWidth: "760px",
-            color: "#475569",
-            fontSize: isMobile ? "16px" : "20px",
-            lineHeight: 1.6,
-            fontWeight: 500,
+            maxWidth: "720px",
+            color: "#334155",
+            fontSize: isMobile ? "28px" : "34px",
+            lineHeight: 1.18,
+            fontWeight: 850,
+            letterSpacing: "-0.04em",
           }}
         >
-          {currentTool.description}
+          {displayDescription}
         </p>
+
+        <p
+          style={{
+            margin: "12px 0 0 0",
+            maxWidth: "760px",
+            color: "#475569",
+            fontSize: isMobile ? "16px" : "19px",
+            lineHeight: 1.65,
+            fontWeight: 550,
+          }}
+        >
+          {subDescription}
+        </p>
+
+        <div
+          style={{
+            marginTop: "10px",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 12px",
+            borderRadius: "999px",
+            background: "rgba(239,68,68,0.08)",
+            border: "1px solid rgba(239,68,68,0.14)",
+            color: "#b91c1c",
+            fontSize: "13px",
+            fontWeight: 800,
+          }}
+        >
+          <span>⚠️</span>
+          <span>Texts are easy to misread — especially when emotions are high</span>
+        </div>
       </div>
 
       <div
@@ -364,13 +499,39 @@ export default function HeroSection({
             type="button"
             key={example.label}
             className="tc-chip-hover"
-            style={{ ...chipStyle, background: "rgba(255,255,255,0.78)" }}
+            style={{
+              ...chipStyle,
+              background: "rgba(255,255,255,0.82)",
+              border: "1px solid rgba(15,23,42,0.06)",
+              fontWeight: 750,
+            }}
             onClick={() => setExample(example.text)}
           >
             {example.label}
           </button>
         ))}
       </div>
+
+      {!result && (
+        <div
+          style={{
+            marginTop: "12px",
+            padding: "10px 14px",
+            borderRadius: "16px",
+            background: livePreview.bg,
+            border: livePreview.border,
+            color: livePreview.color,
+            fontSize: "13px",
+            fontWeight: 700,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <span>{livePreview.emoji}</span>
+          <span>{livePreview.text}</span>
+        </div>
+      )}
 
       <div style={{ marginTop: "24px", position: "relative" }}>
         <textarea
@@ -432,6 +593,25 @@ export default function HeroSection({
             {loading ? "Analyzing..." : currentTool.analyzeLabel}
           </button>
         </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: "10px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+          color: "#64748b",
+          fontSize: "12px",
+          fontWeight: 700,
+        }}
+      >
+        <span>🧠 Checking tone, pressure, and hidden signals</span>
+        <span style={{ opacity: 0.45 }}>•</span>
+        <span>⚡ Instant result</span>
+        <span style={{ opacity: 0.45 }}>•</span>
+        <span>🔒 No signup</span>
       </div>
 
       {result && (

@@ -1,21 +1,22 @@
 export const MINI_TOOLS = {
   home: {
-    slug: "home",
-    title: "ToneCheck",
-    eyebrow: "Think Before You Send",
-    description:
-      "Don't send a message you’ll regret. Check the tone of your texts, emails, or WhatsApp messages before you hit send.",
-    placeholder: "Paste your message, WhatsApp text, or email here...",
-    analyzeLabel: "Check Before Sending",
-    examples: [
-      { label: "😒 Why didn't you reply?", text: "Why didn't you reply?" },
-      { label: "😠 Fine. Do whatever you want.", text: "Fine. Do whatever you want." },
-      { label: "🧾 I was there for you everytime", text: "I was there for you everytime." },
-      { label: "🤝 Can we talk about this?", text: "Can we talk about this?" },
-    ],
-    badge: "Communication Intelligence Demo",
-    resultMode: "default",
-  },
+  slug: "home",
+  title: "ToneCheck",
+  eyebrow: "Check Before You Send",
+  description:
+    "Pause. This message might backfire. Check tone, emotional pressure, and hidden signals before you hit send.",
+  placeholder: "Type a message you're about to send...",
+  analyzeLabel: "Check Before Sending",
+  examples: [
+    { label: "😒 Did you even read my message?", text: "Did you even read my message?" },
+    { label: "😠 Whatever. I don’t care anymore.", text: "Whatever. I don’t care anymore." },
+    { label: "🙄 You always do this.", text: "You always do this." },
+    { label: "🧾 I’ll handle it myself.", text: "Forget it, I’ll handle it myself." },
+    { label: "🤝 Can we talk about this?", text: "Can we talk about this?" },
+  ],
+  badge: "Communication Intelligence Demo",
+  resultMode: "default",
+},
 
   "should-i-send-this": {
     slug: "should-i-send-this",
