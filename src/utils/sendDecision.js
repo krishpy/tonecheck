@@ -1,31 +1,20 @@
-export function getSendVerdict(risk = 0, regret = 0, manipulation = 0) {
-  const combined = risk * 0.6 + regret * 0.3 + manipulation * 0.1;
-
-  if (combined < 25) {
-    return {
-      label: "Send",
-      emoji: "🟢",
-      toneClass: "safe",
-      reason: "This message looks relatively safe to send.",
-    };
+export function getSendVerdict(risk, regret, manipulation) {
+  if (risk >= 85) {
+    return { label: "Don’t send", emoji: "⛔", tone: "danger" };
   }
 
-  if (combined < 55) {
-    return {
-      label: "Maybe",
-      emoji: "🟡",
-      toneClass: "maybe",
-      reason: "This message may create some tension. Consider softening it.",
-    };
+  if (risk >= 65) {
+    return { label: "Risky", emoji: "⚠️", tone: "warning" };
   }
 
-  return {
-    label: "Don't Send",
-    emoji: "🔴",
-    toneClass: "danger",
-    reason: "This message has a higher chance of causing regret or escalation.",
-  };
+  if (risk >= 40) {
+    return { label: "Maybe", emoji: "😐", tone: "neutral" };
+  }
+
+  return { label: "Safe to send", emoji: "✅", tone: "safe" };
 }
+
+const combined = risk + regret * 0.3 + manipulation * 0.3;
 
 export function getDecisionTheme(toneClass) {
 
