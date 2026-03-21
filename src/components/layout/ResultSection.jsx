@@ -1,5 +1,5 @@
 import React from "react";
-import { RewriteCard, StatsRow, DetectedSignals } from "../results";
+import { RewriteCard, DetectedSignals } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
@@ -28,9 +28,6 @@ export default function ResultSection({
   sendVerdict,
   getToneLabel,
   getToneEmoji,
-  replyLikelihood,
-  regretRisk,
-  manipulationRisk,
   getHiddenSignalLabel,
   shareWhatsApp,
   copyResult,
@@ -54,22 +51,13 @@ export default function ResultSection({
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
   const isMobile = useIsMobile();
-  const verdictColors = {
-  danger: "#dc2626",
-  warning: "#ea580c",
-  neutral: "#64748b",
-  safe: "#16a34a",
-   };
 
-  const dynamicAdvisory =
-    result.advisory ||
-    (riskScore >= 85
-      ? "This message may escalate quickly and be received as threatening."
-      : riskScore >= 70
-      ? "This message may sound harsh or aggressive and trigger a defensive reaction."
-      : riskScore >= 40
-      ? "This message may create friction or misunderstanding depending on context."
-      : "This message is relatively safe, but the wording can still be smoother.");
+  const verdictColors = {
+    danger: "#dc2626",
+    warning: "#ea580c",
+    neutral: "#64748b",
+    safe: "#16a34a",
+  };
 
   const rewriteIntro =
     riskScore >= 70
@@ -82,13 +70,29 @@ export default function ResultSection({
     display: "inline-flex",
     alignItems: "center",
     gap: "8px",
-    padding: "10px 14px",
+    padding: isMobile ? "9px 12px" : "10px 14px",
     borderRadius: "999px",
     background: toneTheme.chipBg,
     border: `1px solid ${toneTheme.border}`,
     color: toneTheme.chipText,
     fontWeight: 800,
-    fontSize: "14px",
+    fontSize: isMobile ? "13px" : "14px",
+  };
+
+  const verdictColor = verdictColors[sendVerdict?.tone] || "#111827";
+  const verdictSubLabel =
+    sendVerdict?.sublabel || "Use the rewrite below for a safer version.";
+
+  const toneCardStyle = {
+    background: toneTheme.chipBg,
+    color: toneTheme.chipText,
+    border: `1px solid ${toneTheme.border}`,
+    borderRadius: "16px",
+    padding: isMobile ? "10px 12px" : "12px 14px",
+    minWidth: isMobile ? "100%" : "132px",
+    width: isMobile ? "100%" : "auto",
+    marginTop: isMobile ? "12px" : "0",
+    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
   };
 
   return (
@@ -127,7 +131,7 @@ export default function ResultSection({
             <div
               style={{
                 display: "flex",
-                flexDirection: isMobile ? "column" : "row",
+                flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "flex-start",
                 gap: "24px",
@@ -304,7 +308,7 @@ export default function ResultSection({
                     width: "44px",
                     height: "44px",
                     borderRadius: "14px",
-                    background: verdictColors[sendVerdict.tone] || toneTheme.iconBg,
+                    background: verdictColor,
                     display: "grid",
                     placeItems: "center",
                     color: "#fff",
@@ -316,57 +320,71 @@ export default function ResultSection({
                   {sendVerdict.emoji}
                 </div>
 
-                <div>
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "center",
+                      alignItems: isMobile ? "flex-start" : "center",
+                      justifyContent: "space-between",
                       gap: "10px",
                       flexWrap: "wrap",
                     }}
                   >
-                    <div
-                      style={{
-                        fontSize: isMobile ? "22px" : "30px",
-                        fontWeight: 900,
-                        letterSpacing: "-0.04em",
-                        color: verdictColors[sendVerdict.tone] || "#111827",
-                        lineHeight: 1,
-                      }}
-                    >
-                      {sendVerdict.label}
+                    <div style={{ minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: isMobile ? "22px" : "30px",
+                          fontWeight: 900,
+                          letterSpacing: "-0.04em",
+                          color: verdictColor,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {sendVerdict.label}
+                      </div>
+
+                      {!!sendVerdict.sublabel && (
+                        <div
+                          style={{
+                            marginTop: "7px",
+                            fontSize: "13px",
+                            color: "#64748b",
+                            fontWeight: 600,
+                            lineHeight: 1.45,
+                          }}
+                        >
+                          {sendVerdict.sublabel}
+                        </div>
+                      )}
                     </div>
+
                     <div style={signalChipStyle}>{hiddenSignalLabel}</div>
                   </div>
 
                   <div
                     style={{
-                      marginTop: "8px",
-                      fontSize: "14px",
-                      lineHeight: 1.6,
+                      marginTop: "10px",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "8px",
+                      flexWrap: "wrap",
+                      padding: "8px 12px",
+                      borderRadius: "999px",
+                      background: "rgba(255,255,255,0.56)",
+                      border: "1px solid rgba(15,23,42,0.06)",
                       color: "#475569",
-                      maxWidth: "720px",
+                      fontSize: "12px",
+                      fontWeight: 700,
                     }}
                   >
-                    {dynamicAdvisory}
+                    <span>💡</span>
+                    <span>{verdictSubLabel}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div
-              style={{
-                background: toneTheme.chipBg,
-    color: toneTheme.chipText,
-    border: `1px solid ${toneTheme.border}`,
-    borderRadius: "16px",
-    padding: isMobile ? "10px 12px" : "12px 14px",
-    minWidth: isMobile ? "100%" : "120px",
-    width: isMobile ? "100%" : "auto",
-    marginTop: isMobile ? "12px" : "0",
-    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
-              }}
-            >
+            <div style={toneCardStyle}>
               <div
                 style={{
                   fontSize: "11px",
@@ -392,55 +410,31 @@ export default function ResultSection({
           </div>
         </div>
 
-        <div style={{ ...cardStyle, padding: "18px" }}>
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.16em",
-              textTransform: "uppercase",
-              color: "#6366f1",
-              marginBottom: "12px",
-            }}
-          >
-            What could happen
-          </div>
-
-          <StatsRow
-            replyLikelihood={replyLikelihood}
-            regretRisk={regretRisk}
-            manipulationRisk={manipulationRisk}
-            hiddenSignal={hiddenSignalKey}
-          />
-        </div>
-
         {finalRewrite && (
-            <RewriteCard
-              cardStyle={cardStyle}
-              chipStyle={chipStyle}
-              finalRewrite={finalRewrite}
-              rewriteRiskScore={rewriteRiskScore}
-              riskScore={riskScore}
-              riskImprovement={riskImprovement}
-              rewriteTone={rewriteTone}
-              rewriteloading={rewriteLoading}
-              setRewriteTone={setRewriteTone}
-              copyRewriteOnly={copyRewriteOnly}
-              useRewriteMessage={useRewriteMessage}
-              sendRewriteWhatsApp={sendRewriteWhatsApp}
-              copyState={copyState}
-              rewriteIntro={rewriteIntro}
-              whatsappIcon={
-                <img
-                  src="/whatsapp.svg"
-                  alt=""
-                  style={{ width: 18, height: 18, display: "block" }}
-                />
+          <RewriteCard
+            cardStyle={cardStyle}
+            chipStyle={chipStyle}
+            finalRewrite={finalRewrite}
+            rewriteRiskScore={rewriteRiskScore}
+            riskScore={riskScore}
+            riskImprovement={riskImprovement}
+            rewriteTone={rewriteTone}
+            rewriteloading={rewriteLoading}
+            setRewriteTone={setRewriteTone}
+            copyRewriteOnly={copyRewriteOnly}
+            useRewriteMessage={useRewriteMessage}
+            sendRewriteWhatsApp={sendRewriteWhatsApp}
+            copyState={copyState}
+            rewriteIntro={rewriteIntro}
+            whatsappIcon={
+              <img
+                src="/whatsapp.svg"
+                alt=""
+                style={{ width: 18, height: 18, display: "block" }}
+              />
             }
           />
         )}
-
-        
 
         {!!result.top_manipulation_signals?.length && (
           <DetectedSignals
