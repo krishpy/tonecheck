@@ -1,12 +1,6 @@
 import React from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
-const TONE_OPTIONS = [
-  { value: "balanced", label: "Balanced" },
-  { value: "softer", label: "Softer" },
-  { value: "more_direct", label: "More Direct" },
-];
-
 export default function RewriteCard({
   cardStyle,
   chipStyle,
