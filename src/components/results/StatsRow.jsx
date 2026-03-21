@@ -1,3 +1,6 @@
+import useIsMobile from "../../hooks/useIsMobile";
+
+
 function getLevel(score = 0) {
   if (score >= 70) return "High";
   if (score >= 35) return "Medium";
@@ -84,12 +87,18 @@ export default function StatsRow({
   regretRisk = 0,
   manipulationRisk = 0,
   hiddenSignal = "Neutral",
-}) {
+})
+
+{
+
+   const isMobile = useIsMobile();
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+        gridTemplateColumns: isMobile
+        ? "repeat(2, 1fr)"
+        : "repeat(auto-fit, minmax(180px, 1fr))",
         gap: "14px",
       }}
     >

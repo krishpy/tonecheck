@@ -2,6 +2,7 @@ import React from "react";
 import { RewriteCard, StatsRow, DetectedSignals } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
+import useIsMobile from "../../hooks/useIsMobile";
 
 export default function ResultSection({
   result,
@@ -52,6 +53,7 @@ export default function ResultSection({
   const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
+  const isMobile = useIsMobile();
 
   const dynamicAdvisory =
     result.advisory ||
@@ -119,6 +121,7 @@ export default function ResultSection({
             <div
               style={{
                 display: "flex",
+                flexDirection: isMobile ? "column" : "row",
                 justifyContent: "space-between",
                 alignItems: "flex-start",
                 gap: "24px",
@@ -259,7 +262,7 @@ export default function ResultSection({
             background: toneTheme.bg,
             border: `1px solid ${toneTheme.border}`,
             boxShadow: `0 10px 30px ${toneTheme.glow || "rgba(15,23,42,0.06)"}`,
-            padding: "20px",
+            padding: isMobile ? "14px" : "20px",
           }}
         >
           <div
@@ -318,7 +321,7 @@ export default function ResultSection({
                   >
                     <div
                       style={{
-                        fontSize: "30px",
+                        fontSize: isMobile ? "22px" : "30px",
                         fontWeight: 900,
                         letterSpacing: "-0.04em",
                         color: "#111827",
@@ -349,12 +352,14 @@ export default function ResultSection({
             <div
               style={{
                 background: toneTheme.chipBg,
-                color: toneTheme.chipText,
-                border: `1px solid ${toneTheme.border}`,
-                borderRadius: "16px",
-                padding: "12px 14px",
-                minWidth: "120px",
-                boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
+    color: toneTheme.chipText,
+    border: `1px solid ${toneTheme.border}`,
+    borderRadius: "16px",
+    padding: isMobile ? "10px 12px" : "12px 14px",
+    minWidth: isMobile ? "100%" : "120px",
+    width: isMobile ? "100%" : "auto",
+    marginTop: isMobile ? "12px" : "0",
+    boxShadow: `0 8px 22px ${toneTheme.glow || "rgba(15,23,42,0.08)"}`,
               }}
             >
               <div

@@ -1,4 +1,5 @@
 import React from "react";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const TONE_OPTIONS = [
   { value: "balanced", label: "Balanced" },
@@ -20,6 +21,8 @@ export default function RewriteCard({
   whatsappIcon,
 }) {
   if (!finalRewrite && !rewriteloading) return null;
+
+  const isMobile = useIsMobile();
 
   return (
     <div
@@ -83,7 +86,7 @@ export default function RewriteCard({
           <div
             style={{
               color: "#111827",
-              fontSize: "26px",
+              fontSize: isMobile ? "20px" : "26px",
               lineHeight: 1.7,
               fontWeight: 700,
               whiteSpace: "pre-wrap",
@@ -162,6 +165,8 @@ export default function RewriteCard({
           style={{
             padding: "15px 20px",
             borderRadius: "16px",
+            width: isMobile ? "100%" : "auto",
+             justifyContent: "center",
             border: "1px solid rgba(255,255,255,0.26)",
             cursor: "pointer",
             fontWeight: 800,
@@ -183,6 +188,8 @@ export default function RewriteCard({
           style={{
             padding: "15px 18px",
             borderRadius: "16px",
+            width: isMobile ? "100%" : "auto",
+justifyContent: "center",
             border: "1px solid rgba(15,23,42,0.08)",
             cursor: "pointer",
             fontWeight: 750,
@@ -202,6 +209,8 @@ export default function RewriteCard({
           style={{
             padding: "15px 18px",
             borderRadius: "16px",
+            width: isMobile ? "100%" : "auto",
+justifyContent: "center",
             border: "1px solid rgba(34,197,94,0.16)",
             cursor: "pointer",
             fontWeight: 750,
