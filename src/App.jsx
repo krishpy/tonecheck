@@ -576,7 +576,7 @@ https://trytonecheck.com`;
         >
           <div>
             <HeroSection
-              location={location}
+             location={location}
               navigate={navigate}
               currentTool={currentTool}
               message={message}
@@ -590,6 +590,8 @@ https://trytonecheck.com`;
               chipStyle={chipStyle}
               actionButtonStyle={actionButtonStyle}
               primaryButtonStyle={primaryButtonStyle}
+              result={result}
+              getHiddenSignalLabel={getHiddenSignalLabel}
             />
 
             {result?.error && (
