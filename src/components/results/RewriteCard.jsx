@@ -17,6 +17,7 @@ export default function RewriteCard({
   useRewriteMessage,
   sendRewriteWhatsApp,
   copyState,
+  whatsappIcon,
 }) {
   if (!finalRewrite && !rewriteloading) return null;
 
@@ -194,7 +195,7 @@ export default function RewriteCard({
           Copy
         </button>
 
-       <button
+        <button
           type="button"
           className="tc-button-hover"
           onClick={sendRewriteWhatsApp}
