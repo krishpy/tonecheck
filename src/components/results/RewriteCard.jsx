@@ -1,6 +1,20 @@
 import React from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
+function normalizeText(value) {
+  return String(value || "").trim();
+}
+
+function isBlockedSafeRewrite(text) {
+  const normalized = normalizeText(text).toLowerCase();
+  return (
+    normalized.startsWith("i’m upset") ||
+    normalized.startsWith("i'm upset") ||
+    normalized === "i’m upset, and i want to respond more calmly." ||
+    normalized === "i'm upset, and i want to respond more calmly."
+  );
+}
+
 export default function RewriteCard({
   cardStyle,
   chipStyle,
@@ -14,10 +28,36 @@ export default function RewriteCard({
   copyState,
   rewriteIntro,
   whatsappIcon,
+  riskScore = 0,
+  hiddenSignal = "",
+  toneLabel = "",
 }) {
   const isMobile = useIsMobile();
 
-  if (!finalRewrite && !rewriteloading) return null;
+  const safeRewrite = normalizeText(finalRewrite);
+  const normalizedTone = String(toneLabel || "").toLowerCase();
+  const normalizedHidden = String(hiddenSignal || "").toLowerCase();
+
+  const isLowRiskSafeMessage =
+    Number(riskScore || 0) <= 20 &&
+    (normalizedHidden === "" ||
+      normalizedHidden === "none" ||
+      normalizedHidden === "none detected");
+
+  const shouldSuppressRewrite =
+    !rewriteloading &&
+    (
+      safeRewrite === "" ||
+      (isLowRiskSafeMessage && isBlockedSafeRewrite(safeRewrite)) ||
+      (isLowRiskSafeMessage &&
+        ["friendly", "neutral", "warm", "positive"].some((t) =>
+          normalizedTone.includes(t)
+        ) &&
+        safeRewrite.length < 6)
+    );
+
+  if (shouldSuppressRewrite) return null;
+  if (!safeRewrite && !rewriteloading) return null;
 
   const actionButtonBase = {
     width: isMobile ? "100%" : "auto",
@@ -43,55 +83,53 @@ export default function RewriteCard({
     >
       <div style={{ display: "grid", gap: "8px" }}>
         <div
-  style={{
-    fontSize: "12px",
-    fontWeight: 900,
-    letterSpacing: "0.16em",
-    textTransform: "uppercase",
-    color: "#c2410c",
-  }}
->
-  Better version to send
-</div>
-</div>
+          style={{
+            fontSize: "12px",
+            fontWeight: 900,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: "#c2410c",
+          }}
+        >
+          Better version to send
+        </div>
+      </div>
 
-<div
-  style={{
-    marginTop: "10px",
-    display: "flex",
-    gap: "8px",
-    flexWrap: "wrap",
-  }}
->
-  {["balanced", "softer", "direct", "professional"].map((style) => {
-    const isActive = rewriteTone === style;
-    return (
-      <button
-        key={style}
-        onClick={() => setRewriteTone(style)}
+      <div
         style={{
-          padding: "8px 14px",
-          borderRadius: "999px",
-          border: isActive
-            ? "1px solid #6366f1"
-            : "1px solid rgba(0,0,0,0.08)",
-          background: isActive
-            ? "rgba(99,102,241,0.12)"
-            : "rgba(255,255,255,0.7)",
-          color: isActive ? "#4338ca" : "#374151",
-          fontWeight: 700,
-          fontSize: "13px",
-          cursor: "pointer",
-          transition: "all 0.2s ease",
+          marginTop: "10px",
+          display: "flex",
+          gap: "8px",
+          flexWrap: "wrap",
         }}
       >
-        {style.charAt(0).toUpperCase() + style.slice(1)}
-      </button>
-    );
-  })}
-</div>
-
-
+        {["balanced", "softer", "direct", "professional"].map((style) => {
+          const isActive = rewriteTone === style;
+          return (
+            <button
+              key={style}
+              onClick={() => setRewriteTone(style)}
+              style={{
+                padding: "8px 14px",
+                borderRadius: "999px",
+                border: isActive
+                  ? "1px solid #6366f1"
+                  : "1px solid rgba(0,0,0,0.08)",
+                background: isActive
+                  ? "rgba(99,102,241,0.12)"
+                  : "rgba(255,255,255,0.7)",
+                color: isActive ? "#4338ca" : "#374151",
+                fontWeight: 700,
+                fontSize: "13px",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+              }}
+            >
+              {style.charAt(0).toUpperCase() + style.slice(1)}
+            </button>
+          );
+        })}
+      </div>
 
       <div
         style={{
@@ -128,7 +166,7 @@ export default function RewriteCard({
               letterSpacing: "-0.02em",
             }}
           >
-            “{finalRewrite}”
+            “{safeRewrite}”
           </div>
         )}
       </div>
@@ -213,19 +251,6 @@ export default function RewriteCard({
           }}
         >
           {copyState === "Rewrite copied" ? copyState : ""}
-        </div>
-      </div>
-
-      <div style={{ display: "grid", gap: "10px" }}>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-         
         </div>
       </div>
     </div>

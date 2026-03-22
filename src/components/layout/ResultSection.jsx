@@ -615,20 +615,20 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
 
         {finalRewrite && (
           <RewriteCard
-            cardStyle={cardStyle}
+           cardStyle={cardStyle}
             chipStyle={chipStyle}
-            finalRewrite={finalRewrite}
-            rewriteRiskScore={rewriteRiskScore}
-            riskScore={riskScore}
-            riskImprovement={riskImprovement}
+            finalRewrite={result?.rewritten_text || result?.rewrite_suggestion || ""}
             rewriteTone={rewriteTone}
-            rewriteloading={rewriteLoading}
+            rewriteloading={rewriteloading}
             setRewriteTone={setRewriteTone}
             copyRewriteOnly={copyRewriteOnly}
             useRewriteMessage={useRewriteMessage}
             sendRewriteWhatsApp={sendRewriteWhatsApp}
             copyState={copyState}
             rewriteIntro={rewriteIntro}
+            riskScore={result?.communication_risk_score || 0}
+            hiddenSignal={result?.hidden_signal || result?.primary_hidden_signal || ""}
+            toneLabel={result?.tone || ""}
             whatsappIcon={
               <img
                 src="/whatsapp.svg"
