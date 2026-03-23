@@ -6,9 +6,7 @@ import useIsMobile from "../../hooks/useIsMobile";
 
 function buildSendVerdict(result) {
   const risk = Number(result?.communication_risk_score || 0);
-  const hidden = String(
-    result?.hidden_signal || result?.primary_hidden_signal || ""
-  ).toLowerCase();
+  const hidden = String(result?.hidden_signal || result?.primary_hidden_signal || "").toLowerCase();
   const tone = String(result?.tone || "").toLowerCase();
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
@@ -246,9 +244,7 @@ export default function ResultSection({
   const isMobile = useIsMobile();
 
   const backendRisk = Number(result?.communication_risk_score || 0);
- const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
-  const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
-
+  
   const hiddenSignalKey =
     result.primary_hidden_signal ||
     result.hidden_signal ||
@@ -256,6 +252,11 @@ export default function ResultSection({
     "none";
 
   const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
+
+  const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
+  
+  const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
+  
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
 
