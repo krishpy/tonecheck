@@ -11,10 +11,9 @@ function buildSendVerdict(result) {
   ).toLowerCase();
   const tone = String(result?.tone || "").toLowerCase();
 
-  if (
-    risk <= 20 &&
-    (hidden === "" || hidden === "none" || hidden === "none detected")
-  ) {
+  const isSafeHidden = ["", "none", "none detected"].includes(hidden);
+
+  if (risk <= 20 && isSafeHidden) {
     return {
       tone: "safe",
       emoji: "✅",
@@ -23,17 +22,26 @@ function buildSendVerdict(result) {
     };
   }
 
-  if (
-    risk <= 35 &&
-    (tone.includes("friendly") ||
-      tone.includes("neutral") ||
-      tone.includes("firm"))
-  ) {
+  if (risk <= 60 && isSafeHidden) {
     return {
       tone: "safe",
       emoji: "🙂",
       label: "Looks okay to send",
-      reason: "This message appears fairly safe, though you can refine it if needed.",
+      reason: "This message appears fairly safe.",
+    };
+  }
+
+  if (
+    hidden.includes("threat") ||
+    hidden.includes("hostile") ||
+    hidden.includes("insult") ||
+    hidden.includes("profanity")
+  ) {
+    return {
+      tone: "warning",
+      emoji: "⚠️",
+      label: "Risky — rethink before sending",
+      reason: "This can trigger defensiveness fast.",
     };
   }
 
@@ -48,45 +56,31 @@ function buildSendVerdict(result) {
       tone: "neutral",
       emoji: "🤔",
       label: "Careful — may be misunderstood",
-      reason: "Your intent may land as pressure or blame.",
+      reason: "Your intent may land more sharply than you mean.",
     };
   }
 
-  if (risk <= 50) {
+  if (risk >= 65) {
     return {
-      tone: "neutral",
+      tone: "warning",
       emoji: "⚠️",
-      label: "Might need a quick tweak",
-      reason: "This message could be interpreted more sharply than intended.",
-    };
-  }
-
-  if (risk >= 85 || hidden.includes("threat") || hidden.includes("hostile")) {
-    return {
-      tone: "danger",
-      emoji: "🛑",
-      label: "Don’t send this yet",
-      reason: "This is likely to escalate quickly.",
+      label: "Risky — rethink before sending",
+      reason: "This can trigger defensiveness or conflict.",
     };
   }
 
   return {
-    tone: "warning",
-    emoji: "⚠️",
-    label: "Risky — rethink before sending",
-    reason: "This can trigger defensiveness or conflict.",
+    tone: "neutral",
+    emoji: "🤔",
+    label: "Might need a quick tweak",
+    reason: "This message could be interpreted more sharply than intended.",
   };
 }
 
-function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskScore }) {
-  const tone = String(toneLabel || "").toLowerCase();
+function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
-  const verdictTone = sendVerdict?.tone || "neutral";
 
-  if (
-    riskScore <= 20 &&
-    ["none", "none detected", ""].includes(hidden)
-  ) {
+  if (riskScore <= 20 && ["", "none", "none detected"].includes(hidden)) {
     return {
       title: "Safe to send",
       sublabel: "Clear and unlikely to cause issues.",
@@ -96,24 +90,11 @@ function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskSco
   }
 
   if (
-    verdictTone === "danger" ||
-    riskScore >= 85 ||
     hidden.includes("threat") ||
-    hidden.includes("hostile")
-  ) {
-    return {
-      title: "Don’t send this yet",
-      sublabel: "Likely to escalate quickly.",
-      tip: "Pause and use the rewrite below before sending anything.",
-      chipLabel: hiddenSignalLabel,
-    };
-  }
-
-  if (
-    verdictTone === "warning" ||
-    riskScore >= 65 ||
+    hidden.includes("hostile") ||
+    hidden.includes("insult") ||
     hidden.includes("profanity") ||
-    hidden.includes("insult")
+    riskScore >= 65
   ) {
     return {
       title: "Risky — rethink before sending",
@@ -138,19 +119,10 @@ function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskSco
     };
   }
 
-  if (tone.includes("neutral") || verdictTone === "neutral" || riskScore >= 40) {
-    return {
-      title: "Safe — but could be clearer",
-      sublabel: "This may come across as unclear or emotionally distant.",
-      tip: "Try the rewrite below to make it warmer or clearer.",
-      chipLabel: hiddenSignalLabel,
-    };
-  }
-
   return {
-    title: "Safe to send",
-    sublabel: "Clear and unlikely to cause issues.",
-    tip: "You can still use the rewrite below if you want a smoother version.",
+    title: "Looks okay to send",
+    sublabel: "This message appears fairly safe.",
+    tip: "You can still refine it if you want a smoother version.",
     chipLabel: hiddenSignalLabel,
   };
 }
@@ -274,9 +246,7 @@ export default function ResultSection({
   const isMobile = useIsMobile();
 
   const backendRisk = Number(result?.communication_risk_score || 0);
-  const backendHidden = String(
-    result?.hidden_signal || result?.primary_hidden_signal || ""
-  ).toLowerCase();
+ const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
   const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
 
   const hiddenSignalKey =
