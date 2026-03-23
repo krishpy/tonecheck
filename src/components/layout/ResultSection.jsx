@@ -4,6 +4,84 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 
+function buildSendVerdict(result) {
+  const risk = Number(result?.communication_risk_score || 0);
+  const hidden = String(
+    result?.hidden_signal || result?.primary_hidden_signal || ""
+  ).toLowerCase();
+  const tone = String(result?.tone || "").toLowerCase();
+
+  if (
+    risk <= 20 &&
+    (hidden === "" || hidden === "none" || hidden === "none detected")
+  ) {
+    return {
+      tone: "safe",
+      emoji: "✅",
+      label: "Looks good to send",
+      reason: "This message looks safe and unlikely to create tension.",
+    };
+  }
+
+  if (
+    risk <= 35 &&
+    (tone.includes("friendly") ||
+      tone.includes("neutral") ||
+      tone.includes("firm"))
+  ) {
+    return {
+      tone: "safe",
+      emoji: "🙂",
+      label: "Looks okay to send",
+      reason: "This message appears fairly safe, though you can refine it if needed.",
+    };
+  }
+
+  if (
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt") ||
+    hidden.includes("blame") ||
+    hidden.includes("accus")
+  ) {
+    return {
+      tone: "neutral",
+      emoji: "🤔",
+      label: "Careful — may be misunderstood",
+      reason: "Your intent may land as pressure or blame.",
+    };
+  }
+
+  if (risk <= 50) {
+    return {
+      tone: "neutral",
+      emoji: "⚠️",
+      label: "Might need a quick tweak",
+      reason: "This message could be interpreted more sharply than intended.",
+    };
+  }
+
+  if (
+    risk >= 85 ||
+    hidden.includes("threat") ||
+    hidden.includes("hostile")
+  ) {
+    return {
+      tone: "danger",
+      emoji: "🛑",
+      label: "Don’t send this yet",
+      reason: "This is likely to escalate quickly.",
+    };
+  }
+
+  return {
+    tone: "warning",
+    emoji: "⚠️",
+    label: "Risky — rethink before sending",
+    reason: "This can trigger defensiveness or conflict.",
+  };
+}
+
 function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskScore }) {
   const tone = String(toneLabel || "").toLowerCase();
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
@@ -131,7 +209,7 @@ function getVerdictTheme(tone) {
       tipColor: "#c2410c",
     },
     neutral: {
-      title: "#374151", // darker, sharper
+      title: "#374151",
       subtitle: "#6b7280",
       iconBg: "linear-gradient(135deg, #eab308 0%, #f59e0b 55%, #d97706 100%)",
       iconGlow: "rgba(245,158,11,0.25)",
@@ -139,7 +217,6 @@ function getVerdictTheme(tone) {
       tipBorder: "1px solid rgba(245,158,11,0.2)",
       tipColor: "#b45309",
     },
-
     safe: {
       title: "#166534",
       subtitle: "#15803d",
@@ -175,7 +252,6 @@ export default function ResultSection({
   useRewriteMessage,
   sendRewriteWhatsApp,
   copyState,
-  sendVerdict,
   getToneLabel,
   getToneEmoji,
   getHiddenSignalLabel,
@@ -202,17 +278,28 @@ export default function ResultSection({
   const toneEmoji = getToneEmoji();
   const isMobile = useIsMobile();
 
+  const localRiskScore = Number(result?.communication_risk_score ?? riskScore ?? 0);
+  const sendVerdict = buildSendVerdict(result);
+
   const adaptiveVerdict = getAdaptiveVerdict({
     sendVerdict,
     toneLabel,
     hiddenSignalLabel,
-    riskScore,
+    riskScore: localRiskScore,
   });
 
+  const safeRewrite =
+    localRiskScore <= 20 &&
+    ["none", "none detected", ""].includes(
+      String(result?.hidden_signal || result?.primary_hidden_signal || "").toLowerCase()
+    )
+      ? ""
+      : result?.rewritten_text || result?.rewrite_suggestion || finalRewrite || "";
+
   const rewriteIntro =
-    riskScore >= 70
+    localRiskScore >= 70
       ? "A calmer version that lowers the chance of escalation."
-      : riskScore >= 40
+      : localRiskScore >= 40
       ? "A cleaner version that sounds easier to receive."
       : "A polished version that keeps your meaning but sounds smoother.";
 
@@ -234,30 +321,31 @@ export default function ResultSection({
     toneTheme,
     hiddenSignalLabel,
     toneLabel,
-    riskScore,
+    riskScore: localRiskScore,
   });
 
   const verdictTheme = getVerdictTheme(sendVerdict?.tone);
-const topCardChipHiddenLabels = new Set([
-  "neutral",
-  "none",
-  "none detected",
-  "profanity",
-  "accusation",
-  "accusatory pressure",
-  "guilt pressure",
-  "emotional leverage",
-  "blame shifting",
-  "pressure",
-  "passive aggression",
-  "hostile command",
-  "insult",
-  "threat",
-]);
 
-const shouldShowSignalChip = !topCardChipHiddenLabels.has(
-  String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
-);
+  const topCardChipHiddenLabels = new Set([
+    "neutral",
+    "none",
+    "none detected",
+    "profanity",
+    "accusation",
+    "accusatory pressure",
+    "guilt pressure",
+    "emotional leverage",
+    "blame shifting",
+    "pressure",
+    "passive aggression",
+    "hostile command",
+    "insult",
+    "threat",
+  ]);
+
+  const shouldShowSignalChip = !topCardChipHiddenLabels.has(
+    String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
+  );
 
   return (
     <>
@@ -367,7 +455,7 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
               </div>
             </div>
 
-            {finalRewrite ? (
+            {safeRewrite ? (
               <div
                 style={{
                   marginTop: "22px",
@@ -397,7 +485,7 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
                     whiteSpace: "pre-wrap",
                   }}
                 >
-                  {finalRewrite}
+                  {safeRewrite}
                 </div>
               </div>
             ) : null}
@@ -483,27 +571,28 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
                   gap: isMobile ? "12px" : "14px",
                 }}
               >
-               <div
-              style={{
-                width: isMobile ? "52px" : "60px",
-                height: isMobile ? "52px" : "60px",
-                borderRadius: "20px",
-                background: verdictTheme.iconBg,
-                display: "grid",
-                placeItems: "center",
-                color: "#fff",
-                fontSize: isMobile ? "26px" : "30px",
-                flexShrink: 0,
-                boxShadow: `0 18px 34px ${verdictTheme.iconGlow}`,
-                border: "1px solid rgba(255,255,255,0.35)",
-                transform: "translateY(1px)",
-                animation: "tc-breathe 2.6s ease-in-out infinite",
-              }}
-            >
-              <span style={{ transform: "translateY(1px)" }}>
-                {sendVerdict.emoji}
-              </span>
-            </div>
+                <div
+                  style={{
+                    width: isMobile ? "52px" : "60px",
+                    height: isMobile ? "52px" : "60px",
+                    borderRadius: "20px",
+                    background: verdictTheme.iconBg,
+                    display: "grid",
+                    placeItems: "center",
+                    color: "#fff",
+                    fontSize: isMobile ? "26px" : "30px",
+                    flexShrink: 0,
+                    boxShadow: `0 18px 34px ${verdictTheme.iconGlow}`,
+                    border: "1px solid rgba(255,255,255,0.35)",
+                    transform: "translateY(1px)",
+                    animation: "tc-breathe 2.6s ease-in-out infinite",
+                  }}
+                >
+                  <span style={{ transform: "translateY(1px)" }}>
+                    {sendVerdict.emoji}
+                  </span>
+                </div>
+
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div
                     style={{
@@ -538,17 +627,17 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
                       >
                         {adaptiveVerdict.sublabel}
                       </div>
-                      <div
-                      style={{
-                        marginTop: "5px",
-                        fontSize: "12px",
-                        color: "#94a3b8",
-                        fontWeight: 600,
-                      }}
-                    >
-                      Based on tone + hidden signals detected
-                    </div>
 
+                      <div
+                        style={{
+                          marginTop: "5px",
+                          fontSize: "12px",
+                          color: "#94a3b8",
+                          fontWeight: 600,
+                        }}
+                      >
+                        Based on tone + hidden signals detected
+                      </div>
                     </div>
                   </div>
 
@@ -613,20 +702,20 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
           </div>
         </div>
 
-        {finalRewrite && (
+        {safeRewrite ? (
           <RewriteCard
-           cardStyle={cardStyle}
+            cardStyle={cardStyle}
             chipStyle={chipStyle}
-            finalRewrite={result?.rewritten_text || result?.rewrite_suggestion || ""}
+            finalRewrite={safeRewrite}
             rewriteTone={rewriteTone}
-            rewriteloading={false}
+            rewriteloading={rewriteLoading || false}
             setRewriteTone={setRewriteTone}
             copyRewriteOnly={copyRewriteOnly}
             useRewriteMessage={useRewriteMessage}
             sendRewriteWhatsApp={sendRewriteWhatsApp}
             copyState={copyState}
             rewriteIntro={rewriteIntro}
-            riskScore={result?.communication_risk_score || 0}
+            riskScore={localRiskScore}
             hiddenSignal={result?.hidden_signal || result?.primary_hidden_signal || ""}
             toneLabel={result?.tone || ""}
             whatsappIcon={
@@ -637,7 +726,7 @@ const shouldShowSignalChip = !topCardChipHiddenLabels.has(
               />
             }
           />
-        )}
+        ) : null}
 
         {!!result.top_manipulation_signals?.length && (
           <DetectedSignals

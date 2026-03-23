@@ -93,6 +93,19 @@ export default function RewriteCard({
         >
           Better version to send
         </div>
+
+        {rewriteIntro ? (
+          <div
+            style={{
+              fontSize: "14px",
+              color: "#9a3412",
+              lineHeight: 1.5,
+              fontWeight: 600,
+            }}
+          >
+            {rewriteIntro}
+          </div>
+        ) : null}
       </div>
 
       <div
