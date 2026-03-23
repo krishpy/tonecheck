@@ -61,11 +61,7 @@ function buildSendVerdict(result) {
     };
   }
 
-  if (
-    risk >= 85 ||
-    hidden.includes("threat") ||
-    hidden.includes("hostile")
-  ) {
+  if (risk >= 85 || hidden.includes("threat") || hidden.includes("hostile")) {
     return {
       tone: "danger",
       emoji: "🛑",
@@ -86,6 +82,18 @@ function getAdaptiveVerdict({ sendVerdict, toneLabel, hiddenSignalLabel, riskSco
   const tone = String(toneLabel || "").toLowerCase();
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
   const verdictTone = sendVerdict?.tone || "neutral";
+
+  if (
+    riskScore <= 20 &&
+    ["none", "none detected", ""].includes(hidden)
+  ) {
+    return {
+      title: "Safe to send",
+      sublabel: "Clear and unlikely to cause issues.",
+      tip: "You can send this as-is.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
 
   if (
     verdictTone === "danger" ||
@@ -241,11 +249,7 @@ export default function ResultSection({
   actionButtonStyle,
   toneTheme,
   message,
-  finalRewrite,
-  riskScore,
-  rewriteRiskScore,
   rewriteLoading,
-  riskImprovement,
   rewriteTone,
   setRewriteTone,
   copyRewriteOnly,
@@ -267,6 +271,14 @@ export default function ResultSection({
 }) {
   if (!result || result.error) return null;
 
+  const isMobile = useIsMobile();
+
+  const backendRisk = Number(result?.communication_risk_score || 0);
+  const backendHidden = String(
+    result?.hidden_signal || result?.primary_hidden_signal || ""
+  ).toLowerCase();
+  const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
+
   const hiddenSignalKey =
     result.primary_hidden_signal ||
     result.hidden_signal ||
@@ -276,30 +288,32 @@ export default function ResultSection({
   const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
-  const isMobile = useIsMobile();
 
-  const localRiskScore = Number(result?.communication_risk_score ?? riskScore ?? 0);
-  const sendVerdict = buildSendVerdict(result);
+  const sendVerdict = buildSendVerdict({
+    communication_risk_score: backendRisk,
+    hidden_signal: backendHidden,
+    tone: result?.tone || "",
+  });
 
   const adaptiveVerdict = getAdaptiveVerdict({
     sendVerdict,
     toneLabel,
     hiddenSignalLabel,
-    riskScore: localRiskScore,
+    riskScore: backendRisk,
   });
 
   const safeRewrite =
-    localRiskScore <= 20 &&
-    ["none", "none detected", ""].includes(
-      String(result?.hidden_signal || result?.primary_hidden_signal || "").toLowerCase()
-    )
+    backendRisk <= 20 &&
+    ["none", "none detected", ""].includes(backendHidden)
       ? ""
-      : result?.rewritten_text || result?.rewrite_suggestion || finalRewrite || "";
+      : backendRewrite;
+
+  const shouldShowRewriteCard = safeRewrite.trim() !== "";
 
   const rewriteIntro =
-    localRiskScore >= 70
+    backendRisk >= 70
       ? "A calmer version that lowers the chance of escalation."
-      : localRiskScore >= 40
+      : backendRisk >= 40
       ? "A cleaner version that sounds easier to receive."
       : "A polished version that keeps your meaning but sounds smoother.";
 
@@ -321,7 +335,7 @@ export default function ResultSection({
     toneTheme,
     hiddenSignalLabel,
     toneLabel,
-    riskScore: localRiskScore,
+    riskScore: backendRisk,
   });
 
   const verdictTheme = getVerdictTheme(sendVerdict?.tone);
@@ -455,7 +469,7 @@ export default function ResultSection({
               </div>
             </div>
 
-            {safeRewrite ? (
+            {shouldShowRewriteCard ? (
               <div
                 style={{
                   marginTop: "22px",
@@ -702,7 +716,7 @@ export default function ResultSection({
           </div>
         </div>
 
-        {safeRewrite ? (
+        {shouldShowRewriteCard ? (
           <RewriteCard
             cardStyle={cardStyle}
             chipStyle={chipStyle}
@@ -715,8 +729,8 @@ export default function ResultSection({
             sendRewriteWhatsApp={sendRewriteWhatsApp}
             copyState={copyState}
             rewriteIntro={rewriteIntro}
-            riskScore={localRiskScore}
-            hiddenSignal={result?.hidden_signal || result?.primary_hidden_signal || ""}
+            riskScore={backendRisk}
+            hiddenSignal={backendHidden}
             toneLabel={result?.tone || ""}
             whatsappIcon={
               <img
