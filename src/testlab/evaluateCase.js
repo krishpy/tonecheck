@@ -18,6 +18,14 @@ function includesExpected(expected, actual) {
   return a.includes(e);
 }
 
+export function displayHiddenSignal(signal) {
+  if (!signal || signal === "none") return "Nothing tricky detected";
+  return signal
+    .replace(/_signal$/i, "")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function evaluateCase(testCase, apiResult) {
   const actualTone = normalize(apiResult?.tone || apiResult?.label);
   const actualHidden = normalize(apiResult?.primary_hidden_signal);
