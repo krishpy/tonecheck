@@ -1,33 +1,80 @@
-import Papa from "papaparse";
-
 export function parseCsvFile(file) {
   return new Promise((resolve, reject) => {
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results) => {
-        try {
-          const cleaned = (results.data || [])
-            .map((row) => ({
-              id: String(row.id || "").trim(),
-              category: String(row.category || "").trim().toLowerCase(),
-              input: String(row.input || "").trim(),
-              expected_tone: String(row.expected_tone || "").trim().toLowerCase(),
-              expected_hidden_signal: String(row.expected_hidden_signal || "").trim().toLowerCase(),
-              expected_risk_min: Number(row.expected_risk_min || 0),
-              expected_risk_max: Number(row.expected_risk_max || 0),
-              notes: String(row.notes || "").trim(),
-            }))
-            .filter((row) => row.id && row.input);
+    const reader = new FileReader();
 
-          resolve(cleaned);
-        } catch (err) {
-          reject(err);
-        }
-      },
-      error: (err) => reject(err),
-    });
+    reader.onload = () => {
+      try {
+        const text = String(reader.result || "");
+        const rows = parseCSVText(text);
+        resolve(rows);
+      } catch (err) {
+        reject(err);
+      }
+    };
+
+    reader.onerror = () => reject(new Error("Failed to read CSV file"));
+    reader.readAsText(file);
   });
+}
+
+function parseCSVText(text) {
+  const rows = [];
+  const lines = text.replace(/\r\n/g, "\n").split("\n").filter(Boolean);
+  if (!lines.length) return rows;
+
+  const headers = splitCsvLine(lines[0]).map((h) => cleanCell(h));
+
+  for (let i = 1; i < lines.length; i += 1) {
+    const values = splitCsvLine(lines[i]);
+    if (!values.length) continue;
+
+    const row = {};
+    headers.forEach((header, idx) => {
+      row[header] = cleanCell(values[idx] ?? "");
+    });
+
+    if (Object.values(row).some((v) => String(v).trim() !== "")) {
+      rows.push(row);
+    }
+  }
+
+  return rows;
+}
+
+function splitCsvLine(line) {
+  const out = [];
+  let current = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < line.length; i += 1) {
+    const ch = line[i];
+    const next = line[i + 1];
+
+    if (ch === '"') {
+      if (inQuotes && next === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (ch === "," && !inQuotes) {
+      out.push(current);
+      current = "";
+      continue;
+    }
+
+    current += ch;
+  }
+
+  out.push(current);
+  return out;
+}
+
+function cleanCell(value) {
+  return String(value ?? "").trim();
 }
 
 function escapeCsv(value) {
@@ -39,51 +86,50 @@ function escapeCsv(value) {
 }
 
 export function downloadResultsCsv(rows, filename = "test_lab_results.csv") {
-  const headers = [
-    "id",
-    "category",
-    "input",
-    "expected_tone",
-    "actual_tone",
-    "expected_hidden_signal",
-    "actual_hidden_signal",
-    "expected_risk_min",
-    "expected_risk_max",
-    "actual_risk",
-    "pass",
-    "mismatch_reasons",
-    "advisory",
-    "rewrite",
-    "notes",
-  ];
+  if (!rows || !rows.length) return;
 
-  const lines = [
+  const output = rows.map((row) => {
+    const e = row.evaluation || {};
+
+    return {
+      id: row.id,
+      category: row.category,
+      input: row.input,
+      expected_tone: row.expected_tone,
+      actual_tone: e.actualTone || "",
+      expected_hidden_signal: row.expected_hidden_signal,
+      actual_hidden_signal: e.actualHidden || "",
+      expected_risk_min: row.expected_risk_min,
+      expected_risk_max: row.expected_risk_max,
+      actual_risk: e.actualRisk ?? "",
+      pass:
+        e.status === "ERROR"
+          ? "ERROR"
+          : e.pass
+            ? "PASS"
+            : "FAIL",
+      mismatch_reasons: (e.mismatchReasons || []).join(" | "),
+      advisory: row.apiResult?.advisory || "",
+      rewrite:
+        row.apiResult?.rewrite_suggestion ||
+        row.apiResult?.rewritten_text ||
+        row.apiResult?.rewrite ||
+        "",
+      notes: row.notes || "",
+      model_version: row.apiResult?.model_version || "",
+      risk_level: row.apiResult?.risk_level || "",
+    };
+  });
+
+  const headers = Object.keys(output[0]);
+  const csv = [
     headers.join(","),
-    ...rows.map((row) => {
-      const e = row.evaluation || {};
-      return [
-        row.id,
-        row.category,
-        row.input,
-        row.expected_tone,
-        e.actualTone || "",
-        row.expected_hidden_signal,
-        e.actualHidden || "",
-        row.expected_risk_min,
-        row.expected_risk_max,
-        e.actualRisk ?? "",
-        e.pass ? "PASS" : "FAIL",
-        (e.mismatchReasons || []).join(" | "),
-        row.apiResult?.advisory || "",
-        row.apiResult?.rewrite || "",
-        row.notes || "",
-      ]
-        .map(escapeCsv)
-        .join(",");
-    }),
-  ];
+    ...output.map((record) =>
+      headers.map((header) => escapeCsv(record[header])).join(",")
+    ),
+  ].join("\n");
 
-  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

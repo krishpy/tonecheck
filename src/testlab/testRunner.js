@@ -11,11 +11,18 @@ export async function runSingleTest(testCase, baseUrl, signal) {
     signal,
   });
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+  let payload = {};
+  try {
+    payload = await response.json();
+  } catch {
+    payload = {};
   }
 
-  return await response.json();
+  if (!response.ok) {
+    throw new Error(payload?.detail || `HTTP ${response.status}`);
+  }
+
+  return payload;
 }
 
 export async function runAllTests(testCases, baseUrl, onProgress, signal) {
@@ -24,23 +31,36 @@ export async function runAllTests(testCases, baseUrl, onProgress, signal) {
   for (let i = 0; i < testCases.length; i += 1) {
     const testCase = testCases[i];
 
+    if (onProgress) {
+      onProgress(i, testCases.length, testCase, null);
+    }
+
     try {
       const apiResult = await runSingleTest(testCase, baseUrl, signal);
-      results.push({
+
+      const row = {
         ...testCase,
         apiResult,
         error: null,
-      });
+      };
+
+      results.push(row);
+
+      if (onProgress) {
+        onProgress(i + 1, testCases.length, testCase, row);
+      }
     } catch (error) {
-      results.push({
+      const row = {
         ...testCase,
         apiResult: null,
         error: error?.message || "Request failed",
-      });
-    }
+      };
 
-    if (onProgress) {
-      onProgress(i + 1, testCases.length);
+      results.push(row);
+
+      if (onProgress) {
+        onProgress(i + 1, testCases.length, testCase, row);
+      }
     }
   }
 
