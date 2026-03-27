@@ -1,6 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
 import { DEFAULT_TEST_CASES } from "../testlab/testCases";
-import { runAllTests } from "../testlab/testRunner";
 import { evaluateCase } from "../testlab/evaluateCase";
 import { parseCsvFile, downloadResultsCsv } from "../testlab/csvUtils";
 import { runAllTests, runSingleTest } from "../testlab/testRunner";
@@ -33,38 +32,47 @@ function cardStyle({ good = false, bad = false, warn = false } = {}) {
   };
 }
 
-async function runSingle(row, index) {
-  try {
-    const apiResult = await runSingleTest(row, API_BASE_URL);
+function FailureHints({ hints = [] }) {
+  if (!hints.length) return null;
 
-    const evaluated = {
-      ...row,
-      apiResult,
-      evaluation: evaluateCase(row, apiResult),
-      error: null,
-    };
+  return (
+    <div
+      style={{
+        marginTop: 12,
+        padding: 12,
+        borderRadius: 12,
+        background: "rgba(255,255,255,0.04)",
+        border: "1px solid rgba(255,255,255,0.08)",
+        display: "grid",
+        gap: 10,
+      }}
+    >
+      <div style={{ fontWeight: 800 }}>Why failed</div>
 
-    setRows((prev) => {
-      const copy = [...prev];
-      copy[index] = evaluated;
-      return copy;
-    });
-
-  } catch (err) {
-    setRows((prev) => {
-      const copy = [...prev];
-      copy[index] = {
-        ...row,
-        error: err.message,
-        evaluation: {
-          pass: false,
-          status: "ERROR",
-          mismatchReasons: [err.message],
-        },
-      };
-      return copy;
-    });
-  }
+      {hints.map((hint, idx) => (
+        <div
+          key={`${hint.type}-${idx}`}
+          style={{
+            padding: 10,
+            borderRadius: 10,
+            background: "rgba(0,0,0,0.18)",
+            border: "1px solid rgba(255,255,255,0.06)",
+          }}
+        >
+          <div style={{ fontWeight: 700 }}>{hint.title}</div>
+          <div style={{ marginTop: 6, fontSize: 13, opacity: 0.9 }}>
+            <strong>Expected:</strong> {hint.expected}
+          </div>
+          <div style={{ marginTop: 4, fontSize: 13, opacity: 0.9 }}>
+            <strong>Actual:</strong> {hint.actual}
+          </div>
+          <div style={{ marginTop: 6, fontSize: 13, opacity: 0.82 }}>
+            <strong>Check:</strong> {hint.suggestion}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function StatCard({ label, value, subtitle, tone = "default" }) {
@@ -212,6 +220,7 @@ export default function TestLab() {
   const [testCases, setTestCases] = useState(DEFAULT_TEST_CASES);
   const [rows, setRows] = useState([]);
   const [running, setRunning] = useState(false);
+  const [singleRunningId, setSingleRunningId] = useState("");
   const [filter, setFilter] = useState("all");
   const [progress, setProgress] = useState({
     done: 0,
@@ -225,6 +234,57 @@ export default function TestLab() {
   const [expandedId, setExpandedId] = useState(null);
   const fileInputRef = useRef(null);
   const abortRef = useRef(null);
+
+  async function runSingle(row, index) {
+    setSingleRunningId(row.id);
+
+    try {
+      const apiResult = await runSingleTest(row, API_BASE_URL);
+
+      const evaluated = {
+        ...row,
+        apiResult,
+        error: null,
+        evaluation: evaluateCase(row, apiResult),
+      };
+
+      setRows((prev) => {
+        const copy = [...prev];
+        copy[index] = evaluated;
+        return copy;
+      });
+    } catch (err) {
+      setRows((prev) => {
+        const copy = [...prev];
+        copy[index] = {
+          ...row,
+          apiResult: null,
+          error: err?.message || "Request failed",
+          evaluation: {
+            pass: false,
+            status: "ERROR",
+            actualTone: "",
+            actualHidden: "",
+            actualRisk: 0,
+            mismatchReasons: [err?.message || "Request failed"],
+            failureHints: [
+              {
+                type: "error",
+                title: "Request/runtime error",
+                expected: "successful API response",
+                actual: err?.message || "Request failed",
+                suggestion:
+                  "Check backend logs, endpoint availability, and response schema.",
+              },
+            ],
+          },
+        };
+        return copy;
+      });
+    } finally {
+      setSingleRunningId("");
+    }
+  }
 
   async function handleRunAll() {
     const controller = new AbortController();
@@ -241,7 +301,7 @@ export default function TestLab() {
     });
 
     try {
-      const rawResults = await runAllTests(
+      await runAllTests(
         testCases,
         API_BASE_URL,
         (done, total, currentCase, latestRow) => {
@@ -254,29 +314,38 @@ export default function TestLab() {
 
           if (!latestRow) return;
 
-          const evaluatedRow = latestRow.error || !latestRow.apiResult
-            ? {
-                ...latestRow,
-                evaluation: {
-                  pass: false,
-                  status: "ERROR",
-                  actualTone: "",
-                  actualHidden: "",
-                  actualRisk: 0,
-                  mismatchReasons: [latestRow.error || "no result"],
-                },
-              }
-            : {
-                ...latestRow,
-                evaluation: evaluateCase(latestRow, latestRow.apiResult),
-              };
+          const evaluatedRow =
+            latestRow.error || !latestRow.apiResult
+              ? {
+                  ...latestRow,
+                  evaluation: {
+                    pass: false,
+                    status: "ERROR",
+                    actualTone: "",
+                    actualHidden: "",
+                    actualRisk: 0,
+                    mismatchReasons: [latestRow.error || "no result"],
+                    failureHints: [
+                      {
+                        type: "error",
+                        title: "Request/runtime error",
+                        expected: "successful API response",
+                        actual: latestRow.error || "no result",
+                        suggestion:
+                          "Check backend logs, endpoint availability, and response schema.",
+                      },
+                    ],
+                  },
+                }
+              : {
+                  ...latestRow,
+                  evaluation: evaluateCase(latestRow, latestRow.apiResult),
+                };
 
           setRows((prev) => [...prev, evaluatedRow]);
         },
         controller.signal
       );
-
-      return rawResults;
     } finally {
       setRunning(false);
       abortRef.current = null;
@@ -661,16 +730,10 @@ export default function TestLab() {
             <Pill active={filter === "all"} onClick={() => setFilter("all")}>
               All
             </Pill>
-            <Pill
-              active={filter === "failed"}
-              onClick={() => setFilter("failed")}
-            >
+            <Pill active={filter === "failed"} onClick={() => setFilter("failed")}>
               Failed Only
             </Pill>
-            <Pill
-              active={filter === "passed"}
-              onClick={() => setFilter("passed")}
-            >
+            <Pill active={filter === "passed"} onClick={() => setFilter("passed")}>
               Passed Only
             </Pill>
             <Pill active={filter === "error"} onClick={() => setFilter("error")}>
@@ -712,18 +775,16 @@ export default function TestLab() {
           }}
         >
           <div style={{ display: "grid", gap: 14 }}>
-            {filteredRows.map((row, idx) => {
+            {filteredRows.map((row) => {
               const e = row.evaluation || {};
               const expanded = expandedId === row.id;
               const tone = statusTone(row);
-              const isCurrentRunning =
-                running &&
-                progress.currentId === row.id &&
-                progress.done <= idx + 1;
+              const isCurrentRunning = running && progress.currentId === row.id;
+              const isSingleRunning = singleRunningId === row.id;
 
               return (
                 <div
-                  key={`${row.id}-${idx}`}
+                  key={row.id}
                   style={{
                     ...cardStyle(
                       tone === "good"
@@ -733,9 +794,10 @@ export default function TestLab() {
                           : { warn: true }
                     ),
                     padding: 18,
-                    outline: isCurrentRunning
-                      ? "2px solid rgba(93,214,255,0.9)"
-                      : "none",
+                    outline:
+                      isCurrentRunning || isSingleRunning
+                        ? "2px solid rgba(93,214,255,0.9)"
+                        : "none",
                   }}
                 >
                   <div
@@ -786,8 +848,7 @@ export default function TestLab() {
                       <strong>Actual tone:</strong> {e.actualTone || "-"}
                     </div>
                     <div>
-                      <strong>Expected hidden:</strong>{" "}
-                      {row.expected_hidden_signal}
+                      <strong>Expected hidden:</strong> {row.expected_hidden_signal}
                     </div>
                     <div>
                       <strong>Actual hidden:</strong> {e.actualHidden || "-"}
@@ -813,8 +874,7 @@ export default function TestLab() {
                         padding: 12,
                         borderRadius: 12,
                         background: "rgba(0,0,0,0.18)",
-                        color:
-                          tone === "warn" ? "#ffd38e" : "#ffb7b7",
+                        color: tone === "warn" ? "#ffd38e" : "#ffb7b7",
                         fontWeight: 700,
                       }}
                     >
@@ -822,39 +882,39 @@ export default function TestLab() {
                     </div>
                   ) : null}
 
-                 <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-  
-  <button
-    onClick={() => setExpandedId(expanded ? null : row.id)}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 12,
-      border: "1px solid rgba(255,255,255,0.10)",
-      background: "rgba(255,255,255,0.04)",
-      color: "#fff",
-      cursor: "pointer",
-      fontWeight: 700,
-    }}
-  >
-    {expanded ? "Hide Details" : "Show Details"}
-  </button>
+                  <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    <button
+                      onClick={() => setExpandedId(expanded ? null : row.id)}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: 12,
+                        border: "1px solid rgba(255,255,255,0.10)",
+                        background: "rgba(255,255,255,0.04)",
+                        color: "#fff",
+                        cursor: "pointer",
+                        fontWeight: 700,
+                      }}
+                    >
+                      {expanded ? "Hide Details" : "Show Details"}
+                    </button>
 
-  <button
-    onClick={() => runSingle(row, idx)}
-    style={{
-      padding: "10px 14px",
-      borderRadius: 12,
-      border: "1px solid rgba(124,92,255,0.4)",
-      background: "rgba(124,92,255,0.15)",
-      color: "#fff",
-      cursor: "pointer",
-      fontWeight: 700,
-    }}
-  >
-    🔁 Re-run
-  </button>
-
-</div>
+                    <button
+                      onClick={() => runSingle(row, rows.findIndex((r) => r.id === row.id))}
+                      disabled={running || isSingleRunning}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: 12,
+                        border: "1px solid rgba(124,92,255,0.4)",
+                        background: "rgba(124,92,255,0.15)",
+                        color: "#fff",
+                        cursor: running || isSingleRunning ? "not-allowed" : "pointer",
+                        fontWeight: 700,
+                        opacity: running || isSingleRunning ? 0.6 : 1,
+                      }}
+                    >
+                      {isSingleRunning ? "Running..." : "🔁 Re-run"}
+                    </button>
+                  </div>
 
                   {expanded ? (
                     <div
@@ -874,25 +934,27 @@ export default function TestLab() {
                         </div>
                       ) : null}
 
-                      {row.apiResult && (
+                      <FailureHints hints={row.evaluation?.failureHints || []} />
+
+                      {row.apiResult ? (
                         <div>
-                            <strong>Raw API:</strong>
-                            <pre
+                          <strong>Raw API:</strong>
+                          <pre
                             style={{
-                                fontSize: 12,
-                                overflow: "auto",
-                                maxHeight: 200,
-                                marginTop: 6,
-                                padding: 10,
-                                background: "#000",
-                                borderRadius: 8,
-                                color: "#0f0",
+                              fontSize: 12,
+                              overflow: "auto",
+                              maxHeight: 240,
+                              marginTop: 6,
+                              padding: 10,
+                              background: "#000",
+                              borderRadius: 8,
+                              color: "#0f0",
                             }}
-                            >
+                          >
                             {JSON.stringify(row.apiResult, null, 2)}
-                            </pre>
+                          </pre>
                         </div>
-                        )}
+                      ) : null}
 
                       {row.apiResult?.advisory ? (
                         <div>
@@ -919,8 +981,7 @@ export default function TestLab() {
 
                       {row.apiResult?.policy_profile ? (
                         <div>
-                          <strong>Policy profile:</strong>{" "}
-                          {row.apiResult.policy_profile}
+                          <strong>Policy profile:</strong> {row.apiResult.policy_profile}
                         </div>
                       ) : null}
 

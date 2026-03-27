@@ -39,6 +39,66 @@ function includesExpectedHidden(expected, actual) {
   return false;
 }
 
+function buildFailureHints({
+  expectedTone,
+  actualTone,
+  expectedHidden,
+  actualHidden,
+  expectedRiskMin,
+  expectedRiskMax,
+  actualRisk,
+  tonePass,
+  hiddenPass,
+  riskPass,
+}) {
+  const hints = [];
+
+  if (!tonePass) {
+    hints.push({
+      type: "tone",
+      title: "Tone mismatch",
+      expected: expectedTone,
+      actual: actualTone || "none",
+      suggestion: "Check tone thresholds, late tone overrides, or phrase-level tone mapping.",
+    });
+  }
+
+  if (!hiddenPass) {
+    hints.push({
+      type: "hidden",
+      title: "Hidden signal mismatch",
+      expected: expectedHidden,
+      actual: actualHidden || "none",
+      suggestion: "Check hidden-signal resolver order, phrase overrides, or missing signal patterns.",
+    });
+  }
+
+  if (!riskPass) {
+    const actualNum = Number(actualRisk || 0);
+    const min = Number(expectedRiskMin || 0);
+    const max = Number(expectedRiskMax || 0);
+
+    let direction = "outside expected range";
+    if (actualNum < min) direction = "too low";
+    if (actualNum > max) direction = "too high";
+
+    hints.push({
+      type: "risk",
+      title: "Risk out of range",
+      expected: `${min}–${max}`,
+      actual: String(actualNum),
+      suggestion:
+        direction === "too high"
+          ? "Check safe clamp, aggression score inflation, or late risk overrides."
+          : direction === "too low"
+            ? "Check missing signal boosts, threat/insult/pressure rules, or risk floors."
+            : "Check final risk aggregation and clamp logic.",
+    });
+  }
+
+  return hints;
+}
+
 export function displayHiddenSignal(signal) {
   if (!signal || signal === "none") return "Nothing tricky detected";
   return signal
@@ -63,6 +123,19 @@ export function evaluateCase(testCase, apiResult) {
   if (!hiddenPass) mismatchReasons.push("hidden signal mismatch");
   if (!riskPass) mismatchReasons.push("risk out of range");
 
+  const failureHints = buildFailureHints({
+    expectedTone: testCase.expected_tone,
+    actualTone,
+    expectedHidden: testCase.expected_hidden_signal,
+    actualHidden,
+    expectedRiskMin: testCase.expected_risk_min,
+    expectedRiskMax: testCase.expected_risk_max,
+    actualRisk,
+    tonePass,
+    hiddenPass,
+    riskPass,
+  });
+
   return {
     pass: tonePass && hiddenPass && riskPass,
     status: "DONE",
@@ -70,5 +143,6 @@ export function evaluateCase(testCase, apiResult) {
     actualHidden,
     actualRisk,
     mismatchReasons,
+    failureHints,
   };
 }
