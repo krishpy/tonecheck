@@ -3,6 +3,7 @@ import { DEFAULT_TEST_CASES } from "../testlab/testCases";
 import { runAllTests } from "../testlab/testRunner";
 import { evaluateCase } from "../testlab/evaluateCase";
 import { parseCsvFile, downloadResultsCsv } from "../testlab/csvUtils";
+import { runAllTests, runSingleTest } from "../testlab/testRunner";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
@@ -30,6 +31,40 @@ function cardStyle({ good = false, bad = false, warn = false } = {}) {
     borderRadius: 18,
     boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
   };
+}
+
+async function runSingle(row, index) {
+  try {
+    const apiResult = await runSingleTest(row, API_BASE_URL);
+
+    const evaluated = {
+      ...row,
+      apiResult,
+      evaluation: evaluateCase(row, apiResult),
+      error: null,
+    };
+
+    setRows((prev) => {
+      const copy = [...prev];
+      copy[index] = evaluated;
+      return copy;
+    });
+
+  } catch (err) {
+    setRows((prev) => {
+      const copy = [...prev];
+      copy[index] = {
+        ...row,
+        error: err.message,
+        evaluation: {
+          pass: false,
+          status: "ERROR",
+          mismatchReasons: [err.message],
+        },
+      };
+      return copy;
+    });
+  }
 }
 
 function StatCard({ label, value, subtitle, tone = "default" }) {
@@ -787,22 +822,39 @@ export default function TestLab() {
                     </div>
                   ) : null}
 
-                  <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-                    <button
-                      onClick={() => setExpandedId(expanded ? null : row.id)}
-                      style={{
-                        padding: "10px 14px",
-                        borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.10)",
-                        background: "rgba(255,255,255,0.04)",
-                        color: "#fff",
-                        cursor: "pointer",
-                        fontWeight: 700,
-                      }}
-                    >
-                      {expanded ? "Hide Details" : "Show Details"}
-                    </button>
-                  </div>
+                 <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+  
+  <button
+    onClick={() => setExpandedId(expanded ? null : row.id)}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 12,
+      border: "1px solid rgba(255,255,255,0.10)",
+      background: "rgba(255,255,255,0.04)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 700,
+    }}
+  >
+    {expanded ? "Hide Details" : "Show Details"}
+  </button>
+
+  <button
+    onClick={() => runSingle(row, idx)}
+    style={{
+      padding: "10px 14px",
+      borderRadius: 12,
+      border: "1px solid rgba(124,92,255,0.4)",
+      background: "rgba(124,92,255,0.15)",
+      color: "#fff",
+      cursor: "pointer",
+      fontWeight: 700,
+    }}
+  >
+    🔁 Re-run
+  </button>
+
+</div>
 
                   {expanded ? (
                     <div
@@ -821,6 +873,26 @@ export default function TestLab() {
                           <strong>Notes:</strong> {row.notes}
                         </div>
                       ) : null}
+
+                      {row.apiResult && (
+                        <div>
+                            <strong>Raw API:</strong>
+                            <pre
+                            style={{
+                                fontSize: 12,
+                                overflow: "auto",
+                                maxHeight: 200,
+                                marginTop: 6,
+                                padding: 10,
+                                background: "#000",
+                                borderRadius: 8,
+                                color: "#0f0",
+                            }}
+                            >
+                            {JSON.stringify(row.apiResult, null, 2)}
+                            </pre>
+                        </div>
+                        )}
 
                       {row.apiResult?.advisory ? (
                         <div>
