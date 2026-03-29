@@ -18,15 +18,57 @@ export function parseCsvFile(file) {
 }
 
 function parseCSVText(text) {
+  const normalized = String(text || "").replace(/\r\n/g, "\n");
   const rows = [];
-  const lines = text.replace(/\r\n/g, "\n").split("\n").filter(Boolean);
-  if (!lines.length) return rows;
-  
 
-  const headers = splitCsvLine(lines[0]).map((h) => cleanCell(h));
+  let currentRow = [];
+  let currentCell = "";
+  let inQuotes = false;
 
-  for (let i = 1; i < lines.length; i += 1) {
-    const values = splitCsvLine(lines[i]);
+  for (let i = 0; i < normalized.length; i += 1) {
+    const ch = normalized[i];
+    const next = normalized[i + 1];
+
+    if (ch === '"') {
+      if (inQuotes && next === '"') {
+        currentCell += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (ch === "," && !inQuotes) {
+      currentRow.push(currentCell);
+      currentCell = "";
+      continue;
+    }
+
+    if (ch === "\n" && !inQuotes) {
+      currentRow.push(currentCell);
+      rows.push(currentRow);
+      currentRow = [];
+      currentCell = "";
+      continue;
+    }
+
+    currentCell += ch;
+  }
+
+  // flush last cell / row
+  currentRow.push(currentCell);
+  if (currentRow.some((cell) => String(cell).trim() !== "")) {
+    rows.push(currentRow);
+  }
+
+  if (!rows.length) return [];
+
+  const headers = rows[0].map((h) => cleanCell(h));
+  const output = [];
+
+  for (let i = 1; i < rows.length; i += 1) {
+    const values = rows[i];
     if (!values.length) continue;
 
     const row = {};
@@ -34,14 +76,15 @@ function parseCSVText(text) {
       row[header] = cleanCell(values[idx] ?? "");
     });
 
-    if (!row.input || !row.input.trim()) return null;
+    // guardrail: skip broken / empty rows, do not kill whole file
+    if (!row.input || !row.input.trim()) continue;
 
     if (Object.values(row).some((v) => String(v).trim() !== "")) {
-      rows.push(row);
+      output.push(row);
     }
   }
 
-  return rows;
+  return output;
 }
 
 function splitCsvLine(line) {

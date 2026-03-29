@@ -1,4 +1,12 @@
 export async function runSingleTest(testCase, baseUrl, signal) {
+  if (!testCase.input || !String(testCase.input).trim()) {
+    return {
+      skipped: true,
+      error: "Skipped empty CSV row",
+      mismatch_reasons: ["empty input row in csv"],
+    };
+  }
+
   const response = await fetch(`${baseUrl}/communication-intelligence/analyze`, {
     method: "POST",
     headers: {
@@ -17,15 +25,6 @@ export async function runSingleTest(testCase, baseUrl, signal) {
   } catch {
     payload = {};
   }
-
-  if (!testCase.input || !testCase.input.trim()) {
-  return {
-    ...testCase,
-    pass: false,
-    mismatch_reasons: ["empty input row in csv"],
-    error: "Skipped empty CSV row",
-  };
-}
 
   if (!response.ok) {
     throw new Error(payload?.detail || `HTTP ${response.status}`);
@@ -49,8 +48,10 @@ export async function runAllTests(testCases, baseUrl, onProgress, signal) {
 
       const row = {
         ...testCase,
-        apiResult,
-        error: null,
+        apiResult: apiResult?.skipped ? null : apiResult,
+        error: apiResult?.skipped ? apiResult.error : null,
+        skipped: Boolean(apiResult?.skipped),
+        mismatch_reasons: apiResult?.mismatch_reasons || [],
       };
 
       results.push(row);
@@ -63,6 +64,8 @@ export async function runAllTests(testCases, baseUrl, onProgress, signal) {
         ...testCase,
         apiResult: null,
         error: error?.message || "Request failed",
+        skipped: false,
+        mismatch_reasons: [],
       };
 
       results.push(row);
