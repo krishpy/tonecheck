@@ -21,6 +21,7 @@ function parseCSVText(text) {
   const rows = [];
   const lines = text.replace(/\r\n/g, "\n").split("\n").filter(Boolean);
   if (!lines.length) return rows;
+  
 
   const headers = splitCsvLine(lines[0]).map((h) => cleanCell(h));
 
@@ -32,6 +33,8 @@ function parseCSVText(text) {
     headers.forEach((header, idx) => {
       row[header] = cleanCell(values[idx] ?? "");
     });
+
+    if (!row.input || !row.input.trim()) return null;
 
     if (Object.values(row).some((v) => String(v).trim() !== "")) {
       rows.push(row);

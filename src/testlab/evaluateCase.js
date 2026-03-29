@@ -24,8 +24,10 @@ function includesExpectedTone(expected, actual) {
   const e = normalize(expected);
   const a = normalize(actual);
 
+  if (!e && !a) return true;
   if (e === a) return true;
   if (TONE_ALIASES[e]?.includes(a)) return true;
+
   return false;
 }
 
@@ -36,6 +38,7 @@ function includesExpectedHidden(expected, actual) {
   if (e === "none") return isNoneLike(a);
   if (e === a) return true;
   if (HIDDEN_ALIASES[e]?.includes(a)) return true;
+
   return false;
 }
 
@@ -59,7 +62,8 @@ function buildFailureHints({
       title: "Tone mismatch",
       expected: expectedTone,
       actual: actualTone || "none",
-      suggestion: "Check tone thresholds, late tone overrides, or phrase-level tone mapping.",
+      suggestion:
+        "Check tone thresholds, late tone overrides, or phrase-level tone mapping.",
     });
   }
 
@@ -69,7 +73,8 @@ function buildFailureHints({
       title: "Hidden signal mismatch",
       expected: expectedHidden,
       actual: actualHidden || "none",
-      suggestion: "Check hidden-signal resolver order, phrase overrides, or missing signal patterns.",
+      suggestion:
+        "Check hidden-signal resolver order, phrase overrides, or missing signal patterns.",
     });
   }
 
@@ -78,21 +83,23 @@ function buildFailureHints({
     const min = Number(expectedRiskMin || 0);
     const max = Number(expectedRiskMax || 0);
 
-    let direction = "outside expected range";
-    if (actualNum < min) direction = "too low";
-    if (actualNum > max) direction = "too high";
+    let suggestion =
+      "Check final risk aggregation and clamp logic.";
+
+    if (actualNum > max) {
+      suggestion =
+        "Risk is too high. Check safe clamp, aggression inflation, or late risk overrides.";
+    } else if (actualNum < min) {
+      suggestion =
+        "Risk is too low. Check missing signal boosts, threat/insult/pressure floors, or phrase overrides.";
+    }
 
     hints.push({
       type: "risk",
       title: "Risk out of range",
       expected: `${min}–${max}`,
       actual: String(actualNum),
-      suggestion:
-        direction === "too high"
-          ? "Check safe clamp, aggression score inflation, or late risk overrides."
-          : direction === "too low"
-            ? "Check missing signal boosts, threat/insult/pressure rules, or risk floors."
-            : "Check final risk aggregation and clamp logic.",
+      suggestion,
     });
   }
 
@@ -113,7 +120,10 @@ export function evaluateCase(testCase, apiResult) {
   const actualRisk = Number(apiResult?.communication_risk_score ?? 0);
 
   const tonePass = includesExpectedTone(testCase.expected_tone, actualTone);
-  const hiddenPass = includesExpectedHidden(testCase.expected_hidden_signal, actualHidden);
+  const hiddenPass = includesExpectedHidden(
+    testCase.expected_hidden_signal,
+    actualHidden
+  );
   const riskPass =
     actualRisk >= Number(testCase.expected_risk_min) &&
     actualRisk <= Number(testCase.expected_risk_max);

@@ -18,6 +18,15 @@ export async function runSingleTest(testCase, baseUrl, signal) {
     payload = {};
   }
 
+  if (!testCase.input || !testCase.input.trim()) {
+  return {
+    ...testCase,
+    pass: false,
+    mismatch_reasons: ["empty input row in csv"],
+    error: "Skipped empty CSV row",
+  };
+}
+
   if (!response.ok) {
     throw new Error(payload?.detail || `HTTP ${response.status}`);
   }
