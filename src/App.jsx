@@ -19,6 +19,18 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function getSessionId() {
+  let sessionId = localStorage.getItem("tonecheck_session_id");
+
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("tonecheck_session_id", sessionId);
+  }
+
+  return sessionId;
+}
+
+
 function getTonecheckSessionId() {
   let sessionId = localStorage.getItem("tonecheck_session_id");
   if (!sessionId) {
@@ -403,6 +415,27 @@ https://trytonecheck.com`;
           }),
         }
       );
+
+      const response = await fetch(
+       "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+      {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "test-default-key",
+       },
+       body: JSON.stringify({
+       message_text: message,
+       rewrite_style: selectedStyle,
+       session_id: getSessionId(),
+       user_id: null,
+       page_slug: window.location.pathname,
+        }),
+     }
+    );
+
+
+
 
       const rawText = await response.text();
       let data = {};
