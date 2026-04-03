@@ -398,41 +398,26 @@ https://trytonecheck.com`;
 
       setCopyState("");
 
-      const response = await fetch(
-        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "test-default-key",
-          },
-          body: JSON.stringify({
-            message_text: message,
-            rewrite_style: selectedStyle,
-            session_id: getTonecheckSessionId(),
-            user_id: null,
-            page_slug: window.location.pathname,
-          }),
-        }
-      );
+     const response = await fetch(
+  "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": "test-default-key",
+    },
+    body: JSON.stringify({
+      message_text: message,
+      rewrite_style: selectedStyle,
+      session_id: getSessionId(),
+      user_id: null,
+      page_slug: window.location.pathname,
+    }),
+  }
+);
 
-      const response = await fetch(
-       "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-      {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json",
-        "x-api-key": "test-default-key",
-       },
-       body: JSON.stringify({
-       message_text: message,
-       rewrite_style: selectedStyle,
-       session_id: getSessionId(),
-       user_id: null,
-       page_slug: window.location.pathname,
-        }),
-     }
-    );
+
+      
 
 
 
