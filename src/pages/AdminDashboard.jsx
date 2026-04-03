@@ -3,6 +3,15 @@ import React, { useEffect, useState } from "react";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
+function formatLabel(value) {
+  if (!value) return "-";
+
+  return String(value)
+    .replace(/_signal$/i, "")
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function Card({ title, value }) {
   return (
     <div
@@ -83,7 +92,9 @@ function TableBlock({ title, columns, rows, sortByCount = false }) {
                     fontWeight: col === "risk_level" ? 700 : 400,
                   }}
                 >
-                  {row[col] ?? ""}
+                  {col === "tone" || col === "hidden_signal" || col === "risk_level"
+  ? formatLabel(row[col])
+  : row[col] ?? ""}
                 </td>
               ))}
             </tr>
@@ -125,8 +136,10 @@ export default function AdminDashboard() {
     loadDashboard(days);
   }, [days]);
 
-  const topTone = data?.top_tones?.[0]?.tone || "-";
-  const topSignal = data?.top_hidden_signals?.[0]?.hidden_signal || "-";
+  const topTone = formatLabel(data?.top_tones?.[0]?.tone || "-");
+const topSignal = formatLabel(
+  data?.top_hidden_signals?.find((x) => x.hidden_signal !== "none")?.hidden_signal || "-"
+);
   const topPage =
     data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
   const rewriteRate =
