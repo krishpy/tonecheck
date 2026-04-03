@@ -3,6 +3,28 @@ import React, { useEffect, useState } from "react";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
+const topTone = data?.top_tones?.[0]?.tone || "-";
+const topSignal = data?.top_hidden_signals?.[0]?.hidden_signal || "-";
+const topPage = data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
+const rewriteRate =
+  data?.overview?.total_analyses
+    ? Math.round((data.overview.rewrites_shown / data.overview.total_analyses) * 100)
+    : 0;
+
+<div
+  style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+    gap: "16px",
+    marginBottom: "24px",
+  }}
+>
+  <Card title="Top Tone" value={topTone} />
+  <Card title="Top Hidden Signal" value={topSignal} />
+  <Card title="Top Page" value={topPage} />
+  <Card title="Rewrite Rate" value={`${rewriteRate}%`} />
+</div>
+
 function Card({ title, value }) {
   return (
     <div
@@ -228,7 +250,7 @@ export default function AdminDashboard() {
               <TableBlock
                 title="Page Breakdown"
                 columns={["page_slug", "total_analyses", "unique_visitors"]}
-                rows={data.page_slug_breakdown}
+                rows={(data.page_slug_breakdown || []).filter((row) => row.page_slug !== "unknown")}
               />
 
               <TableBlock
