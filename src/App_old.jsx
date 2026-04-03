@@ -19,15 +19,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function getTonecheckSessionId() {
-  let sessionId = localStorage.getItem("tonecheck_session_id");
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem("tonecheck_session_id", sessionId);
-  }
-  return sessionId;
-}
-
 function RedirectHome() {
   const navigate = useNavigate();
 
@@ -339,9 +330,9 @@ https://trytonecheck.com`;
   }
 
   function sendRewriteWhatsApp() {
-    if (!finalRewrite) return;
-    openShare(`https://wa.me/?text=${encodeURIComponent(finalRewrite)}`);
-  }
+  if (!finalRewrite) return;
+  openShare(`https://wa.me/?text=${encodeURIComponent(finalRewrite)}`);
+}
 
   function shareWhatsApp() {
     openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`);
@@ -397,9 +388,6 @@ https://trytonecheck.com`;
           body: JSON.stringify({
             message_text: message,
             rewrite_style: selectedStyle,
-            session_id: getTonecheckSessionId(),
-            user_id: null,
-            page_slug: window.location.pathname,
           }),
         }
       );
@@ -589,7 +577,7 @@ https://trytonecheck.com`;
         >
           <div>
             <HeroSection
-              location={location}
+             location={location}
               navigate={navigate}
               currentTool={currentTool}
               message={message}
@@ -684,6 +672,7 @@ export default function App() {
       <Route path="/desperate-text-checker" element={<AppContent />} />
       <Route path="/test-lab" element={<TestLab />} />
       <Route path="*" element={<RedirectHome />} />
+      
     </Routes>
   );
 }
