@@ -279,6 +279,22 @@ const topSignal = formatLabel(
                 columns={["day", "total", "rewrites_shown"]}
                 rows={data.rewrite_trend}
               />
+
+              <TableBlock
+                    title="Top Risk Messages"
+                    columns={[
+                        "id",
+                        "risk_score",
+                        "risk_level",
+                        "tone",
+                        "hidden_signal",
+                        "page_slug",
+                        "message_preview",
+                        "created_at",
+                    ]}
+                    rows={data.top_risk_messages}
+                    sortByCount={false}
+                    />
             </div>
           </>
         )}
