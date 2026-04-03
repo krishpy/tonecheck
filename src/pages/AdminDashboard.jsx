@@ -3,28 +3,6 @@ import React, { useEffect, useState } from "react";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
-const topTone = data?.top_tones?.[0]?.tone || "-";
-const topSignal = data?.top_hidden_signals?.[0]?.hidden_signal || "-";
-const topPage = data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
-const rewriteRate =
-  data?.overview?.total_analyses
-    ? Math.round((data.overview.rewrites_shown / data.overview.total_analyses) * 100)
-    : 0;
-
-<div
-  style={{
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-    gap: "16px",
-    marginBottom: "24px",
-  }}
->
-  <Card title="Top Tone" value={topTone} />
-  <Card title="Top Hidden Signal" value={topSignal} />
-  <Card title="Top Page" value={topPage} />
-  <Card title="Rewrite Rate" value={`${rewriteRate}%`} />
-</div>
-
 function Card({ title, value }) {
   return (
     <div
@@ -52,10 +30,10 @@ function getRiskColor(level) {
   return "#10b981";
 }
 
-function TableBlock({ title, columns, rows }) {
-  const sortedRows = [...(rows || [])].sort(
-    (a, b) => (b.count || 0) - (a.count || 0)
-  );
+function TableBlock({ title, columns, rows, sortByCount = false }) {
+  const finalRows = sortByCount
+    ? [...(rows || [])].sort((a, b) => (b.count || 0) - (a.count || 0))
+    : rows || [];
 
   return (
     <div
@@ -90,7 +68,7 @@ function TableBlock({ title, columns, rows }) {
         </thead>
 
         <tbody>
-          {sortedRows.map((row, index) => (
+          {finalRows.map((row, index) => (
             <tr key={index}>
               {columns.map((col) => (
                 <td
@@ -146,6 +124,15 @@ export default function AdminDashboard() {
   useEffect(() => {
     loadDashboard(days);
   }, [days]);
+
+  const topTone = data?.top_tones?.[0]?.tone || "-";
+  const topSignal = data?.top_hidden_signals?.[0]?.hidden_signal || "-";
+  const topPage =
+    data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
+  const rewriteRate =
+    data?.overview?.total_analyses
+      ? Math.round((data.overview.rewrites_shown / data.overview.total_analyses) * 100)
+      : 0;
 
   return (
     <div
@@ -213,6 +200,20 @@ export default function AdminDashboard() {
             <div
               style={{
                 display: "grid",
+                gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                gap: "16px",
+                marginBottom: "24px",
+              }}
+            >
+              <Card title="Top Tone" value={topTone} />
+              <Card title="Top Hidden Signal" value={topSignal} />
+              <Card title="Top Page" value={topPage} />
+              <Card title="Rewrite Rate" value={`${rewriteRate}%`} />
+            </div>
+
+            <div
+              style={{
+                display: "grid",
                 gridTemplateColumns: "1fr",
                 gap: "20px",
               }}
@@ -233,24 +234,29 @@ export default function AdminDashboard() {
                 title="Top Tones"
                 columns={["tone", "count"]}
                 rows={data.top_tones}
+                sortByCount={true}
               />
 
               <TableBlock
                 title="Top Hidden Signals"
                 columns={["hidden_signal", "count"]}
                 rows={data.top_hidden_signals}
+                sortByCount={true}
               />
 
               <TableBlock
                 title="Risk Distribution"
                 columns={["risk_level", "count"]}
                 rows={data.risk_distribution}
+                sortByCount={true}
               />
 
               <TableBlock
                 title="Page Breakdown"
                 columns={["page_slug", "total_analyses", "unique_visitors"]}
-                rows={(data.page_slug_breakdown || []).filter((row) => row.page_slug !== "unknown")}
+                rows={(data.page_slug_breakdown || []).filter(
+                  (row) => row.page_slug !== "unknown"
+                )}
               />
 
               <TableBlock
