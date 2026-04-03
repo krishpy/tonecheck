@@ -250,12 +250,14 @@ const topSignal = formatLabel(
                 sortByCount={true}
               />
 
-              <TableBlock
-                title="Top Hidden Signals"
-                columns={["hidden_signal", "count"]}
-                rows={data.top_hidden_signals}
-                sortByCount={true}
-              />
+             <TableBlock
+  title="Top Hidden Signals"
+  columns={["hidden_signal", "count"]}
+  rows={(data.top_hidden_signals || []).filter(
+    (row) => row.hidden_signal !== "none"
+  )}
+  sortByCount={true}
+/>
 
               <TableBlock
                 title="Risk Distribution"
