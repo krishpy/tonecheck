@@ -9,6 +9,7 @@ import SeoContentBlock from "./components/layout/SeoContentBlock";
 import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
 import TestLab from "./pages/TestLab";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -702,6 +703,7 @@ export default function App() {
       <Route path="/desperate-text-checker" element={<AppContent />} />
       <Route path="/test-lab" element={<TestLab />} />
       <Route path="*" element={<RedirectHome />} />
+      <Route path="/admin" element={<AdminDashboard />} />
     </Routes>
   );
 }
