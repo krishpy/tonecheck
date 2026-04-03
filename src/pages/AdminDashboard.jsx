@@ -92,7 +92,7 @@ function TableBlock({ title, columns, rows, sortByCount = false }) {
                     fontWeight: col === "risk_level" ? 700 : 400,
                   }}
                 >
-                  {col === "tone" || col === "hidden_signal" || col === "risk_level"
+  {col === "tone" || col === "hidden_signal" || col === "risk_level"
   ? formatLabel(row[col])
   : row[col] ?? ""}
                 </td>
@@ -251,13 +251,13 @@ const topSignal = formatLabel(
               />
 
              <TableBlock
-  title="Top Hidden Signals"
-  columns={["hidden_signal", "count"]}
-  rows={(data.top_hidden_signals || []).filter(
-    (row) => row.hidden_signal !== "none"
-  )}
-  sortByCount={true}
-/>
+                title="Top Hidden Signals"
+                columns={["hidden_signal", "count"]}
+                rows={(data.top_hidden_signals || []).filter(
+                    (row) => row.hidden_signal !== "none"
+                )}
+                sortByCount={true}
+                />
 
               <TableBlock
                 title="Risk Distribution"
