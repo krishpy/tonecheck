@@ -24,7 +24,17 @@ function Card({ title, value }) {
   );
 }
 
+function getRiskColor(level) {
+  if (level === "high" || level === "severe") return "#ef4444";
+  if (level === "medium") return "#f59e0b";
+  return "#10b981";
+}
+
 function TableBlock({ title, columns, rows }) {
+  const sortedRows = [...(rows || [])].sort(
+    (a, b) => (b.count || 0) - (a.count || 0)
+  );
+
   return (
     <div
       style={{
@@ -56,8 +66,9 @@ function TableBlock({ title, columns, rows }) {
             ))}
           </tr>
         </thead>
+
         <tbody>
-          {(rows || []).map((row, index) => (
+          {sortedRows.map((row, index) => (
             <tr key={index}>
               {columns.map((col) => (
                 <td
@@ -65,8 +76,11 @@ function TableBlock({ title, columns, rows }) {
                   style={{
                     padding: "10px 8px",
                     borderBottom: "1px solid #f3f4f6",
-                    color: "#111827",
-                    fontSize: "14px",
+                    color:
+                      col === "risk_level"
+                        ? getRiskColor(String(row[col] || "").toLowerCase())
+                        : "#111827",
+                    fontWeight: col === "risk_level" ? 700 : 400,
                   }}
                 >
                   {row[col] ?? ""}
