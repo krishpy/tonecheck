@@ -499,7 +499,12 @@ https://trytonecheck.com`;
   const replyLikelihood = Number(result?.reply_likelihood ?? 0);
   const manipulationRisk = Number(result?.manipulation_risk ?? 0);
   const toneTheme = getToneTheme();
-  const sendVerdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
+  const sendVerdict = getSendVerdict(
+  riskScore,
+  regretRisk,
+  manipulationRisk,
+  Number(result?.threat_score ?? 0)
+);
   const resultBadge = getResultBadge(result, riskImprovement);
 
   const pageStyle = {
