@@ -39,7 +39,14 @@ function getRiskColor(level) {
   return "#10b981";
 }
 
-function TableBlock({ title, columns, rows, sortByCount = false }) {
+function TableBlock({ 
+    title, 
+    columns, 
+    rows, 
+    sortByCount = false,
+    onRowClick = null,
+
+ }) {
   const finalRows = sortByCount
     ? [...(rows || [])].sort((a, b) => (b.count || 0) - (a.count || 0))
     : rows || [];
@@ -78,7 +85,13 @@ function TableBlock({ title, columns, rows, sortByCount = false }) {
 
         <tbody>
           {finalRows.map((row, index) => (
-            <tr key={index}>
+           <tr
+  key={index}
+  onClick={() => onRowClick && onRowClick(row)}
+  style={{
+    cursor: onRowClick ? "pointer" : "default",
+  }}
+>
               {columns.map((col) => (
                 <td
                   key={col}
@@ -115,6 +128,7 @@ export default function AdminDashboard() {
   const [data, setData] = useState(null);
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(true);
+  const [selectedRiskEvent, setSelectedRiskEvent] = useState(null);
 
   async function loadDashboard(selectedDays) {
     try {
@@ -294,6 +308,9 @@ const topSignal = formatLabel(
                     ]}
                     rows={data.top_risk_messages}
                     sortByCount={false}
+                    onRowClick={setSelectedRiskEvent}
+                    
+                    
                     />
             </div>
           </>
