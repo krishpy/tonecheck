@@ -1,3 +1,5 @@
+import { getSendVerdict } from "../utils/sendDecision";
+
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -80,10 +82,13 @@ const VERDICT_ALIASES = {
   review: [
     "review",
     "review before sending",
+    "check before sending",
     "send but refine it",
     "send — but refine it",
+    "careful",
+    "careful — may be misunderstood",
   ],
-  "do not send": ["do not send", "don't send"],
+  "do not send": ["do not send", "don't send", "better not send"],
 };
 
 function readTone(apiResult) {
@@ -131,13 +136,40 @@ function readReplyVibe(apiResult) {
   );
 }
 
-function readVerdict(apiResult) {
-  return normalizeLoose(
-    apiResult?.send_verdict ||
-      apiResult?.send_decision ||
-      apiResult?.decision ||
-      apiResult?.verdict
+function readConsumerVerdict(apiResult) {
+  const tone = readTone(apiResult);
+  const hidden = readHidden(apiResult);
+
+  const risk =
+    Number(apiResult?.communication_risk_score) ||
+    Number(apiResult?.risk_score) ||
+    Number(apiResult?.risk) ||
+    0;
+
+  const regret =
+    Number(apiResult?.regret_risk) ||
+    Number(apiResult?.regret_score) ||
+    0;
+
+  const manipulation =
+    Number(apiResult?.manipulation_risk) ||
+    Number(apiResult?.manipulation_score) ||
+    0;
+
+  const threat =
+    Number(apiResult?.threat_score) ||
+    0;
+
+  const derived = getSendVerdict(
+    risk,
+    regret,
+    manipulation,
+    threat,
+    tone,
+    hidden
   );
+
+  return normalizeLoose(derived?.label);
 }
 
 function hasRewrite(apiResult) {
@@ -256,7 +288,7 @@ function buildFailureHints({
       title: "Send verdict mismatch",
       expected: expectedVerdict || "not set",
       actual: actualVerdict || "none",
-      suggestion: "Check consumer decision mapping for passive, manipulative, and accusatory messages.",
+      suggestion: "Check ToneCheck consumer decision mapping.",
     });
   }
 
@@ -289,7 +321,7 @@ export function evaluateCase(testCase, apiResult) {
   const actualRegret = readRegretBand(apiResult);
   const actualPressure = readPressureBand(apiResult);
   const actualReply = readReplyVibe(apiResult);
-  const actualVerdict = readVerdict(apiResult);
+  const actualVerdict = readConsumerVerdict(apiResult);
   const actualRewrite = hasRewrite(apiResult);
   const actualAdvisory = hasAdvisory(apiResult);
 
