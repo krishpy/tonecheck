@@ -2,57 +2,173 @@ function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeLoose(value) {
+  return normalize(value)
+    .replace(/[_-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function isNoneLike(value) {
-  const v = normalize(value);
-  return v === "" || v === "none" || v === "null" || v === "undefined";
+  const v = normalizeLoose(value);
+  return (
+    v === "" ||
+    v === "none" ||
+    v === "null" ||
+    v === "undefined" ||
+    v === "none detected" ||
+    v === "nothing tricky detected"
+  );
 }
 
 const TONE_ALIASES = {
+  calm: ["calm", "neutral", "polite"],
+  neutral: ["neutral", "calm", "polite", "direct"],
+  polite: ["polite", "neutral", "calm"],
+  direct: ["direct", "neutral"],
+  tense: ["tense", "frustrated", "firm", "aggressive"],
+  frustrated: ["frustrated", "tense", "aggressive"],
+  aggressive: ["aggressive", "frustrated", "tense"],
   passive: ["passive", "passive aggressive"],
-  "passive aggressive": ["passive", "passive aggressive"],
+  "passive aggressive": ["passive aggressive", "passive"],
   threat: ["threat", "threatening"],
-  threatening: ["threat", "threatening"],
+  threatening: ["threatening", "threat"],
 };
 
 const HIDDEN_ALIASES = {
-  passive: ["passive", "passive_aggression_signal"],
-  guilt: ["guilt", "guilt_tripping", "guilt_trip_signal"],
-  emotional: ["emotional", "emotional_leverage"],
+  none: ["none", "none detected", "nothing tricky detected"],
+  passive: ["passive", "passive aggression", "passive aggression signal"],
+  guilt: ["guilt", "guilt tripping", "guilt trip", "guilt trip signal"],
+  emotional: ["emotional", "emotional pressure", "emotional leverage"],
+  pressure: ["pressure", "emotional pressure"],
 };
 
-function includesExpectedTone(expected, actual) {
-  const e = normalize(expected);
-  const a = normalize(actual);
+const BAND_ALIASES = {
+  low: ["low"],
+  medium: ["medium", "med"],
+  high: ["high"],
+  poor: ["poor", "low"],
+  mixed: ["mixed", "medium"],
+  good: ["good", "high"],
+};
+
+const VERDICT_ALIASES = {
+  send: ["send", "safe to send", "send as is"],
+  review: ["review", "review before sending", "send but refine it", "send — but refine it"],
+  "do not send": ["do not send", "don't send"],
+};
+
+function readTone(apiResult) {
+  return normalizeLoose(
+    apiResult?.tone ||
+      apiResult?.tone_label ||
+      apiResult?.label ||
+      apiResult?.detected_tone
+  );
+}
+
+function readHidden(apiResult) {
+  return normalizeLoose(
+    apiResult?.primary_hidden_signal ||
+      apiResult?.hidden_signal ||
+      apiResult?.hidden_signal_label ||
+      apiResult?.what_could_happen?.hidden_signal
+  );
+}
+
+function readRegretBand(apiResult) {
+  return normalizeLoose(
+    apiResult?.chance_of_regret ||
+      apiResult?.regret_band ||
+      apiResult?.regret_risk_label ||
+      apiResult?.regret_level
+  );
+}
+
+function readPressureBand(apiResult) {
+  return normalizeLoose(
+    apiResult?.emotional_pressure ||
+      apiResult?.emotional_pressure_band ||
+      apiResult?.pressure_label ||
+      apiResult?.manipulation_band
+  );
+}
+
+function readReplyVibe(apiResult) {
+  return normalizeLoose(
+    apiResult?.reply_vibe ||
+      apiResult?.reply_likelihood_band ||
+      apiResult?.reply_likelihood_label ||
+      apiResult?.reply_outlook
+  );
+}
+
+function readVerdict(apiResult) {
+  return normalizeLoose(
+    apiResult?.send_verdict ||
+      apiResult?.send_decision ||
+      apiResult?.decision ||
+      apiResult?.verdict
+  );
+}
+
+function hasRewrite(apiResult) {
+  return Boolean(
+    normalize(apiResult?.rewritten_text) ||
+      normalize(apiResult?.rewrite_suggestion) ||
+      normalize(apiResult?.rewrite)
+  );
+}
+
+function hasAdvisory(apiResult) {
+  return Boolean(normalize(apiResult?.advisory));
+}
+
+function matchExpected(expected, actual, aliases = {}) {
+  const e = normalizeLoose(expected);
+  const a = normalizeLoose(actual);
 
   if (!e && !a) return true;
   if (e === a) return true;
-  if (TONE_ALIASES[e]?.includes(a)) return true;
+  if (e === "none") return isNoneLike(a);
+  if (aliases[e]?.includes(a)) return true;
 
   return false;
 }
 
-function includesExpectedHidden(expected, actual) {
-  const e = normalize(expected);
-  const a = normalize(actual);
-
-  if (e === "none") return isNoneLike(a);
-  if (e === a) return true;
-  if (HIDDEN_ALIASES[e]?.includes(a)) return true;
-
-  return false;
+function parseBooleanExpected(value) {
+  const v = normalizeLoose(value);
+  if (!v) return null;
+  if (["yes", "true", "1", "y"].includes(v)) return true;
+  if (["no", "false", "0", "n"].includes(v)) return false;
+  return null;
 }
 
 function buildFailureHints({
+  tonePass,
+  hiddenPass,
+  regretPass,
+  pressurePass,
+  replyPass,
+  verdictPass,
+  rewritePass,
+  advisoryPass,
   expectedTone,
   actualTone,
   expectedHidden,
   actualHidden,
-  expectedRiskMin,
-  expectedRiskMax,
-  actualRisk,
-  tonePass,
-  hiddenPass,
-  riskPass,
+  expectedRegret,
+  actualRegret,
+  expectedPressure,
+  actualPressure,
+  expectedReply,
+  actualReply,
+  expectedVerdict,
+  actualVerdict,
+  expectedRewrite,
+  actualRewrite,
+  expectedAdvisory,
+  actualAdvisory,
 }) {
   const hints = [];
 
@@ -60,10 +176,9 @@ function buildFailureHints({
     hints.push({
       type: "tone",
       title: "Tone mismatch",
-      expected: expectedTone,
+      expected: expectedTone || "not set",
       actual: actualTone || "none",
-      suggestion:
-        "Check tone thresholds, late tone overrides, or phrase-level tone mapping.",
+      suggestion: "Check final tone label mapping used by ToneCheck UI.",
     });
   }
 
@@ -71,87 +186,171 @@ function buildFailureHints({
     hints.push({
       type: "hidden",
       title: "Hidden signal mismatch",
-      expected: expectedHidden,
+      expected: expectedHidden || "not set",
       actual: actualHidden || "none",
-      suggestion:
-        "Check hidden-signal resolver order, phrase overrides, or missing signal patterns.",
+      suggestion: "Check hidden-signal resolver and consumer-facing label mapping.",
     });
   }
 
-  if (!riskPass) {
-    const actualNum = Number(actualRisk || 0);
-    const min = Number(expectedRiskMin || 0);
-    const max = Number(expectedRiskMax || 0);
-
-    let suggestion =
-      "Check final risk aggregation and clamp logic.";
-
-    if (actualNum > max) {
-      suggestion =
-        "Risk is too high. Check safe clamp, aggression inflation, or late risk overrides.";
-    } else if (actualNum < min) {
-      suggestion =
-        "Risk is too low. Check missing signal boosts, threat/insult/pressure floors, or phrase overrides.";
-    }
-
+  if (!regretPass) {
     hints.push({
-      type: "risk",
-      title: "Risk out of range",
-      expected: `${min}–${max}`,
-      actual: String(actualNum),
-      suggestion,
+      type: "regret",
+      title: "Chance of regret mismatch",
+      expected: expectedRegret || "not set",
+      actual: actualRegret || "none",
+      suggestion: "Check regret band mapping shown in the UI chip.",
+    });
+  }
+
+  if (!pressurePass) {
+    hints.push({
+      type: "pressure",
+      title: "Emotional pressure mismatch",
+      expected: expectedPressure || "not set",
+      actual: actualPressure || "none",
+      suggestion: "Check emotional-pressure chip mapping and fallback label source.",
+    });
+  }
+
+  if (!replyPass) {
+    hints.push({
+      type: "reply",
+      title: "Reply vibe mismatch",
+      expected: expectedReply || "not set",
+      actual: actualReply || "none",
+      suggestion: "Check reply vibe / reply likelihood band mapping.",
+    });
+  }
+
+  if (!verdictPass) {
+    hints.push({
+      type: "verdict",
+      title: "Send verdict mismatch",
+      expected: expectedVerdict || "not set",
+      actual: actualVerdict || "none",
+      suggestion: "Check ToneCheck decision mapping, not API risk score mapping.",
+    });
+  }
+
+  if (!rewritePass) {
+    hints.push({
+      type: "rewrite",
+      title: "Rewrite presence mismatch",
+      expected: String(expectedRewrite),
+      actual: String(actualRewrite),
+      suggestion: "Check rewrite generation and frontend fallback field order.",
+    });
+  }
+
+  if (!advisoryPass) {
+    hints.push({
+      type: "advisory",
+      title: "Advisory presence mismatch",
+      expected: String(expectedAdvisory),
+      actual: String(actualAdvisory),
+      suggestion: "Check advisory generation and consumer response mapping.",
     });
   }
 
   return hints;
 }
 
-export function displayHiddenSignal(signal) {
-  if (!signal || signal === "none") return "Nothing tricky detected";
-  return signal
-    .replace(/_signal$/i, "")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 export function evaluateCase(testCase, apiResult) {
-  const actualTone = normalize(apiResult?.tone || apiResult?.label);
-  const actualHidden = normalize(apiResult?.primary_hidden_signal);
-  const actualRisk = Number(apiResult?.communication_risk_score ?? 0);
+  const actualTone = readTone(apiResult);
+  const actualHidden = readHidden(apiResult);
+  const actualRegret = readRegretBand(apiResult);
+  const actualPressure = readPressureBand(apiResult);
+  const actualReply = readReplyVibe(apiResult);
+  const actualVerdict = readVerdict(apiResult);
+  const actualRewrite = hasRewrite(apiResult);
+  const actualAdvisory = hasAdvisory(apiResult);
 
-  const tonePass = includesExpectedTone(testCase.expected_tone, actualTone);
-  const hiddenPass = includesExpectedHidden(
+  const expectedRewrite = parseBooleanExpected(testCase.expected_rewrite_present);
+  const expectedAdvisory = parseBooleanExpected(testCase.expected_advisory_present);
+
+  const tonePass = matchExpected(testCase.expected_tone, actualTone, TONE_ALIASES);
+  const hiddenPass = matchExpected(
     testCase.expected_hidden_signal,
-    actualHidden
+    actualHidden,
+    HIDDEN_ALIASES
   );
-  const riskPass =
-    actualRisk >= Number(testCase.expected_risk_min) &&
-    actualRisk <= Number(testCase.expected_risk_max);
+  const regretPass = !normalize(testCase.expected_regret_band)
+    ? true
+    : matchExpected(testCase.expected_regret_band, actualRegret, BAND_ALIASES);
+  const pressurePass = !normalize(testCase.expected_emotional_pressure_band)
+    ? true
+    : matchExpected(
+        testCase.expected_emotional_pressure_band,
+        actualPressure,
+        BAND_ALIASES
+      );
+  const replyPass = !normalize(testCase.expected_reply_vibe)
+    ? true
+    : matchExpected(testCase.expected_reply_vibe, actualReply, BAND_ALIASES);
+  const verdictPass = !normalize(testCase.expected_send_verdict)
+    ? true
+    : matchExpected(testCase.expected_send_verdict, actualVerdict, VERDICT_ALIASES);
+  const rewritePass =
+    expectedRewrite === null ? true : expectedRewrite === actualRewrite;
+  const advisoryPass =
+    expectedAdvisory === null ? true : expectedAdvisory === actualAdvisory;
 
   const mismatchReasons = [];
   if (!tonePass) mismatchReasons.push("tone mismatch");
   if (!hiddenPass) mismatchReasons.push("hidden signal mismatch");
-  if (!riskPass) mismatchReasons.push("risk out of range");
+  if (!regretPass) mismatchReasons.push("chance of regret mismatch");
+  if (!pressurePass) mismatchReasons.push("emotional pressure mismatch");
+  if (!replyPass) mismatchReasons.push("reply vibe mismatch");
+  if (!verdictPass) mismatchReasons.push("send verdict mismatch");
+  if (!rewritePass) mismatchReasons.push("rewrite presence mismatch");
+  if (!advisoryPass) mismatchReasons.push("advisory presence mismatch");
 
   const failureHints = buildFailureHints({
+    tonePass,
+    hiddenPass,
+    regretPass,
+    pressurePass,
+    replyPass,
+    verdictPass,
+    rewritePass,
+    advisoryPass,
     expectedTone: testCase.expected_tone,
     actualTone,
     expectedHidden: testCase.expected_hidden_signal,
     actualHidden,
-    expectedRiskMin: testCase.expected_risk_min,
-    expectedRiskMax: testCase.expected_risk_max,
-    actualRisk,
-    tonePass,
-    hiddenPass,
-    riskPass,
+    expectedRegret: testCase.expected_regret_band,
+    actualRegret,
+    expectedPressure: testCase.expected_emotional_pressure_band,
+    actualPressure,
+    expectedReply: testCase.expected_reply_vibe,
+    actualReply,
+    expectedVerdict: testCase.expected_send_verdict,
+    actualVerdict,
+    expectedRewrite,
+    actualRewrite,
+    expectedAdvisory,
+    actualAdvisory,
   });
 
   return {
-    pass: tonePass && hiddenPass && riskPass,
+    pass:
+      tonePass &&
+      hiddenPass &&
+      regretPass &&
+      pressurePass &&
+      replyPass &&
+      verdictPass &&
+      rewritePass &&
+      advisoryPass,
     status: "DONE",
     actualTone,
     actualHidden,
-    actualRisk,
+    actualRegret,
+    actualPressure,
+    actualReply,
+    actualVerdict,
+    actualRewrite,
+    actualAdvisory,
     mismatchReasons,
     failureHints,
   };

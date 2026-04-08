@@ -216,6 +216,19 @@ function topModelVersion(rows) {
   return versions[0] || "—";
 }
 
+function chipStyle(value) {
+  return {
+    display: "inline-flex",
+    alignItems: "center",
+    padding: "7px 10px",
+    borderRadius: 999,
+    border: "1px solid rgba(255,255,255,0.10)",
+    background: "rgba(255,255,255,0.05)",
+    fontSize: 13,
+    fontWeight: 700,
+  };
+}
+
 export default function TestLab() {
   const [testCases, setTestCases] = useState(DEFAULT_TEST_CASES);
   const [rows, setRows] = useState([]);
@@ -265,7 +278,12 @@ export default function TestLab() {
             status: "ERROR",
             actualTone: "",
             actualHidden: "",
-            actualRisk: 0,
+            actualRegret: "",
+            actualPressure: "",
+            actualReply: "",
+            actualVerdict: "",
+            actualRewrite: false,
+            actualAdvisory: false,
             mismatchReasons: [err?.message || "Request failed"],
             failureHints: [
               {
@@ -323,7 +341,12 @@ export default function TestLab() {
                     status: "ERROR",
                     actualTone: "",
                     actualHidden: "",
-                    actualRisk: 0,
+                    actualRegret: "",
+                    actualPressure: "",
+                    actualReply: "",
+                    actualVerdict: "",
+                    actualRewrite: false,
+                    actualAdvisory: false,
                     mismatchReasons: [latestRow.error || "no result"],
                     failureHints: [
                       {
@@ -416,12 +439,22 @@ export default function TestLab() {
         return [
           `${row.id} · ${row.category}`,
           row.input,
-          `Expected tone: ${row.expected_tone}`,
+          `Expected tone: ${row.expected_tone || "-"}`,
           `Actual tone: ${e.actualTone || "-"}`,
-          `Expected hidden: ${row.expected_hidden_signal}`,
+          `Expected hidden: ${row.expected_hidden_signal || "-"}`,
           `Actual hidden: ${e.actualHidden || "-"}`,
-          `Expected risk: ${row.expected_risk_min}–${row.expected_risk_max}`,
-          `Actual risk: ${e.actualRisk ?? "-"}`,
+          `Expected regret: ${row.expected_regret_band || "-"}`,
+          `Actual regret: ${e.actualRegret || "-"}`,
+          `Expected pressure: ${row.expected_emotional_pressure_band || "-"}`,
+          `Actual pressure: ${e.actualPressure || "-"}`,
+          `Expected reply vibe: ${row.expected_reply_vibe || "-"}`,
+          `Actual reply vibe: ${e.actualReply || "-"}`,
+          `Expected verdict: ${row.expected_send_verdict || "-"}`,
+          `Actual verdict: ${e.actualVerdict || "-"}`,
+          `Expected rewrite present: ${row.expected_rewrite_present || "-"}`,
+          `Actual rewrite present: ${String(e.actualRewrite)}`,
+          `Expected advisory present: ${row.expected_advisory_present || "-"}`,
+          `Actual advisory present: ${String(e.actualAdvisory)}`,
           `Issues: ${(e.mismatchReasons || []).join(", ")}`,
         ].join("\n");
       })
@@ -477,6 +510,10 @@ export default function TestLab() {
         String(row.input || "").toLowerCase().includes(q) ||
         String(row.evaluation?.actualTone || "").toLowerCase().includes(q) ||
         String(row.evaluation?.actualHidden || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualRegret || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualPressure || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualReply || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualVerdict || "").toLowerCase().includes(q) ||
         String(row.evaluation?.mismatchReasons || [])
           .join(" ")
           .toLowerCase()
@@ -508,20 +545,20 @@ export default function TestLab() {
           }}
         >
           <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 8 }}>
-            Internal QA
+            ToneCheck Consumer QA
           </div>
-          <h1 style={{ margin: 0, fontSize: 34 }}>Production Test Lab</h1>
+          <h1 style={{ margin: 0, fontSize: 34 }}>ToneCheck Test Lab</h1>
           <p
             style={{
               marginTop: 10,
               opacity: 0.8,
-              maxWidth: 900,
+              maxWidth: 940,
               lineHeight: 1.5,
             }}
           >
-            Upload a CSV or use the built-in set, run it against the live
-            CommIntel endpoint, and see exactly which case is running, where the
-            failures cluster, and what changed.
+            This lab validates the consumer-facing output only: tone, hidden
+            signal, chance of regret, emotional pressure, reply vibe, send
+            verdict, advisory, and rewrite presence. No risk score checks here.
           </p>
 
           <div
@@ -644,6 +681,27 @@ export default function TestLab() {
             {topModelVersion(rows)}
           </div>
 
+          <div
+            style={{
+              marginTop: 12,
+              padding: 12,
+              borderRadius: 12,
+              background: "rgba(93,214,255,0.08)",
+              border: "1px solid rgba(93,214,255,0.22)",
+              fontSize: 13,
+              lineHeight: 1.5,
+            }}
+          >
+            CSV columns for this lab:
+            <br />
+            <strong>
+              id, category, input, expected_tone, expected_hidden_signal,
+              expected_regret_band, expected_emotional_pressure_band,
+              expected_reply_vibe, expected_send_verdict,
+              expected_rewrite_present, expected_advisory_present, notes
+            </strong>
+          </div>
+
           {running ? (
             <div style={{ marginTop: 16, display: "grid", gap: 10 }}>
               <ProgressBar done={progress.done} total={progress.total} />
@@ -696,13 +754,13 @@ export default function TestLab() {
           <StatCard
             label="Passed"
             value={stats.passed}
-            subtitle="Green cases"
+            subtitle="Matches consumer output"
             tone="good"
           />
           <StatCard
             label="Failed"
             value={stats.failed}
-            subtitle="Needs tuning"
+            subtitle="UI mismatch"
             tone="bad"
           />
           <StatCard
@@ -714,7 +772,7 @@ export default function TestLab() {
           <StatCard
             label="Pass Rate"
             value={`${stats.passRate}%`}
-            subtitle="Overall score"
+            subtitle="Consumer QA score"
           />
           <StatCard
             label="Top mismatch"
@@ -753,7 +811,7 @@ export default function TestLab() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by id, category, tone, hidden signal, mismatch, or text"
+            placeholder="Search by id, category, tone, hidden signal, regret, pressure, reply vibe, verdict, or text"
             style={{
               width: "100%",
               padding: "12px 14px",
@@ -834,30 +892,101 @@ export default function TestLab() {
                   <div
                     style={{
                       marginTop: 14,
+                      display: "flex",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <span style={chipStyle()}>
+                      Tone: {e.actualTone || "—"}
+                    </span>
+                    <span style={chipStyle()}>
+                      Hidden: {e.actualHidden || "—"}
+                    </span>
+                    <span style={chipStyle()}>
+                      Regret: {e.actualRegret || "—"}
+                    </span>
+                    <span style={chipStyle()}>
+                      Pressure: {e.actualPressure || "—"}
+                    </span>
+                    <span style={chipStyle()}>
+                      Reply vibe: {e.actualReply || "—"}
+                    </span>
+                    <span style={chipStyle()}>
+                      Verdict: {e.actualVerdict || "—"}
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: 14,
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                       gap: 10,
                       fontSize: 14,
                       opacity: 0.92,
                     }}
                   >
                     <div>
-                      <strong>Expected tone:</strong> {row.expected_tone}
+                      <strong>Expected tone:</strong> {row.expected_tone || "-"}
                     </div>
                     <div>
                       <strong>Actual tone:</strong> {e.actualTone || "-"}
                     </div>
                     <div>
-                      <strong>Expected hidden:</strong> {row.expected_hidden_signal}
+                      <strong>Expected hidden:</strong>{" "}
+                      {row.expected_hidden_signal || "-"}
                     </div>
                     <div>
                       <strong>Actual hidden:</strong> {e.actualHidden || "-"}
                     </div>
                     <div>
-                      <strong>Expected risk:</strong> {row.expected_risk_min}–{row.expected_risk_max}
+                      <strong>Expected regret:</strong>{" "}
+                      {row.expected_regret_band || "-"}
                     </div>
                     <div>
-                      <strong>Actual risk:</strong> {e.actualRisk ?? "-"}
+                      <strong>Actual regret:</strong> {e.actualRegret || "-"}
+                    </div>
+                    <div>
+                      <strong>Expected pressure:</strong>{" "}
+                      {row.expected_emotional_pressure_band || "-"}
+                    </div>
+                    <div>
+                      <strong>Actual pressure:</strong> {e.actualPressure || "-"}
+                    </div>
+                    <div>
+                      <strong>Expected reply vibe:</strong>{" "}
+                      {row.expected_reply_vibe || "-"}
+                    </div>
+                    <div>
+                      <strong>Actual reply vibe:</strong> {e.actualReply || "-"}
+                    </div>
+                    <div>
+                      <strong>Expected verdict:</strong>{" "}
+                      {row.expected_send_verdict || "-"}
+                    </div>
+                    <div>
+                      <strong>Actual verdict:</strong> {e.actualVerdict || "-"}
+                    </div>
+                    <div>
+                      <strong>Expected rewrite:</strong>{" "}
+                      {row.expected_rewrite_present || "-"}
+                    </div>
+                    <div>
+                      <strong>Actual rewrite:</strong>{" "}
+                      {typeof e.actualRewrite === "boolean"
+                        ? String(e.actualRewrite)
+                        : "-"}
+                    </div>
+                    <div>
+                      <strong>Expected advisory:</strong>{" "}
+                      {row.expected_advisory_present || "-"}
+                    </div>
+                    <div>
+                      <strong>Actual advisory:</strong>{" "}
+                      {typeof e.actualAdvisory === "boolean"
+                        ? String(e.actualAdvisory)
+                        : "-"}
                     </div>
                   </div>
 
@@ -973,12 +1102,6 @@ export default function TestLab() {
                         </div>
                       ) : null}
 
-                      {row.apiResult?.risk_level ? (
-                        <div>
-                          <strong>Risk level:</strong> {row.apiResult.risk_level}
-                        </div>
-                      ) : null}
-
                       {row.apiResult?.policy_profile ? (
                         <div>
                           <strong>Policy profile:</strong> {row.apiResult.policy_profile}
@@ -1005,8 +1128,8 @@ export default function TestLab() {
                   opacity: 0.75,
                 }}
               >
-                Click <strong>Run All Tests</strong> to validate the engine, or
-                upload a CSV first.
+                Click <strong>Run All Tests</strong> to validate ToneCheck
+                consumer output, or upload a CSV first.
               </div>
             ) : null}
           </div>
