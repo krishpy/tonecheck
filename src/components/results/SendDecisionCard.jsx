@@ -4,6 +4,7 @@ function getReadableSignal(signal) {
   const map = {
     polite_request_signal: "a polite ask",
     accusatory_pressure_signal: "blame or pressure",
+    accusation_signal: "blame or pressure",
     pressure_signal: "urgency or pressure",
     passive_aggression_signal: "passive aggression",
     hostility_signal: "hostility",
@@ -30,13 +31,13 @@ function getVerdictTheme(toneClass) {
     };
   }
 
-  if (toneClass === "maybe") {
+  if (toneClass === "neutral" || toneClass === "warning") {
     return {
       bg: "linear-gradient(135deg, rgba(254,249,195,0.96), rgba(255,251,235,0.94))",
       border: "1px solid rgba(245,158,11,0.28)",
       pillBg: "rgba(245,158,11,0.16)",
       pillText: "#b45309",
-      title: "Pause and rethink",
+      title: "Review before sending",
       shadow: "0 12px 30px rgba(245,158,11,0.10)",
     };
   }
@@ -71,12 +72,20 @@ export default function SendDecisionCard({
   riskScore = 0,
   regretRisk = 0,
   manipulationRisk = 0,
+  threatScore = 0,
   tone = "",
   hiddenSignal = "",
 }) {
-  const verdict = getSendVerdict(riskScore, regretRisk, manipulationRisk);
-  const decisionTheme = getDecisionTheme(sendVerdict.toneClass);
-  const theme = getVerdictTheme(verdict.toneClass);
+  const verdict = getSendVerdict(
+    riskScore,
+    regretRisk,
+    manipulationRisk,
+    threatScore,
+    tone,
+    hiddenSignal
+  );
+
+  const theme = getVerdictTheme(verdict.tone);
   const regretLabel = getLevelLabel(regretRisk);
 
   return (
@@ -176,7 +185,7 @@ export default function SendDecisionCard({
               maxWidth: "760px",
             }}
           >
-            {verdict.reason}
+            {verdict.sublabel}
           </div>
         </div>
 

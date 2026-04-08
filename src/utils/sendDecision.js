@@ -1,10 +1,55 @@
-export function getSendVerdict(risk, regret, manipulation, threat = 0) {
-  const riskScore = Number(risk || 0);
-  const regretScore = Number(regret || 0);
-  const manipulationScore = Number(manipulation || 0);
-  const threatScore = Number(threat || 0);
+function normalize(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function toNumber(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
+export function getSendVerdict(
+  risk,
+  regret,
+  manipulation,
+  threat = 0,
+  tone = "",
+  hiddenSignal = ""
+) {
+  const riskScore = toNumber(risk);
+  const regretScore = toNumber(regret);
+  const manipulationScore = toNumber(manipulation);
+  const threatScore = toNumber(threat);
+
+  const toneLabel = normalize(tone);
+  const hidden = normalize(hiddenSignal);
 
   const combined = riskScore + regretScore * 0.3 + manipulationScore * 0.3;
+
+  const isPassiveAggressive =
+    toneLabel === "passive aggressive" ||
+    toneLabel === "passive" ||
+    hidden === "passive aggression" ||
+    hidden === "passive_aggression_signal";
+
+  const isAccusatory =
+    toneLabel === "accusatory" ||
+    hidden === "accusation signal" ||
+    hidden === "accusation_signal" ||
+    hidden === "accusatory pressure signal" ||
+    hidden === "accusatory_pressure_signal";
+
+  const isManipulative =
+    toneLabel === "manipulative" ||
+    hidden === "guilt tripping" ||
+    hidden === "guilt trip signal" ||
+    hidden === "guilt_trip_signal" ||
+    hidden === "emotional leverage" ||
+    hidden === "emotional_leverage";
+
+  const isTense =
+    toneLabel === "tense" ||
+    toneLabel === "frustrated" ||
+    toneLabel === "aggressive";
 
   // 🚫 DIRECT THREAT / SEVERE
   if (threatScore >= 70 || riskScore >= 85) {
@@ -13,6 +58,17 @@ export function getSendVerdict(risk, regret, manipulation, threat = 0) {
       sublabel: "Threat or severe escalation detected",
       emoji: "🚫",
       tone: "danger",
+    };
+  }
+
+  // ⚠️ CONSUMER-SPECIFIC REVIEW RULES
+  // These are important for ToneCheck even when raw risk is not high enough.
+  if (isPassiveAggressive || isAccusatory || isManipulative) {
+    return {
+      label: "Review Before Sending",
+      sublabel: "Could trigger defensiveness or confusion",
+      emoji: "⚠️",
+      tone: "warning",
     };
   }
 
@@ -26,8 +82,8 @@ export function getSendVerdict(risk, regret, manipulation, threat = 0) {
     };
   }
 
-  // 🤔 MEDIUM RISK
-  if (combined >= 40) {
+  // 🤔 MEDIUM RISK / TENSE DELIVERY
+  if (combined >= 40 || isTense) {
     return {
       label: "Send — but refine it",
       sublabel: "Could be misunderstood",
