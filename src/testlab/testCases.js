@@ -32,7 +32,7 @@ export const DEFAULT_TEST_CASES = [
     category: "passive_aggressive",
     input: "Fine. Do whatever you want.",
     expected_tone: "passive aggressive",
-    expected_hidden_signal: "passive",
+    expected_hidden_signal: "passive aggression",
     expected_regret_band: "medium",
     expected_emotional_pressure_band: "medium",
     expected_reply_vibe: "poor",
