@@ -19,6 +19,15 @@ function verdictFromApiValue(sendVerdict) {
     };
   }
 
+  if (v === "rethink" || v === "rethink_before_sending") {
+    return {
+      label: "Rethink Before Sending",
+      sublabel: "This may create emotional pressure or damage trust",
+      emoji: "⚠️",
+      tone: "danger",
+    };
+  }
+
   if (v === "review" || v === "review_before_sending") {
     return {
       label: "Careful — may be misunderstood",
@@ -119,7 +128,7 @@ function inferVerdictFromSignals(
       tone: "warning",
     };
   }
-  
+
   if (combined >= 65 || riskScore >= 50) {
     return {
       label: "Careful — may be misunderstood",
