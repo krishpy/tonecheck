@@ -184,17 +184,26 @@ function getDecisionTheme(toneClass) {
 
 
 
-const verdict = getSendVerdict({
-  sendVerdict: result?.send_verdict,
-  risk: result?.communication_risk_score,
-  regret: result?.regret_risk,
-  manipulation: result?.manipulation_risk,
-  threat: result?.threat_score,
-  tone: result?.tone,
-  hiddenSignal: result?.primary_hidden_signal,
-  replyVibe: result?.reply_vibe,
-});
+const effectiveResult = result || {
+  communication_risk_score: riskScore,
+  regret_risk: regretRisk,
+  manipulation_risk: manipulationRisk,
+  threat_score: threatScore,
+  tone,
+  primary_hidden_signal: hiddenSignal,
+  reply_vibe: replyVibe,
+};
 
+const verdict = getSendVerdict({
+  sendVerdict: effectiveResult?.send_verdict,
+  risk: effectiveResult?.communication_risk_score,
+  regret: effectiveResult?.regret_risk,
+  manipulation: effectiveResult?.manipulation_risk,
+  threat: effectiveResult?.threat_score,
+  tone: effectiveResult?.tone,
+  hiddenSignal: effectiveResult?.primary_hidden_signal,
+  replyVibe: effectiveResult?.reply_vibe,
+});
 const theme = getDecisionTheme(verdict.tone);
 
 function getReadableSignal(signal) {
