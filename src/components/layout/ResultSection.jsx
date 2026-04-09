@@ -5,12 +5,53 @@ import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 
 function buildSendVerdict(result) {
+  const apiVerdict = String(result?.send_verdict || "").toLowerCase().trim();
   const risk = Number(result?.communication_risk_score || 0);
-  const hidden = String(result?.hidden_signal || result?.primary_hidden_signal || "").toLowerCase();
+  const hidden = String(
+    result?.hidden_signal || result?.primary_hidden_signal || ""
+  ).toLowerCase();
   const tone = String(result?.tone || "").toLowerCase();
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
+  // First trust backend verdict
+  if (apiVerdict === "do_not_send") {
+    return {
+      tone: "danger",
+      emoji: "🚫",
+      label: "Do Not Send",
+      reason: "This may escalate badly.",
+    };
+  }
+
+  if (apiVerdict === "rethink") {
+    return {
+      tone: "danger",
+      emoji: "⚠️",
+      label: "Rethink Before Sending",
+      reason: "This may create emotional pressure or damage trust.",
+    };
+  }
+
+  if (apiVerdict === "review" || apiVerdict === "review_before_sending") {
+    return {
+      tone: "neutral",
+      emoji: "🤔",
+      label: "Careful — may be misunderstood",
+      reason: "Your intent may land more sharply than you mean.",
+    };
+  }
+
+  if (apiVerdict === "send" || apiVerdict === "safe_to_send") {
+    return {
+      tone: "safe",
+      emoji: "✅",
+      label: "Looks good to send",
+      reason: "This message looks safe and unlikely to create tension.",
+    };
+  }
+
+  // Fallback logic only if backend verdict is missing
   if (risk <= 20 && isSafeHidden) {
     return {
       tone: "safe",
@@ -48,7 +89,8 @@ function buildSendVerdict(result) {
     hidden.includes("pressure") ||
     hidden.includes("guilt") ||
     hidden.includes("blame") ||
-    hidden.includes("accus")
+    hidden.includes("accus") ||
+    tone.includes("manipulative")
   ) {
     return {
       tone: "neutral",
@@ -77,12 +119,38 @@ function buildSendVerdict(result) {
 
 function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
+  const verdictLabel = String(sendVerdict?.label || "").toLowerCase();
 
-  if (riskScore <= 20 && ["", "none", "none detected"].includes(hidden)) {
+  if (verdictLabel.includes("safe")) {
     return {
       title: "Safe to send",
       sublabel: "Clear and unlikely to cause issues.",
       tip: "You can send this as-is.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  if (verdictLabel.includes("rethink")) {
+    return {
+      title: "Rethink before sending",
+      sublabel: "This may create emotional pressure or damage trust.",
+      tip: "Step back and send the calmer version below instead.",
+      chipLabel: hiddenSignalLabel,
+    };
+  }
+
+  if (
+    verdictLabel.includes("careful") ||
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt") ||
+    hidden.includes("blame") ||
+    hidden.includes("accus")
+  ) {
+    return {
+      title: "Careful — may be misunderstood",
+      sublabel: "Your intent may land as pressure or blame.",
+      tip: "Make the message clearer and more direct before sending.",
       chipLabel: hiddenSignalLabel,
     };
   }
@@ -98,21 +166,6 @@ function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
       title: "Risky — rethink before sending",
       sublabel: "This can trigger defensiveness fast.",
       tip: "Strip out harsh wording and send the calmer version below.",
-      chipLabel: hiddenSignalLabel,
-    };
-  }
-
-  if (
-    hidden.includes("passive") ||
-    hidden.includes("pressure") ||
-    hidden.includes("guilt") ||
-    hidden.includes("blame") ||
-    hidden.includes("accus")
-  ) {
-    return {
-      title: "Careful — may be misunderstood",
-      sublabel: "Your intent may land as pressure or blame.",
-      tip: "Make the message clearer and more direct before sending.",
       chipLabel: hiddenSignalLabel,
     };
   }
@@ -169,13 +222,13 @@ function getToneCardStyle({ isMobile, toneTheme, hiddenSignalLabel, toneLabel, r
 function getVerdictTheme(tone) {
   const map = {
     danger: {
-      title: "#c81e1e",
-      subtitle: "#7f1d1d",
-      iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
-      iconGlow: "rgba(239,68,68,0.26)",
-      tipBg: "rgba(254,242,242,0.92)",
-      tipBorder: "1px solid rgba(239,68,68,0.18)",
-      tipColor: "#b91c1c",
+  title: "#c81e1e",
+  subtitle: "#7f1d1d",
+  iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
+  iconGlow: "rgba(239,68,68,0.26)",
+  tipBg: "rgba(254,242,242,0.92)",
+  tipBorder: "1px solid rgba(239,68,68,0.18)",
+  tipColor: "#b91c1c",
     },
     warning: {
       title: "#d97706",
