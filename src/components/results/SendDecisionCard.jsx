@@ -182,6 +182,8 @@ function getDecisionTheme(toneClass) {
   };
 }
 
+
+
 const verdict = getSendVerdict({
   sendVerdict: result?.send_verdict,
   risk: result?.communication_risk_score,
