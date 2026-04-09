@@ -100,12 +100,18 @@ function inferVerdictFromSignals(
     };
   }
 
-  if (
-    isPassiveAggressive ||
-    isAccusatory ||
-    isManipulative ||
-    reply === "poor"
-  ) {
+   // 🔥 Stronger review tier for manipulation / very poor reply outlook
+  if (isManipulative || reply === "poor") {
+    return {
+      label: "Rethink Before Sending",
+      sublabel: "This may create emotional pressure or damage trust",
+      emoji: "⚠️",
+      tone: "danger",
+    };
+  }
+
+  // ⚠️ Medium review tier for passive-aggressive / accusatory tone
+  if (isPassiveAggressive || isAccusatory) {
     return {
       label: "Careful — may be misunderstood",
       sublabel: "Your intent may land as pressure or blame",
@@ -113,7 +119,7 @@ function inferVerdictFromSignals(
       tone: "warning",
     };
   }
-
+  
   if (combined >= 65 || riskScore >= 50) {
     return {
       label: "Careful — may be misunderstood",
