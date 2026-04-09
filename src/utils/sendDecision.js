@@ -163,16 +163,10 @@ function inferVerdictFromSignals(
  *     replyVibe,
  *   })
  */
-export function getSendVerdict({
-  sendVerdict: apiResult?.send_verdict,
-  risk: apiResult?.communication_risk_score,
-  regret: apiResult?.regret_risk,
-  manipulation: apiResult?.manipulation_risk,
-  threat: apiResult?.threat_score,
-  tone: apiResult?.tone,
-  hiddenSignal: apiResult?.primary_hidden_signal,
-  replyVibe: apiResult?.reply_vibe,
-}) {
+export function getSendVerdict(
+  riskOrPayload, regret, manipulation,
+   threat = 0, tone = "", hiddenSignal = "", replyVibe = "") 
+   {
   // Preferred object-style usage
   if (
     riskOrPayload &&
@@ -206,6 +200,17 @@ export function getSendVerdict({
     replyVibe
   );
 }
+
+const verdict = getSendVerdict({
+  sendVerdict: apiResult?.send_verdict,
+  risk: apiResult?.communication_risk_score,
+  regret: apiResult?.regret_risk,
+  manipulation: apiResult?.manipulation_risk,
+  threat: apiResult?.threat_score,
+  tone: apiResult?.tone,
+  hiddenSignal: apiResult?.primary_hidden_signal,
+  replyVibe: apiResult?.reply_vibe,
+});
 
 export function getDecisionTheme(toneClass) {
   if (toneClass === "safe") {
