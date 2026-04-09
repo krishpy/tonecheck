@@ -1,4 +1,4 @@
-import { getSendVerdict } from "../utils/sendDecision";
+import SendDecisionCard from "../components/results/SendDecisionCard";
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();

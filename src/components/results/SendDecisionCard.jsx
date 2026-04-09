@@ -1,6 +1,3 @@
-
-
-
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
 }
@@ -144,7 +141,9 @@ function inferVerdictFromSignals(
 }
 
 function getSendVerdict(payload) {
-  const apiVerdict = verdictFromApiValue(payload?.sendVerdict || payload?.send_verdict);
+  const apiVerdict = verdictFromApiValue(
+    payload?.sendVerdict || payload?.send_verdict
+  );
   if (apiVerdict) return apiVerdict;
 
   return inferVerdictFromSignals(
@@ -156,73 +155,6 @@ function getSendVerdict(payload) {
     payload?.hiddenSignal || payload?.hidden_signal,
     payload?.replyVibe || payload?.reply_vibe
   );
-}
-
-function getDecisionTheme(toneClass) {
-  if (toneClass === "safe") {
-    return {
-      bg: "linear-gradient(135deg, rgba(220,252,231,0.96), rgba(240,253,244,0.94))",
-      border: "rgba(34,197,94,0.35)",
-      iconBg: "linear-gradient(135deg,#22c55e,#16a34a)",
-    };
-  }
-
-  if (toneClass === "neutral" || toneClass === "warning") {
-    return {
-      bg: "linear-gradient(135deg, rgba(254,249,195,0.96), rgba(255,251,235,0.94))",
-      border: "rgba(245,158,11,0.35)",
-      iconBg: "linear-gradient(135deg,#f59e0b,#d97706)",
-    };
-  }
-
-  return {
-    bg: "linear-gradient(135deg, rgba(254,226,226,0.96), rgba(254,242,242,0.94))",
-    border: "rgba(239,68,68,0.35)",
-    iconBg: "linear-gradient(135deg,#ef4444,#dc2626)",
-  };
-}
-
-
-
-const effectiveResult = result || {
-  communication_risk_score: riskScore,
-  regret_risk: regretRisk,
-  manipulation_risk: manipulationRisk,
-  threat_score: threatScore,
-  tone,
-  primary_hidden_signal: hiddenSignal,
-  reply_vibe: replyVibe,
-};
-
-const verdict = getSendVerdict({
-  sendVerdict: effectiveResult?.send_verdict,
-  risk: effectiveResult?.communication_risk_score,
-  regret: effectiveResult?.regret_risk,
-  manipulation: effectiveResult?.manipulation_risk,
-  threat: effectiveResult?.threat_score,
-  tone: effectiveResult?.tone,
-  hiddenSignal: effectiveResult?.primary_hidden_signal,
-  replyVibe: effectiveResult?.reply_vibe,
-});
-const theme = getDecisionTheme(verdict.tone);
-
-function getReadableSignal(signal) {
-  const map = {
-    polite_request_signal: "a polite ask",
-    accusatory_pressure_signal: "blame or pressure",
-    accusation_signal: "blame or pressure",
-    pressure_signal: "urgency or pressure",
-    passive_aggression_signal: "passive aggression",
-    hostility_signal: "hostility",
-    threat_signal: "a threat",
-    profanity_signal: "harsh language",
-    insult_signal: "an insult",
-    hostile_command_signal: "a harsh command",
-    constructive_disagreement_signal: "calm disagreement",
-    neutral_information: "neutral",
-  };
-
-  return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
 }
 
 function getVerdictTheme(toneClass) {
@@ -258,6 +190,27 @@ function getVerdictTheme(toneClass) {
   };
 }
 
+function getReadableSignal(signal) {
+  const map = {
+    polite_request_signal: "a polite ask",
+    accusatory_pressure_signal: "blame or pressure",
+    accusation_signal: "blame or pressure",
+    pressure_signal: "urgency or pressure",
+    passive_aggression_signal: "passive aggression",
+    passive_aggression: "passive aggression",
+    guilt_tripping: "guilt-tripping",
+    hostility_signal: "hostility",
+    threat_signal: "a threat",
+    profanity_signal: "harsh language",
+    insult_signal: "an insult",
+    hostile_command_signal: "a harsh command",
+    constructive_disagreement_signal: "calm disagreement",
+    neutral_information: "neutral",
+  };
+
+  return map[String(signal || "").trim()] || String(signal || "neutral").replaceAll("_", " ");
+}
+
 const chipStyle = {
   padding: "8px 12px",
   borderRadius: "999px",
@@ -269,23 +222,56 @@ const chipStyle = {
 };
 
 function getLevelLabel(score = 0) {
+  if (typeof score === "string") return score;
   if (score >= 70) return "High";
   if (score >= 35) return "Medium";
   return "Low";
 }
 
 export default function SendDecisionCard({
+  result = null,
   riskScore = 0,
   regretRisk = 0,
   manipulationRisk = 0,
   threatScore = 0,
   tone = "",
   hiddenSignal = "",
+  replyVibe = "",
 }) {
+  const effectiveResult = result || {
+    communication_risk_score: riskScore,
+    regret_risk: regretRisk,
+    manipulation_risk: manipulationRisk,
+    threat_score: threatScore,
+    tone,
+    primary_hidden_signal: hiddenSignal,
+    reply_vibe: replyVibe,
+    send_verdict: "",
+  };
 
+  const verdict = getSendVerdict({
+    sendVerdict: effectiveResult?.send_verdict,
+    risk: effectiveResult?.communication_risk_score,
+    regret: effectiveResult?.regret_risk,
+    manipulation: effectiveResult?.manipulation_risk,
+    threat: effectiveResult?.threat_score,
+    tone: effectiveResult?.tone,
+    hiddenSignal: effectiveResult?.primary_hidden_signal,
+    replyVibe: effectiveResult?.reply_vibe,
+  });
 
   const theme = getVerdictTheme(verdict.tone);
-  const regretLabel = getLevelLabel(regretRisk);
+
+  const displayTone = effectiveResult?.tone || tone;
+  const displayHiddenSignal =
+    effectiveResult?.primary_hidden_signal || hiddenSignal;
+
+  const displayRegret =
+    effectiveResult?.chance_of_regret ??
+    effectiveResult?.regret_risk_band ??
+    regretRisk;
+
+  const regretLabel = getLevelLabel(displayRegret);
 
   return (
     <section
@@ -436,21 +422,21 @@ export default function SendDecisionCard({
           flexWrap: "wrap",
         }}
       >
-        {tone ? (
+        {displayTone ? (
           <div
             title="How your message emotionally comes across."
             style={chipStyle}
           >
-            Comes across as: <strong>{tone}</strong>
+            Comes across as: <strong>{displayTone}</strong>
           </div>
         ) : null}
 
-        {hiddenSignal ? (
+        {displayHiddenSignal ? (
           <div
             title="The main feeling or pattern detected in the message."
             style={chipStyle}
           >
-            Feels like: <strong>{getReadableSignal(hiddenSignal)}</strong>
+            Feels like: <strong>{getReadableSignal(displayHiddenSignal)}</strong>
           </div>
         ) : null}
 
