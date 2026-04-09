@@ -661,7 +661,6 @@ https://trytonecheck.com`;
               copyRewriteOnly={copyRewriteOnly}
               useRewriteMessage={useRewriteMessage}
               copyState={copyState}
-              sendVerdict={sendVerdict}
               getToneLabel={getToneLabel}
               getToneEmoji={getToneEmoji}
               getMeterWidth={getMeterWidth}
