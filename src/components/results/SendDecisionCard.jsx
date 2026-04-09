@@ -264,17 +264,6 @@ export default function SendDecisionCard({
     send_verdict: "",
   };
 
-  const verdict = getSendVerdict({
-    sendVerdict: effectiveResult?.send_verdict,
-    risk: effectiveResult?.communication_risk_score,
-    regret: effectiveResult?.regret_risk,
-    manipulation: effectiveResult?.manipulation_risk,
-    threat: effectiveResult?.threat_score,
-    tone: effectiveResult?.tone,
-    hiddenSignal: effectiveResult?.primary_hidden_signal,
-    replyVibe: effectiveResult?.reply_vibe,
-  });
-
   const theme = getVerdictTheme(verdict.tone);
 
   const displayTone = effectiveResult?.tone || tone;

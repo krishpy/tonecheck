@@ -6,6 +6,15 @@ import useIsMobile from "../../hooks/useIsMobile";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(result?.send_verdict || "").toLowerCase().trim();
+  if (apiVerdict && VERDICT_UI_MAP[apiVerdict]) {
+    const mapped = VERDICT_UI_MAP[apiVerdict];
+    return {
+      tone: mapped.tone,
+      emoji: mapped.emoji,
+      label: mapped.label,
+      reason: mapped.sublabel,
+    };
+  }
   const risk = Number(result?.communication_risk_score || 0);
   const hidden = String(
     result?.hidden_signal || result?.primary_hidden_signal || ""
@@ -14,6 +23,8 @@ function buildSendVerdict(result) {
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
+
+  
   // First trust backend verdict
   if (apiVerdict === "do_not_send") {
     return {
@@ -116,6 +127,33 @@ function buildSendVerdict(result) {
     reason: "This message could be interpreted more sharply than intended.",
   };
 }
+
+const verdictMap = {
+  do_not_send: {
+    label: "Don’t send",
+    sublabel: "This may escalate or cause damage",
+    emoji: "⛔",
+    tone: "danger",
+  },
+  rethink: {
+    label: "Rethink before sending",
+    sublabel: "This may create pressure or regret",
+    emoji: "⚠️",
+    tone: "warning",
+  },
+  review: {
+    label: "Careful — may be misunderstood",
+    sublabel: "Your intent may land as pressure or blame",
+    emoji: "😐",
+    tone: "neutral",
+  },
+  send: {
+    label: "Safe to send",
+    sublabel: "Clear and unlikely to cause issues",
+    emoji: "✅",
+    tone: "success",
+  },
+};
 
 function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
