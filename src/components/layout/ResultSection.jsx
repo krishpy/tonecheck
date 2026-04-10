@@ -6,15 +6,6 @@ import useIsMobile from "../../hooks/useIsMobile";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(result?.send_verdict || "").toLowerCase().trim();
-  if (apiVerdict && VERDICT_UI_MAP[apiVerdict]) {
-    const mapped = VERDICT_UI_MAP[apiVerdict];
-    return {
-      tone: mapped.tone,
-      emoji: mapped.emoji,
-      label: mapped.label,
-      reason: mapped.sublabel,
-    };
-  }
   const risk = Number(result?.communication_risk_score || 0);
   const hidden = String(
     result?.hidden_signal || result?.primary_hidden_signal || ""
@@ -23,15 +14,13 @@ function buildSendVerdict(result) {
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
-
-  
-  // First trust backend verdict
+  // ✅ First trust backend verdict
   if (apiVerdict === "do_not_send") {
     return {
       tone: "danger",
-      emoji: "🚫",
-      label: "Do Not Send",
-      reason: "This may escalate badly.",
+      emoji: "⛔",
+      label: "Don’t send",
+      reason: "This may escalate or cause damage.",
     };
   }
 
@@ -39,8 +28,8 @@ function buildSendVerdict(result) {
     return {
       tone: "danger",
       emoji: "⚠️",
-      label: "Rethink Before Sending",
-      reason: "This may create emotional pressure or damage trust.",
+      label: "Rethink before sending",
+      reason: "This may create pressure or regret.",
     };
   }
 
@@ -49,7 +38,7 @@ function buildSendVerdict(result) {
       tone: "neutral",
       emoji: "🤔",
       label: "Careful — may be misunderstood",
-      reason: "Your intent may land more sharply than you mean.",
+      reason: "Your intent may land as pressure or blame.",
     };
   }
 
@@ -57,12 +46,12 @@ function buildSendVerdict(result) {
     return {
       tone: "safe",
       emoji: "✅",
-      label: "Looks good to send",
-      reason: "This message looks safe and unlikely to create tension.",
+      label: "Safe to send",
+      reason: "Clear and unlikely to cause issues.",
     };
   }
 
-  // Fallback logic only if backend verdict is missing
+  // Fallback only if backend verdict is missing
   if (risk <= 20 && isSafeHidden) {
     return {
       tone: "safe",
