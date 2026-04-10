@@ -160,14 +160,6 @@ function readConsumerVerdict(apiResult) {
     Number(apiResult?.threat_score) ||
     0;
 
-  const derived = getSendVerdict(
-    risk,
-    regret,
-    manipulation,
-    threat,
-    tone,
-    hidden
-  );
 
   return normalizeLoose(derived?.label);
 }
