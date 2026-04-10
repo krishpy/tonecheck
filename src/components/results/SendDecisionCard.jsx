@@ -32,8 +32,8 @@ function verdictFromApiValue(sendVerdict) {
     return {
       label: "Careful — may be misunderstood",
       sublabel: "Your intent may land as pressure or blame",
-      emoji: "⚠️",
-      tone: "warning",
+      emoji: "🤔",
+      tone: "neutral",
     };
   }
 
@@ -109,7 +109,6 @@ function inferVerdictFromSignals(
     };
   }
 
-   // 🔥 Stronger review tier for manipulation / very poor reply outlook
   if (isManipulative || reply === "poor") {
     return {
       label: "Rethink Before Sending",
@@ -119,13 +118,12 @@ function inferVerdictFromSignals(
     };
   }
 
-  // ⚠️ Medium review tier for passive-aggressive / accusatory tone
   if (isPassiveAggressive || isAccusatory) {
     return {
       label: "Careful — may be misunderstood",
       sublabel: "Your intent may land as pressure or blame",
-      emoji: "⚠️",
-      tone: "warning",
+      emoji: "🤔",
+      tone: "neutral",
     };
   }
 
@@ -133,8 +131,8 @@ function inferVerdictFromSignals(
     return {
       label: "Careful — may be misunderstood",
       sublabel: "Your message may trigger defensiveness",
-      emoji: "⚠️",
-      tone: "warning",
+      emoji: "🤔",
+      tone: "neutral",
     };
   }
 
@@ -200,7 +198,7 @@ function getVerdictTheme(toneClass) {
     border: "1px solid rgba(239,68,68,0.28)",
     pillBg: "rgba(239,68,68,0.16)",
     pillText: "#b91c1c",
-    title: "Better not send",
+    title: "Rethink before sending",
     shadow: "0 12px 30px rgba(239,68,68,0.10)",
   };
 }
@@ -263,6 +261,17 @@ export default function SendDecisionCard({
     reply_vibe: replyVibe,
     send_verdict: "",
   };
+
+  const verdict = getSendVerdict({
+    sendVerdict: effectiveResult?.send_verdict,
+    risk: effectiveResult?.communication_risk_score,
+    regret: effectiveResult?.regret_risk,
+    manipulation: effectiveResult?.manipulation_risk,
+    threat: effectiveResult?.threat_score,
+    tone: effectiveResult?.tone,
+    hiddenSignal: effectiveResult?.primary_hidden_signal,
+    replyVibe: effectiveResult?.reply_vibe,
+  });
 
   const theme = getVerdictTheme(verdict.tone);
 

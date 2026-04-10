@@ -14,7 +14,7 @@ function buildSendVerdict(result) {
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
-  // ✅ First trust backend verdict
+  // Trust backend first
   if (apiVerdict === "do_not_send") {
     return {
       tone: "danger",
@@ -29,7 +29,7 @@ function buildSendVerdict(result) {
       tone: "danger",
       emoji: "⚠️",
       label: "Rethink before sending",
-      reason: "This may create pressure or regret.",
+      reason: "This may create emotional pressure or damage trust.",
     };
   }
 
@@ -116,33 +116,6 @@ function buildSendVerdict(result) {
     reason: "This message could be interpreted more sharply than intended.",
   };
 }
-
-const verdictMap = {
-  do_not_send: {
-    label: "Don’t send",
-    sublabel: "This may escalate or cause damage",
-    emoji: "⛔",
-    tone: "danger",
-  },
-  rethink: {
-    label: "Rethink before sending",
-    sublabel: "This may create pressure or regret",
-    emoji: "⚠️",
-    tone: "warning",
-  },
-  review: {
-    label: "Careful — may be misunderstood",
-    sublabel: "Your intent may land as pressure or blame",
-    emoji: "😐",
-    tone: "neutral",
-  },
-  send: {
-    label: "Safe to send",
-    sublabel: "Clear and unlikely to cause issues",
-    emoji: "✅",
-    tone: "success",
-  },
-};
 
 function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
@@ -249,13 +222,13 @@ function getToneCardStyle({ isMobile, toneTheme, hiddenSignalLabel, toneLabel, r
 function getVerdictTheme(tone) {
   const map = {
     danger: {
-  title: "#c81e1e",
-  subtitle: "#7f1d1d",
-  iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
-  iconGlow: "rgba(239,68,68,0.26)",
-  tipBg: "rgba(254,242,242,0.92)",
-  tipBorder: "1px solid rgba(239,68,68,0.18)",
-  tipColor: "#b91c1c",
+      title: "#c81e1e",
+      subtitle: "#7f1d1d",
+      iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
+      iconGlow: "rgba(239,68,68,0.26)",
+      tipBg: "rgba(254,242,242,0.92)",
+      tipBorder: "1px solid rgba(239,68,68,0.18)",
+      tipColor: "#b91c1c",
     },
     warning: {
       title: "#d97706",
@@ -324,7 +297,7 @@ export default function ResultSection({
   const isMobile = useIsMobile();
 
   const backendRisk = Number(result?.communication_risk_score || 0);
-  
+
   const hiddenSignalKey =
     result.primary_hidden_signal ||
     result.hidden_signal ||
@@ -332,23 +305,16 @@ export default function ResultSection({
     "none";
 
   const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
-
   const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
-  
   const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
-  
+
   const toneLabel = getToneLabel();
   const toneEmoji = getToneEmoji();
 
-  const sendVerdict = buildSendVerdict({
-    communication_risk_score: backendRisk,
-    hidden_signal: backendHidden,
-    tone: result?.tone || "",
-  });
+  const sendVerdict = buildSendVerdict(result);
 
   const adaptiveVerdict = getAdaptiveVerdict({
     sendVerdict,
-    toneLabel,
     hiddenSignalLabel,
     riskScore: backendRisk,
   });
@@ -485,7 +451,9 @@ export default function ResultSection({
                 </div>
               </div>
 
-              {shouldShowSignalChip ? <div style={signalChipStyle}>{hiddenSignalLabel}</div> : null}
+              {shouldShowSignalChip ? (
+                <div style={signalChipStyle}>{hiddenSignalLabel}</div>
+              ) : null}
             </div>
 
             <div
