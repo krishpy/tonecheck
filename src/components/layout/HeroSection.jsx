@@ -721,7 +721,11 @@ export default function HeroSection({
         <textarea
           className="tc-textarea"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            setResult(null);
+            setCopyState("");
+            }}
           placeholder={currentTool.placeholder}
           style={{
             width: "100%",
