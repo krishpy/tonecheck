@@ -38,23 +38,26 @@ export default function RewriteCard({
   const normalizedTone = String(toneLabel || "").toLowerCase();
   const normalizedHidden = String(hiddenSignal || "").toLowerCase();
 
-  const isLowRiskSafeMessage =
-    Number(riskScore || 0) <= 20 &&
-    (normalizedHidden === "" ||
-      normalizedHidden === "none" ||
-      normalizedHidden === "none detected");
+const isSafeHiddenSignal =
+  normalizedHidden === "" ||
+  normalizedHidden === "none" ||
+  normalizedHidden === "none detected" ||
+  normalizedHidden === "neutral";
 
-  const shouldSuppressRewrite =
-    !rewriteloading &&
-    (
-      safeRewrite === "" ||
-      (isLowRiskSafeMessage && isBlockedSafeRewrite(safeRewrite)) ||
-      (isLowRiskSafeMessage &&
-        ["friendly", "neutral", "warm", "positive"].some((t) =>
-          normalizedTone.includes(t)
-        ) &&
-        safeRewrite.length < 6)
-    );
+const isSafeTone = ["friendly", "neutral", "warm", "positive", "polite", "professional"].some(
+  (t) => normalizedTone.includes(t)
+);
+
+const isLowOrManageableRisk = Number(riskScore || 0) < 45;
+
+const shouldSuppressRewrite =
+  !rewriteloading &&
+  (
+    safeRewrite === "" ||
+    (isLowOrManageableRisk && isSafeHiddenSignal && isBlockedSafeRewrite(safeRewrite)) ||
+    (isLowOrManageableRisk && isSafeHiddenSignal && isSafeTone) ||
+    safeRewrite.length < 6
+  );
 
   if (shouldSuppressRewrite) return null;
   if (!safeRewrite && !rewriteloading) return null;
