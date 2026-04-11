@@ -1,4 +1,4 @@
-import SendDecisionCard from "../components/results/SendDecisionCard";
+
 
 function normalize(value) {
   return String(value || "").trim().toLowerCase();
@@ -135,8 +135,16 @@ function readReplyVibe(apiResult) {
       apiResult?.reply_outlook
   );
 }
-
 function readConsumerVerdict(apiResult) {
+  const explicitVerdict = normalizeLoose(
+    apiResult?.send_decision_label ||
+    apiResult?.send_decision ||
+    apiResult?.send_verdict ||
+    apiResult?.verdict
+  );
+
+  if (explicitVerdict) return explicitVerdict;
+
   const tone = readTone(apiResult);
   const hidden = readHidden(apiResult);
 
@@ -160,8 +168,35 @@ function readConsumerVerdict(apiResult) {
     Number(apiResult?.threat_score) ||
     0;
 
+  if (
+    threat >= 60 ||
+    tone.includes("threat") ||
+    hidden.includes("threat")
+  ) {
+    return "do not send";
+  }
 
-  return normalizeLoose(derived?.label);
+  if (
+    tone.includes("manipulative") ||
+    hidden.includes("guilt") ||
+    hidden.includes("emotional leverage") ||
+    manipulation >= 40
+  ) {
+    return "review";
+  }
+
+  if (
+    tone.includes("passive aggressive") ||
+    tone.includes("accusatory") ||
+    hidden.includes("pressure") ||
+    hidden.includes("accusation") ||
+    risk >= 50 ||
+    regret >= 60
+  ) {
+    return "review";
+  }
+
+  return "send";
 }
 
 function hasRewrite(apiResult) {
