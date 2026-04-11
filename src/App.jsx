@@ -642,6 +642,7 @@ https://trytonecheck.com`;
 
             <ResultSection
               result={result}
+              message={message}
               location={location}
               currentTool={currentTool}
               cardStyle={cardStyle}
@@ -650,7 +651,6 @@ https://trytonecheck.com`;
               actionButtonStyle={actionButtonStyle}
               toneTheme={toneTheme}
               primaryHiddenSignalLabel={primaryHiddenSignalLabel}
-              message={message}
               finalRewrite={finalRewrite}
               riskScore={riskScore}
               rewriteRiskScore={rewriteRiskScore}
