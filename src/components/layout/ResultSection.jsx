@@ -10,7 +10,7 @@ function buildSendVerdict(result) {
   const hidden = String(
     result?.hidden_signal || result?.primary_hidden_signal || ""
   ).toLowerCase();
-  const tone = String(result?.tone || "").toLowerCase();
+  
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
