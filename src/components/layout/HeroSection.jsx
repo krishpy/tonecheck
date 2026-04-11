@@ -8,12 +8,6 @@ const TOOLTIP_MAP = {
   "Hidden signal": "Subtle meaning your message may carry beyond what you intended.",
 };
 
-function getLevel(score = 0) {
-  if (score >= 70) return "High";
-  if (score >= 35) return "Medium";
-  return "Low";
-}
-
 function getReplyVibe(score = 0) {
   if (score >= 70) return "Good";
   if (score >= 35) return "Mixed";
@@ -27,11 +21,11 @@ function getReplyMeta(score = 0) {
     return {
       label: "Reply vibe",
       value,
-      emoji: "👍",
+      emoji: "😊",
       bg: "rgba(34,197,94,0.10)",
       border: "1px solid rgba(34,197,94,0.20)",
       color: "#166534",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(34,197,94,0.14)",
     };
   }
 
@@ -43,7 +37,7 @@ function getReplyMeta(score = 0) {
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
 
@@ -54,45 +48,83 @@ function getReplyMeta(score = 0) {
     bg: "rgba(239,68,68,0.10)",
     border: "1px solid rgba(239,68,68,0.20)",
     color: "#b91c1c",
-    shadow: "0 4px 12px rgba(239,68,68,0.12)",
+    shadow: "0 4px 12px rgba(239,68,68,0.14)",
   };
 }
 
-function getRiskMeta(label, score = 0, lowEmoji = "✅", mediumEmoji = "😐", highEmoji = "⚠️") {
-  const value = getLevel(score);
+function getRegretMeta(level = "low") {
+  const value = String(level || "low").trim().toLowerCase();
 
-  if (value === "High") {
+  if (value === "high") {
     return {
-      label,
-      value,
-      emoji: highEmoji,
+      label: "Chance of regret",
+      value: "High",
+      emoji: "😬",
       bg: "rgba(236,72,153,0.10)",
       border: "1px solid rgba(236,72,153,0.20)",
       color: "#be185d",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(236,72,153,0.14)",
     };
   }
 
-  if (value === "Medium") {
+  if (value === "medium") {
     return {
-      label,
-      value,
-      emoji: mediumEmoji,
+      label: "Chance of regret",
+      value: "Medium",
+      emoji: "🤔",
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
 
   return {
-    label,
-    value,
-    emoji: lowEmoji,
+    label: "Chance of regret",
+    value: "Low",
+    emoji: "😌",
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
     color: "#166534",
-    shadow: "0 4px 12px rgba(239,68,68,0.12)",
+    shadow: "0 4px 12px rgba(34,197,94,0.14)",
+  };
+}
+
+function getPressureMeta(level = "low") {
+  const value = String(level || "low").trim().toLowerCase();
+
+  if (value === "high") {
+    return {
+      label: "Emotional pressure",
+      value: "High",
+      emoji: "⚠️",
+      bg: "rgba(236,72,153,0.10)",
+      border: "1px solid rgba(236,72,153,0.20)",
+      color: "#be185d",
+      shadow: "0 4px 12px rgba(236,72,153,0.14)",
+    };
+  }
+
+  if (value === "medium") {
+    return {
+      label: "Emotional pressure",
+      value: "Medium",
+      emoji: "😕",
+      bg: "rgba(245,158,11,0.10)",
+      border: "1px solid rgba(245,158,11,0.20)",
+      color: "#b45309",
+      shadow: "0 4px 12px rgba(245,158,11,0.14)",
+    };
+  }
+
+  return {
+    label: "Emotional pressure",
+    value: "Low",
+    emoji: "🌿",
+    bg: "rgba(34,197,94,0.10)",
+    border: "1px solid rgba(34,197,94,0.20)",
+    color: "#166534",
+    shadow: "0 4px 12px rgba(34,197,94,0.14)",
   };
 }
 
@@ -112,7 +144,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
       bg: "rgba(239,68,68,0.10)",
       border: "1px solid rgba(239,68,68,0.20)",
       color: "#b91c1c",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(239,68,68,0.14)",
     };
   }
 
@@ -130,7 +162,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
       bg: "rgba(245,158,11,0.10)",
       border: "1px solid rgba(245,158,11,0.20)",
       color: "#b45309",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+      shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
 
@@ -141,7 +173,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
     color: "#166534",
-    shadow: "0 4px 12px rgba(239,68,68,0.12)",
+    shadow: "0 4px 12px rgba(34,197,94,0.14)",
   };
 }
 
@@ -225,12 +257,29 @@ function MiniOutcomeChip({ item }) {
         fontSize: "13px",
         cursor: "default",
         boxShadow: item.shadow || "none",
+        transition: "transform 180ms ease, box-shadow 180ms ease",
       }}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = "translateY(-1px)";
+        e.currentTarget.style.boxShadow =
+          item.shadow || "0 6px 16px rgba(15,23,42,0.10)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = item.shadow || "none";
+      }}
     >
-      <span>{item.emoji}</span>
+      <span
+        style={{
+          display: "inline-block",
+          transition: "transform 180ms ease",
+        }}
+      >
+        {item.emoji}
+      </span>
 
       <span>
         {item.label}: {item.value}
@@ -447,95 +496,36 @@ export default function HeroSection({
     ? getHiddenSignalLabel(hiddenSignalKey)
     : "Neutral";
 
-function getPressureMeta(level = "low") {
-  const value = String(level || "low").trim().toLowerCase();
-
-  if (value === "high") {
-    return {
-      label: "Emotional pressure",
-      value: "High",
-      emoji: "⚠️",
-      bg: "rgba(236,72,153,0.10)",
-      border: "1px solid rgba(236,72,153,0.20)",
-      color: "#be185d",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
-    };
-  }
-
-  if (value === "medium") {
-    return {
-      label: "Emotional pressure",
-      value: "Medium",
-      emoji: "😐",
-      bg: "rgba(245,158,11,0.10)",
-      border: "1px solid rgba(245,158,11,0.20)",
-      color: "#b45309",
-      shadow: "0 4px 12px rgba(239,68,68,0.12)",
-    };
-  }
-
-  return {
-    label: "Emotional pressure",
-    value: "Low",
-    emoji: "🌿",
-    bg: "rgba(34,197,94,0.10)",
-    border: "1px solid rgba(34,197,94,0.20)",
-    color: "#166534",
-    shadow: "0 4px 12px rgba(239,68,68,0.12)",
-  };
-}
-
-const topOutcomes = result
-  ? [
-      getReplyMeta(Number(result?.reply_likelihood ?? 0)),
-      getRiskMeta("Chance of regret", Number(result?.regret_risk ?? 0), "✅", "😐", "😬"),
-      getPressureMeta(result?.emotional_pressure),
-      getHiddenSignalMeta(hiddenSignalLabel),
-    ]
-  : [];
+  const topOutcomes = result
+    ? [
+        getReplyMeta(Number(result?.reply_likelihood ?? 0)),
+        getRegretMeta(result?.chance_of_regret),
+        getPressureMeta(result?.emotional_pressure),
+        getHiddenSignalMeta(hiddenSignalLabel),
+      ]
+    : [];
 
   const livePreview = useMemo(() => getLivePreview(message), [message]);
 
-  {!result && (
-  <div
-    style={{
-      marginTop: "12px",
-      padding: "10px 14px",
-      borderRadius: "16px",
-      background: livePreview.bg,
-      border: livePreview.border,
-      color: livePreview.color,
-      fontSize: "13px",
-      fontWeight: 700,
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-    }}
-  >
-    <span>{livePreview.emoji}</span>
-    <span>{livePreview.text}</span>
-  </div>
-)}
-
   const heroRiskScore = Number(result?.risk_score ?? 0);
 
-const displayDescription =
-  location.pathname === "/"
-    ? heroRiskScore >= 80
-      ? "Pause. This message might escalate."
-      : heroRiskScore >= 50
-      ? "Think before you send this."
-      : "Check how your message may sound before you send"
-    : currentTool.description;
+  const displayDescription =
+    location.pathname === "/"
+      ? heroRiskScore >= 80
+        ? "Pause. This message might escalate."
+        : heroRiskScore >= 50
+        ? "Think before you send this."
+        : "Check how your message may sound before you send"
+      : currentTool.description;
 
-const subDescription =
-  location.pathname === "/"
-    ? heroRiskScore >= 80
-      ? "This wording may trigger conflict, defensiveness, or regret."
-      : heroRiskScore >= 50
-      ? "Check tone, emotional pressure, and hidden signals before you hit send."
-      : "Get quick feedback on tone, clarity, and hidden meaning before you send."
-    : "Get instant feedback before your message lands the wrong way.";
+  const subDescription =
+    location.pathname === "/"
+      ? heroRiskScore >= 80
+        ? "This wording may trigger conflict, defensiveness, or regret."
+        : heroRiskScore >= 50
+        ? "Check tone, emotional pressure, and hidden signals before you hit send."
+        : "Get quick feedback on tone, clarity, and hidden meaning before you send."
+      : "Get instant feedback before your message lands the wrong way.";
 
   return (
     <div
@@ -789,7 +779,7 @@ const subDescription =
         </div>
       </div>
 
-    <div
+      <div
         style={{
           marginTop: "10px",
           display: "flex",
