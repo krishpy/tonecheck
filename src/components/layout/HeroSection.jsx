@@ -447,14 +447,52 @@ export default function HeroSection({
     ? getHiddenSignalLabel(hiddenSignalKey)
     : "Neutral";
 
-  const topOutcomes = result
-    ? [
-        getReplyMeta(Number(result?.reply_likelihood ?? 0)),
-        getRiskMeta("Chance of regret", Number(result?.regret_risk ?? 0), "✅", "😐", "😬"),
-        getRiskMeta("Emotional pressure", Number(result?.manipulation_risk ?? 0), "🌿", "😐", "⚠️"),
-        getHiddenSignalMeta(hiddenSignalLabel),
-      ]
-    : [];
+function getPressureMeta(level = "low") {
+  const value = String(level || "low").trim().toLowerCase();
+
+  if (value === "high") {
+    return {
+      label: "Emotional pressure",
+      value: "High",
+      emoji: "⚠️",
+      bg: "rgba(236,72,153,0.10)",
+      border: "1px solid rgba(236,72,153,0.20)",
+      color: "#be185d",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+    };
+  }
+
+  if (value === "medium") {
+    return {
+      label: "Emotional pressure",
+      value: "Medium",
+      emoji: "😐",
+      bg: "rgba(245,158,11,0.10)",
+      border: "1px solid rgba(245,158,11,0.20)",
+      color: "#b45309",
+      shadow: "0 4px 12px rgba(239,68,68,0.12)",
+    };
+  }
+
+  return {
+    label: "Emotional pressure",
+    value: "Low",
+    emoji: "🌿",
+    bg: "rgba(34,197,94,0.10)",
+    border: "1px solid rgba(34,197,94,0.20)",
+    color: "#166534",
+    shadow: "0 4px 12px rgba(239,68,68,0.12)",
+  };
+}
+
+const topOutcomes = result
+  ? [
+      getReplyMeta(Number(result?.reply_likelihood ?? 0)),
+      getRiskMeta("Chance of regret", Number(result?.regret_risk ?? 0), "✅", "😐", "😬"),
+      getPressureMeta(result?.emotional_pressure),
+      getHiddenSignalMeta(hiddenSignalLabel),
+    ]
+  : [];
 
   const livePreview = useMemo(() => getLivePreview(message), [message]);
 
