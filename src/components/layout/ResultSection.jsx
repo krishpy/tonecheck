@@ -17,7 +17,7 @@ function buildSendVerdict(result) {
   const hasRewrite =
   !!result?.rewrite_suggestion?.trim() &&
   result?.rewrite_source !== "blocked_safe_message" &&
-  result?.rewrite_source !== "blocked_invalid_safe_rewrite" &&
+  result?.rewrite_source !== "blocked_invalid_safe_rewrite"
 
   // Trust backend first
   if (apiVerdict === "do_not_send") {
