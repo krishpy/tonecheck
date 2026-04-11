@@ -116,7 +116,7 @@ export function downloadResultsCsv(rows, filename = "tonecheck_test_lab_results.
       actual_regret_band: e.actualRegret || "",
       expected_emotional_pressure_band:
         row.expected_emotional_pressure_band || "",
-      actual_emotional_pressure_band: e.actualPressure || "",
+      actual_band: e.actualPressure || "",
       expected_reply_vibe: row.expected_reply_vibe || "",
       actual_reply_vibe: e.actualReply || "",
       expected_send_verdict: row.expected_send_verdict || "",

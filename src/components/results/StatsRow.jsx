@@ -1,6 +1,5 @@
 import useIsMobile from "../../hooks/useIsMobile";
 
-
 function getLevel(score = 0) {
   if (score >= 70) return "High";
   if (score >= 35) return "Medium";
@@ -25,6 +24,7 @@ function formatHiddenSignal(signal = "") {
     accusatory_pressure_signal: "Accusatory pressure",
     pressure_signal: "Pressure",
     passive_aggression_signal: "Passive aggression",
+    passive_aggression: "Passive aggression",
     constructive_disagreement_signal: "Constructive disagreement",
     polite_request_signal: "Polite request",
     neutral_information: "Neutral",
@@ -33,6 +33,16 @@ function formatHiddenSignal(signal = "") {
 
   if (!signal) return "Neutral";
   return map[signal] || signal.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatPressureLevel(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+
+  if (normalized === "high") return "High";
+  if (normalized === "medium") return "Medium";
+  if (normalized === "low") return "Low";
+
+  return "Low";
 }
 
 function StatCard({ label, value, tooltip }) {
@@ -86,19 +96,18 @@ export default function StatsRow({
   replyLikelihood = 0,
   regretRisk = 0,
   manipulationRisk = 0,
+  emotionalPressure = "low",
   hiddenSignal = "Neutral",
-})
+}) {
+  const isMobile = useIsMobile();
 
-{
-
-   const isMobile = useIsMobile();
   return (
     <div
       style={{
         display: "grid",
         gridTemplateColumns: isMobile
-        ? "repeat(2, 1fr)"
-        : "repeat(auto-fit, minmax(180px, 1fr))",
+          ? "repeat(2, 1fr)"
+          : "repeat(auto-fit, minmax(180px, 1fr))",
         gap: "14px",
       }}
     >
@@ -116,7 +125,7 @@ export default function StatsRow({
 
       <StatCard
         label="Emotional pressure"
-        value={getLevel(manipulationRisk)}
+        value={formatPressureLevel(emotionalPressure)}
         tooltip="How much tension or emotional pressure the message may create."
       />
 
