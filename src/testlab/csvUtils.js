@@ -75,6 +75,9 @@ function parseCSVText(text) {
       row[header] = cleanCell(values[idx] ?? "");
     });
 
+    // Accept multiple source column names for the message text
+    row.input = row.input || row.message || row.text || row.message_text || "";
+
     if (!row.input || !row.input.trim()) continue;
 
     if (!row.id) row.id = `CSV-${i}`;
@@ -98,7 +101,10 @@ function escapeCsv(value) {
   return s;
 }
 
-export function downloadResultsCsv(rows, filename = "tonecheck_test_lab_results.csv") {
+export function downloadResultsCsv(
+  rows,
+  filename = "tonecheck_test_lab_results.csv"
+) {
   if (!rows || !rows.length) return;
 
   const output = rows.map((row) => {
@@ -116,7 +122,7 @@ export function downloadResultsCsv(rows, filename = "tonecheck_test_lab_results.
       actual_regret_band: e.actualRegret || "",
       expected_emotional_pressure_band:
         row.expected_emotional_pressure_band || "",
-      actual_band: e.actualPressure || "",
+      actual_emotional_pressure_band: e.actualPressure || "",
       expected_reply_vibe: row.expected_reply_vibe || "",
       actual_reply_vibe: e.actualReply || "",
       expected_send_verdict: row.expected_send_verdict || "",
