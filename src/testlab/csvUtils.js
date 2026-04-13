@@ -101,65 +101,46 @@ function escapeCsv(value) {
   return s;
 }
 
-export function downloadResultsCsv(
-  rows,
-  filename = "tonecheck_test_lab_results.csv"
-) {
-  if (!rows || !rows.length) return;
+export function downloadResultsCsv(results, filename = "tonecheck_test_results.csv") {
+  const columns = [
+    "id",
+    "category",
+    "input",
+    "expected_tone",
+    "actual_tone",
+    "expected_signal",
+    "actual_signal",
+    "expected_regret",
+    "actual_regret",
+    "expected_pressure",
+    "actual_pressure",
+    "expected_reply_vibe",
+    "actual_reply_vibe",
+    "expected_verdict",
+    "actual_verdict",
+    "pass",
+    "mismatch_reasons",
+    "api_tone",
+    "api_hidden_signal",
+    "api_risk_score",
+    "api_regret_risk",
+    "api_reply_likelihood",
+    "api_send_decision",
+    "rewrite",
+    "advisory",
+  ];
 
-  const output = rows.map((row) => {
-    const e = row.evaluation || {};
+  const escapeCell = (value) => {
+    const s = String(value ?? "");
+    return `"${s.replaceAll('"', '""')}"`;
+  };
 
-    return {
-      id: row.id,
-      category: row.category,
-      input: row.input,
-      expected_tone: row.expected_tone || "",
-      actual_tone: e.actualTone || "",
-      expected_hidden_signal: row.expected_hidden_signal || "",
-      actual_hidden_signal: e.actualHidden || "",
-      expected_regret_band: row.expected_regret_band || "",
-      actual_regret_band: e.actualRegret || "",
-      expected_emotional_pressure_band:
-        row.expected_emotional_pressure_band || "",
-      actual_emotional_pressure_band: e.actualPressure || "",
-      expected_reply_vibe: row.expected_reply_vibe || "",
-      actual_reply_vibe: e.actualReply || "",
-      expected_send_verdict: row.expected_send_verdict || "",
-      actual_send_verdict: e.actualVerdict || "",
-      expected_rewrite_present: row.expected_rewrite_present || "",
-      actual_rewrite_present:
-        typeof e.actualRewrite === "boolean" ? String(e.actualRewrite) : "",
-      expected_advisory_present: row.expected_advisory_present || "",
-      actual_advisory_present:
-        typeof e.actualAdvisory === "boolean" ? String(e.actualAdvisory) : "",
-      pass:
-        e.status === "ERROR"
-          ? "ERROR"
-          : e.pass
-            ? "PASS"
-            : "FAIL",
-      mismatch_reasons: (e.mismatchReasons || []).join(" | "),
-      advisory: row.apiResult?.advisory || "",
-      rewrite:
-        row.apiResult?.rewrite_suggestion ||
-        row.apiResult?.rewritten_text ||
-        row.apiResult?.rewrite ||
-        "",
-      notes: row.notes || "",
-      model_version: row.apiResult?.model_version || "",
-    };
-  });
+  const rows = [
+    columns.join(","),
+    ...results.map((row) => columns.map((col) => escapeCell(row[col])).join(",")),
+  ];
 
-  const headers = Object.keys(output[0]);
-  const csv = [
-    headers.join(","),
-    ...output.map((record) =>
-      headers.map((header) => escapeCsv(record[header])).join(",")
-    ),
-  ].join("\n");
-
-  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

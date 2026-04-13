@@ -1,380 +1,203 @@
-function normalize(value) {
+function norm(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-function normalizeLoose(value) {
-  return normalize(value)
-    .replace(/[_-]+/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+function safeNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
 }
 
-function isNoneLike(value) {
-  const v = normalizeLoose(value);
-  return (
-    v === "" ||
-    v === "none" ||
-    v === "null" ||
-    v === "undefined" ||
-    v === "none detected" ||
-    v === "nothing tricky detected"
+function toneNorm(value) {
+  const v = norm(value);
+  const map = {
+    aggressive: "aggressive",
+    threatening: "threatening",
+    hostile: "aggressive",
+    accusatory: "accusatory",
+    manipulative: "manipulative",
+    frustrated: "frustrated",
+    tense: "tense",
+    emotional: "emotional",
+    firm: "firm",
+    professional: "professional",
+    polite: "polite",
+    friendly: "friendly",
+    neutral: "neutral",
+    passive_aggressive: "passive aggressive",
+    "passive aggressive": "passive aggressive",
+  };
+  return map[v] || v;
+}
+
+function signalNorm(value) {
+  const v = norm(value);
+  const map = {
+    "": "none",
+    none: "none",
+    "none detected": "none",
+    neutral: "none",
+    neutral_information: "none",
+
+    threat: "threat_signal",
+    threat_signal: "threat_signal",
+
+    insult: "insult_signal",
+    insult_signal: "insult_signal",
+
+    profanity: "profanity_signal",
+    profanity_signal: "profanity_signal",
+
+    pressure: "pressure_signal",
+    pressure_signal: "pressure_signal",
+
+    accusation: "accusation_signal",
+    accusation_signal: "accusation_signal",
+
+    guilt_pressure: "guilt_pressure",
+    guilt_tripping: "guilt_pressure",
+    guilt_trip_signal: "guilt_pressure",
+
+    emotional_leverage: "emotional_leverage",
+    emotional_dependency: "emotional_dependency",
+
+    passive_aggression: "passive_aggression_signal",
+    passive_aggression_signal: "passive_aggression_signal",
+    "passive aggression": "passive_aggression_signal",
+
+    hostile_command: "hostile_command_signal",
+    hostile_command_signal: "hostile_command_signal",
+
+    boundary_signal: "boundary_signal",
+  };
+  return map[v] || v;
+}
+
+function levelNorm(value) {
+  const v = norm(value);
+  if (["low", "medium", "high"].includes(v)) return v;
+  return "low";
+}
+
+function verdictNorm(value) {
+  const v = norm(value);
+  const map = {
+    send: "send",
+    safe: "send",
+    safe_to_send: "send",
+
+    refine: "review",
+    review: "review",
+    review_before_sending: "review",
+    rethink: "review",
+
+    do_not_send: "dont_send",
+    dont_send: "dont_send",
+    "don't send": "dont_send",
+  };
+  return map[v] || v;
+}
+
+function getActualTone(result) {
+  return toneNorm(result?.tone || result?.label);
+}
+
+function getActualSignal(result) {
+  return signalNorm(
+    result?.primary_hidden_signal ||
+      result?.hidden_signal ||
+      result?.primary_manipulation_signal
   );
 }
 
-const TONE_ALIASES = {
-  calm: ["calm", "neutral", "polite"],
-  neutral: ["neutral", "calm", "polite", "direct", "friendly"],
-  polite: ["polite", "neutral", "calm", "direct", "friendly"],
-  direct: ["direct", "neutral", "polite"],
-  friendly: ["friendly", "polite", "neutral", "calm"],
-  tense: ["tense", "frustrated", "firm", "aggressive", "accusatory", "emotional"],
-  emotional: ["emotional", "tense", "neutral"],
-  frustrated: ["frustrated", "tense", "aggressive", "accusatory", "emotional"],
-  aggressive: ["aggressive", "frustrated", "tense", "accusatory"],
-  accusatory: ["accusatory", "aggressive", "tense"],
-  manipulative: ["manipulative", "passive aggressive", "tense"],
-  passive: ["passive", "passive aggressive"],
-  "passive aggressive": ["passive aggressive", "passive", "manipulative"],
-  threat: ["threat", "threatening"],
-  threatening: ["threatening", "threat"],
-};
-
-const HIDDEN_ALIASES = {
-  none: ["none", "none detected", "nothing tricky detected"],
-  passive: ["passive", "passive aggression", "passive aggression signal"],
-  "passive aggression": ["passive", "passive aggression", "passive aggression signal"],
-  guilt: ["guilt", "guilt tripping", "guilt trip", "guilt trip signal", "emotional leverage"],
-  emotional: ["emotional", "emotional pressure", "emotional leverage", "guilt tripping", "guilt trip signal"],
-  pressure: ["pressure", "pressure signal", "emotional pressure", "accusation signal", "accusatory pressure signal"],
-  accusation: ["accusation", "accusation signal"],
-};
-
-const BAND_ALIASES = {
-  low: ["low", "poor"],
-  medium: ["medium", "mixed"],
-  high: ["high", "good"],
-  poor: ["poor", "low"],
-  mixed: ["mixed", "medium"],
-  good: ["good", "high"],
-};
-
-const VERDICT_ALIASES = {
-  send: ["send", "safe to send", "send as is"],
-  refine: ["refine", "send but refine", "send — but refine it"],
-  review: [
-    "review",
-    "review before sending",
-    "check before sending",
-    "send but soften tone",
-    "send, but soften tone",
-    "careful",
-    "careful — may be misunderstood",
-    "rethink before sending",
-  ],
-  "do not send": ["do not send", "don't send", "dont send"],
-};
-
-function readTone(apiResult) {
-  return normalizeLoose(
-    apiResult?.tone ||
-      apiResult?.tone_label ||
-      apiResult?.label ||
-      apiResult?.detected_tone
-  );
+function getActualRegret(result) {
+  return levelNorm(result?.chance_of_regret || result?.regret_risk_band);
 }
 
-function readHidden(apiResult) {
-  return normalizeLoose(
-    apiResult?.primary_hidden_signal ||
-      apiResult?.hidden_signal ||
-      apiResult?.hidden_signal_label ||
-      apiResult?.what_could_happen?.hidden_signal
-  );
+function getActualPressure(result) {
+  return levelNorm(result?.emotional_pressure);
 }
 
-function readRegretBand(apiResult) {
-  return normalizeLoose(
-    apiResult?.chance_of_regret ||
-      apiResult?.regret_band ||
-      apiResult?.regret_risk_band ||
-      apiResult?.regret_risk_label ||
-      apiResult?.regret_level
-  );
+function getActualReplyVibe(result) {
+  return levelNorm(result?.reply_vibe);
 }
 
-function readPressureBand(apiResult) {
-  return normalizeLoose(
-    apiResult?.emotional_pressure ||
-      apiResult?.emotional_pressure_band ||
-      apiResult?.pressure_label ||
-      apiResult?.manipulation_band
-  );
+function getActualVerdict(result) {
+  return verdictNorm(result?.send_decision || result?.send_verdict);
 }
 
-function readReplyVibe(apiResult) {
-  return normalizeLoose(
-    apiResult?.reply_vibe ||
-      apiResult?.reply_likelihood_band ||
-      apiResult?.reply_likelihood_label ||
-      apiResult?.reply_outlook
-  );
+function compareField(expected, actual) {
+  if (!expected) return { pass: true };
+  return {
+    pass: expected === actual,
+    expected,
+    actual,
+  };
 }
 
-function readConsumerVerdict(apiResult) {
-  return normalizeLoose(
-    apiResult?.send_decision_label ||
-      apiResult?.send_decision ||
-      apiResult?.send_verdict ||
-      apiResult?.verdict
-  );
-}
+export function evaluateCase(testCase, result) {
+  const expectedTone = toneNorm(testCase.expected_tone);
+  const expectedSignal = signalNorm(testCase.expected_signal);
+  const expectedRegret = levelNorm(testCase.expected_regret);
+  const expectedPressure = levelNorm(testCase.expected_pressure);
+  const expectedReplyVibe = levelNorm(testCase.expected_reply_vibe);
+  const expectedVerdict = verdictNorm(testCase.expected_verdict);
 
-function hasRewrite(apiResult) {
-  return Boolean(
-    normalize(apiResult?.rewritten_text) ||
-      normalize(apiResult?.rewrite_suggestion) ||
-      normalize(apiResult?.rewrite)
-  );
-}
+  const actualTone = getActualTone(result);
+  const actualSignal = getActualSignal(result);
+  const actualRegret = getActualRegret(result);
+  const actualPressure = getActualPressure(result);
+  const actualReplyVibe = getActualReplyVibe(result);
+  const actualVerdict = getActualVerdict(result);
 
-function hasAdvisory(apiResult) {
-  return Boolean(normalize(apiResult?.advisory));
-}
+  const toneCheck = compareField(expectedTone, actualTone);
+  const signalCheck = compareField(expectedSignal, actualSignal);
+  const regretCheck = compareField(expectedRegret, actualRegret);
+  const pressureCheck = compareField(expectedPressure, actualPressure);
+  const replyCheck = compareField(expectedReplyVibe, actualReplyVibe);
+  const verdictCheck = compareField(expectedVerdict, actualVerdict);
 
-function matchExpected(expected, actual, aliases = {}) {
-  const e = normalizeLoose(expected);
-  const a = normalizeLoose(actual);
+  const mismatches = [];
 
-  if (!e && !a) return true;
-  if (e === a) return true;
-  if (e === "none") return isNoneLike(a);
-  if (aliases[e]?.includes(a)) return true;
-
-  return false;
-}
-
-function parseBooleanExpected(value) {
-  const v = normalizeLoose(value);
-  if (!v) return null;
-  if (["yes", "true", "1", "y"].includes(v)) return true;
-  if (["no", "false", "0", "n"].includes(v)) return false;
-  return null;
-}
-
-function buildFailureHints({
-  tonePass,
-  hiddenPass,
-  regretPass,
-  pressurePass,
-  replyPass,
-  verdictPass,
-  rewritePass,
-  advisoryPass,
-  expectedTone,
-  actualTone,
-  expectedHidden,
-  actualHidden,
-  expectedRegret,
-  actualRegret,
-  expectedPressure,
-  actualPressure,
-  expectedReply,
-  actualReply,
-  expectedVerdict,
-  actualVerdict,
-  expectedRewrite,
-  actualRewrite,
-  expectedAdvisory,
-  actualAdvisory,
-}) {
-  const hints = [];
-
-  if (!tonePass) {
-    hints.push({
-      type: "tone",
-      title: "Tone mismatch",
-      expected: expectedTone || "not set",
-      actual: actualTone || "none",
-      suggestion: "Check final backend tone label, not frontend remapping.",
-    });
-  }
-
-  if (!hiddenPass) {
-    hints.push({
-      type: "hidden",
-      title: "Hidden signal mismatch",
-      expected: expectedHidden || "not set",
-      actual: actualHidden || "none",
-      suggestion: "Check backend primary_hidden_signal / hidden_signal output.",
-    });
-  }
-
-  if (!regretPass) {
-    hints.push({
-      type: "regret",
-      title: "Chance of regret mismatch",
-      expected: expectedRegret || "not set",
-      actual: actualRegret || "none",
-      suggestion: "Check backend chance_of_regret mapping.",
-    });
-  }
-
-  if (!pressurePass) {
-    hints.push({
-      type: "pressure",
-      title: "Emotional pressure mismatch",
-      expected: expectedPressure || "not set",
-      actual: actualPressure || "none",
-      suggestion: "Check backend emotional_pressure output.",
-    });
-  }
-
-  if (!replyPass) {
-    hints.push({
-      type: "reply",
-      title: "Reply vibe mismatch",
-      expected: expectedReply || "not set",
-      actual: actualReply || "none",
-      suggestion: "Check backend reply_vibe output.",
-    });
-  }
-
-  if (!verdictPass) {
-    hints.push({
-      type: "verdict",
-      title: "Send verdict mismatch",
-      expected: expectedVerdict || "not set",
-      actual: actualVerdict || "none",
-      suggestion: "Compare against send_decision / send_decision_label directly.",
-    });
-  }
-
-  if (!rewritePass) {
-    hints.push({
-      type: "rewrite",
-      title: "Rewrite presence mismatch",
-      expected: String(expectedRewrite),
-      actual: String(actualRewrite),
-      suggestion: "Safe/neutral messages should usually not return a rewrite.",
-    });
-  }
-
-  if (!advisoryPass) {
-    hints.push({
-      type: "advisory",
-      title: "Advisory presence mismatch",
-      expected: String(expectedAdvisory),
-      actual: String(actualAdvisory),
-      suggestion: "Check backend advisory generation and fallback handling.",
-    });
-  }
-
-  return hints;
-}
-
-export function evaluateCase(testCase, apiResult) {
-  const actualTone = readTone(apiResult);
-  const actualHidden = readHidden(apiResult);
-  const actualRegret = readRegretBand(apiResult);
-  const actualPressure = readPressureBand(apiResult);
-  const actualReply = readReplyVibe(apiResult);
-  const actualVerdict = readConsumerVerdict(apiResult);
-  const actualRewrite = hasRewrite(apiResult);
-  const actualAdvisory = hasAdvisory(apiResult);
-
-  const expectedRewrite = parseBooleanExpected(testCase.expected_rewrite_present);
-  const expectedAdvisory = parseBooleanExpected(testCase.expected_advisory_present);
-
-  const tonePass = matchExpected(testCase.expected_tone, actualTone, TONE_ALIASES);
-  const hiddenPass = matchExpected(
-    testCase.expected_hidden_signal,
-    actualHidden,
-    HIDDEN_ALIASES
-  );
-
-  const regretPass = !normalize(testCase.expected_regret_band)
-    ? true
-    : matchExpected(testCase.expected_regret_band, actualRegret, BAND_ALIASES);
-
-  const pressurePass = !normalize(testCase.expected_emotional_pressure_band)
-    ? true
-    : matchExpected(
-        testCase.expected_emotional_pressure_band,
-        actualPressure,
-        BAND_ALIASES
-      );
-
-  const replyPass = !normalize(testCase.expected_reply_vibe)
-    ? true
-    : matchExpected(testCase.expected_reply_vibe, actualReply, BAND_ALIASES);
-
-  const verdictPass = !normalize(testCase.expected_send_verdict)
-    ? true
-    : matchExpected(testCase.expected_send_verdict, actualVerdict, VERDICT_ALIASES);
-
-  const rewritePass =
-    expectedRewrite === null ? true : expectedRewrite === actualRewrite;
-
-  const advisoryPass =
-    expectedAdvisory === null ? true : expectedAdvisory === actualAdvisory;
-
-  const mismatchReasons = [];
-  if (!tonePass) mismatchReasons.push("tone mismatch");
-  if (!hiddenPass) mismatchReasons.push("hidden signal mismatch");
-  if (!regretPass) mismatchReasons.push("chance of regret mismatch");
-  if (!pressurePass) mismatchReasons.push("emotional pressure mismatch");
-  if (!replyPass) mismatchReasons.push("reply vibe mismatch");
-  if (!verdictPass) mismatchReasons.push("send verdict mismatch");
-  if (!rewritePass) mismatchReasons.push("rewrite presence mismatch");
-  if (!advisoryPass) mismatchReasons.push("advisory presence mismatch");
-
-  const failureHints = buildFailureHints({
-    tonePass,
-    hiddenPass,
-    regretPass,
-    pressurePass,
-    replyPass,
-    verdictPass,
-    rewritePass,
-    advisoryPass,
-    expectedTone: testCase.expected_tone,
-    actualTone,
-    expectedHidden: testCase.expected_hidden_signal,
-    actualHidden,
-    expectedRegret: testCase.expected_regret_band,
-    actualRegret,
-    expectedPressure: testCase.expected_emotional_pressure_band,
-    actualPressure,
-    expectedReply: testCase.expected_reply_vibe,
-    actualReply,
-    expectedVerdict: testCase.expected_send_verdict,
-    actualVerdict,
-    expectedRewrite,
-    actualRewrite,
-    expectedAdvisory,
-    actualAdvisory,
-  });
+  if (!toneCheck.pass) mismatches.push(`tone: expected ${expectedTone}, got ${actualTone}`);
+  if (!signalCheck.pass) mismatches.push(`signal: expected ${expectedSignal}, got ${actualSignal}`);
+  if (!regretCheck.pass) mismatches.push(`regret: expected ${expectedRegret}, got ${actualRegret}`);
+  if (!pressureCheck.pass) mismatches.push(`pressure: expected ${expectedPressure}, got ${actualPressure}`);
+  if (!replyCheck.pass) mismatches.push(`reply_vibe: expected ${expectedReplyVibe}, got ${actualReplyVibe}`);
+  if (!verdictCheck.pass) mismatches.push(`verdict: expected ${expectedVerdict}, got ${actualVerdict}`);
 
   return {
-    pass:
-      tonePass &&
-      hiddenPass &&
-      regretPass &&
-      pressurePass &&
-      replyPass &&
-      verdictPass &&
-      rewritePass &&
-      advisoryPass,
-    status: "DONE",
-    actualTone,
-    actualHidden,
-    actualRegret,
-    actualPressure,
-    actualReply,
-    actualVerdict,
-    actualRewrite,
-    actualAdvisory,
-    mismatchReasons,
-    failureHints,
+    id: testCase.id,
+    category: testCase.category,
+    input: testCase.input,
+
+    expected_tone: expectedTone,
+    actual_tone: actualTone,
+
+    expected_signal: expectedSignal,
+    actual_signal: actualSignal,
+
+    expected_regret: expectedRegret,
+    actual_regret: actualRegret,
+
+    expected_pressure: expectedPressure,
+    actual_pressure: actualPressure,
+
+    expected_reply_vibe: expectedReplyVibe,
+    actual_reply_vibe: actualReplyVibe,
+
+    expected_verdict: expectedVerdict,
+    actual_verdict: actualVerdict,
+
+    pass: mismatches.length === 0 ? "PASS" : "FAIL",
+    mismatch_reasons: mismatches.join(" | "),
+
+    api_tone: result?.tone || "",
+    api_hidden_signal: result?.primary_hidden_signal || result?.hidden_signal || "",
+    api_risk_score: safeNumber(result?.communication_risk_score ?? result?.risk_score),
+    api_regret_risk: safeNumber(result?.regret_risk),
+    api_reply_likelihood: safeNumber(result?.reply_likelihood),
+    api_send_decision: result?.send_decision || result?.send_verdict || "",
+    rewrite: result?.rewritten_text || result?.rewrite_suggestion || "",
+    advisory: result?.advisory || "",
   };
 }
