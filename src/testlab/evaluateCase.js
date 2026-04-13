@@ -164,7 +164,6 @@ export function evaluateCase(testCase, result) {
   if (!pressureCheck.pass) mismatches.push(`pressure: expected ${expectedPressure}, got ${actualPressure}`);
   if (!replyCheck.pass) mismatches.push(`reply_vibe: expected ${expectedReplyVibe}, got ${actualReplyVibe}`);
   if (!verdictCheck.pass) mismatches.push(`verdict: expected ${expectedVerdict}, got ${actualVerdict}`);
-
   return {
     id: testCase.id,
     category: testCase.category,
@@ -172,24 +171,31 @@ export function evaluateCase(testCase, result) {
 
     expected_tone: expectedTone,
     actual_tone: actualTone,
+    actualTone,
 
     expected_signal: expectedSignal,
     actual_signal: actualSignal,
+    actualHidden: actualSignal,
 
     expected_regret: expectedRegret,
     actual_regret: actualRegret,
+    actualRegret,
 
     expected_pressure: expectedPressure,
     actual_pressure: actualPressure,
+    actualPressure,
 
     expected_reply_vibe: expectedReplyVibe,
     actual_reply_vibe: actualReplyVibe,
+    actualReply: actualReplyVibe,
 
     expected_verdict: expectedVerdict,
     actual_verdict: actualVerdict,
+    actualVerdict,
 
     pass: mismatches.length === 0 ? "PASS" : "FAIL",
     mismatch_reasons: mismatches.join(" | "),
+    mismatchReasons: mismatches,
 
     api_tone: result?.tone || "",
     api_hidden_signal: result?.primary_hidden_signal || result?.hidden_signal || "",

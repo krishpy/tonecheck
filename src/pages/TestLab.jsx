@@ -7,28 +7,33 @@ import { runAllTests, runSingleTest } from "../testlab/testRunner";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
-function cardStyle({ good = false, bad = false, warn = false } = {}) {
+function cardStyle({ good = false, bad = false, warn = false, bright = false } = {}) {
   const border = bad
-    ? "1px solid rgba(255,92,92,0.28)"
+    ? "1px solid rgba(255,107,107,0.28)"
     : good
-      ? "1px solid rgba(58,194,122,0.28)"
+      ? "1px solid rgba(34,197,94,0.26)"
       : warn
-        ? "1px solid rgba(255,196,92,0.28)"
-        : "1px solid rgba(255,255,255,0.08)";
+        ? "1px solid rgba(251,191,36,0.28)"
+        : bright
+          ? "1px solid rgba(124,92,255,0.18)"
+          : "1px solid rgba(148,163,184,0.14)";
 
   const bg = bad
-    ? "rgba(255,92,92,0.08)"
+    ? "linear-gradient(135deg, rgba(255,241,242,0.96), rgba(255,247,247,0.94))"
     : good
-      ? "rgba(58,194,122,0.08)"
+      ? "linear-gradient(135deg, rgba(240,253,244,0.96), rgba(248,250,252,0.96))"
       : warn
-        ? "rgba(255,196,92,0.08)"
-        : "rgba(255,255,255,0.04)";
+        ? "linear-gradient(135deg, rgba(255,251,235,0.96), rgba(255,247,237,0.94))"
+        : bright
+          ? "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.96))"
+          : "rgba(255,255,255,0.88)";
 
   return {
     border,
     background: bg,
-    borderRadius: 18,
-    boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+    borderRadius: 22,
+    boxShadow: "0 14px 36px rgba(99,102,241,0.08)",
+    backdropFilter: "blur(10px)",
   };
 }
 
@@ -39,27 +44,28 @@ function FailureHints({ hints = [] }) {
     <div
       style={{
         marginTop: 12,
-        padding: 12,
-        borderRadius: 12,
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(255,255,255,0.08)",
+        padding: 14,
+        borderRadius: 16,
+        background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(254,242,242,0.96))",
+        border: "1px solid rgba(255,107,107,0.18)",
         display: "grid",
         gap: 10,
       }}
     >
-      <div style={{ fontWeight: 800 }}>Why failed</div>
+      <div style={{ fontWeight: 900, color: "#7f1d1d" }}>Why failed</div>
 
       {hints.map((hint, idx) => (
         <div
           key={`${hint.type}-${idx}`}
           style={{
-            padding: 10,
-            borderRadius: 10,
-            background: "rgba(0,0,0,0.18)",
-            border: "1px solid rgba(255,255,255,0.06)",
+            padding: 12,
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.85)",
+            border: "1px solid rgba(239,68,68,0.10)",
+            color: "#1f2937",
           }}
         >
-          <div style={{ fontWeight: 700 }}>{hint.title}</div>
+          <div style={{ fontWeight: 800 }}>{hint.title}</div>
           <div style={{ marginTop: 6, fontSize: 13, opacity: 0.9 }}>
             <strong>Expected:</strong> {hint.expected}
           </div>
@@ -83,14 +89,25 @@ function StatCard({ label, value, subtitle, tone = "default" }) {
         ? { bad: true }
         : tone === "warn"
           ? { warn: true }
-          : {};
+          : { bright: true };
+
+  const valueColor =
+    tone === "good"
+      ? "#15803d"
+      : tone === "bad"
+        ? "#dc2626"
+        : tone === "warn"
+          ? "#b45309"
+          : "#312e81";
 
   return (
-    <div style={{ ...cardStyle(props), padding: 16 }}>
-      <div style={{ fontSize: 12, opacity: 0.7 }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 900, marginTop: 6 }}>{value}</div>
+    <div style={{ ...cardStyle(props), padding: 18 }}>
+      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 30, fontWeight: 900, marginTop: 8, color: valueColor }}>
+        {value}
+      </div>
       {subtitle ? (
-        <div style={{ fontSize: 13, opacity: 0.72, marginTop: 6 }}>
+        <div style={{ fontSize: 13, color: "#64748b", marginTop: 6 }}>
           {subtitle}
         </div>
       ) : null}
@@ -106,12 +123,15 @@ function Pill({ active, onClick, children }) {
         padding: "10px 14px",
         borderRadius: 999,
         border: active
-          ? "1px solid #7c5cff"
-          : "1px solid rgba(255,255,255,0.10)",
-        background: active ? "rgba(124,92,255,0.18)" : "rgba(255,255,255,0.04)",
-        color: "#fff",
+          ? "1px solid rgba(124,92,255,0.35)"
+          : "1px solid rgba(148,163,184,0.18)",
+        background: active
+          ? "linear-gradient(135deg, rgba(124,92,255,0.16), rgba(93,214,255,0.14))"
+          : "rgba(255,255,255,0.72)",
+        color: active ? "#312e81" : "#334155",
         cursor: "pointer",
-        fontWeight: 700,
+        fontWeight: 800,
+        boxShadow: active ? "0 8px 22px rgba(124,92,255,0.10)" : "none",
       }}
     >
       {children}
@@ -126,10 +146,10 @@ function ProgressBar({ done, total }) {
     <div style={{ width: "100%" }}>
       <div
         style={{
-          height: 10,
+          height: 12,
           width: "100%",
           borderRadius: 999,
-          background: "rgba(255,255,255,0.08)",
+          background: "rgba(226,232,240,0.8)",
           overflow: "hidden",
         }}
       >
@@ -138,12 +158,12 @@ function ProgressBar({ done, total }) {
             width: `${pct}%`,
             height: "100%",
             borderRadius: 999,
-            background: "linear-gradient(90deg, #7c5cff, #5dd6ff)",
+            background: "linear-gradient(90deg, #7c5cff, #5dd6ff, #22c55e)",
             transition: "width 180ms ease",
           }}
         />
       </div>
-      <div style={{ marginTop: 8, fontSize: 13, opacity: 0.76 }}>
+      <div style={{ marginTop: 8, fontSize: 13, color: "#64748b" }}>
         {done}/{total} completed · {pct}%
       </div>
     </div>
@@ -191,7 +211,12 @@ function mismatchSummary(rows) {
   const counts = new Map();
 
   rows.forEach((row) => {
-    (row.evaluation?.mismatchReasons || []).forEach((reason) => {
+    const reasons = row.evaluation?.mismatch_reasons
+      ? String(row.evaluation.mismatch_reasons).split(" | ")
+      : row.evaluation?.mismatchReasons || [];
+
+    reasons.forEach((reason) => {
+      if (!reason) return;
       counts.set(reason, (counts.get(reason) || 0) + 1);
     });
   });
@@ -203,12 +228,13 @@ function mismatchSummary(rows) {
 
 function statusTone(row) {
   if (row.evaluation?.status === "ERROR") return "warn";
-  return row.evaluation?.pass ? "good" : "bad";
+  return row.evaluation?.pass === "PASS" || row.evaluation?.pass === true ? "good" : "bad";
 }
 
 function statusLabel(row) {
   if (row.evaluation?.status === "ERROR") return "ERROR";
-  return row.evaluation?.pass ? "PASS" : "FAIL";
+  if (row.evaluation?.pass === "PASS" || row.evaluation?.pass === true) return "PASS";
+  return "FAIL";
 }
 
 function topModelVersion(rows) {
@@ -216,16 +242,17 @@ function topModelVersion(rows) {
   return versions[0] || "—";
 }
 
-function chipStyle(value) {
+function chipStyle() {
   return {
     display: "inline-flex",
     alignItems: "center",
     padding: "7px 10px",
     borderRadius: 999,
-    border: "1px solid rgba(255,255,255,0.10)",
-    background: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(148,163,184,0.18)",
+    background: "rgba(255,255,255,0.82)",
     fontSize: 13,
     fontWeight: 700,
+    color: "#334155",
   };
 }
 
@@ -440,22 +467,18 @@ export default function TestLab() {
           `${row.id} · ${row.category}`,
           row.input,
           `Expected tone: ${row.expected_tone || "-"}`,
-          `Actual tone: ${e.actualTone || "-"}`,
-          `Expected hidden: ${row.expected_hidden_signal || "-"}`,
-          `Actual hidden: ${e.actualHidden || "-"}`,
-          `Expected regret: ${row.expected_regret_band || "-"}`,
-          `Actual regret: ${e.actualRegret || "-"}`,
-          `Expected pressure: ${row.expected_emotional_pressure_band || "-"}`,
-          `Actual pressure: ${e.actualPressure || "-"}`,
+          `Actual tone: ${e.actualTone || e.actual_tone || "-"}`,
+          `Expected hidden: ${row.expected_hidden_signal || row.expected_signal || "-"}`,
+          `Actual hidden: ${e.actualHidden || e.actual_signal || "-"}`,
+          `Expected regret: ${row.expected_regret_band || row.expected_regret || "-"}`,
+          `Actual regret: ${e.actualRegret || e.actual_regret || "-"}`,
+          `Expected pressure: ${row.expected_emotional_pressure_band || row.expected_pressure || "-"}`,
+          `Actual pressure: ${e.actualPressure || e.actual_pressure || "-"}`,
           `Expected reply vibe: ${row.expected_reply_vibe || "-"}`,
-          `Actual reply vibe: ${e.actualReply || "-"}`,
-          `Expected verdict: ${row.expected_send_verdict || "-"}`,
-          `Actual verdict: ${e.actualVerdict || "-"}`,
-          `Expected rewrite present: ${row.expected_rewrite_present || "-"}`,
-          `Actual rewrite present: ${String(e.actualRewrite)}`,
-          `Expected advisory present: ${row.expected_advisory_present || "-"}`,
-          `Actual advisory present: ${String(e.actualAdvisory)}`,
-          `Issues: ${(e.mismatchReasons || []).join(", ")}`,
+          `Actual reply vibe: ${e.actualReply || e.actual_reply_vibe || "-"}`,
+          `Expected verdict: ${row.expected_send_verdict || row.expected_verdict || "-"}`,
+          `Actual verdict: ${e.actualVerdict || e.actual_verdict || "-"}`,
+          `Issues: ${(e.mismatchReasons || e.mismatch_reasons || []).join ? (e.mismatchReasons || []).join(", ") : String(e.mismatch_reasons || "")}`,
         ].join("\n");
       })
       .join("\n\n--------------------\n\n");
@@ -465,7 +488,7 @@ export default function TestLab() {
 
   const stats = useMemo(() => {
     const total = rows.length;
-    const passed = rows.filter((row) => row.evaluation?.pass).length;
+    const passed = rows.filter((row) => row.evaluation?.pass === "PASS" || row.evaluation?.pass === true).length;
     const errored = rows.filter((row) => row.evaluation?.status === "ERROR").length;
     const failed = total - passed - errored;
     const passRate = total ? Math.round((passed / total) * 100) : 0;
@@ -496,9 +519,9 @@ export default function TestLab() {
         filter === "all"
           ? true
           : filter === "failed"
-            ? !pass && status !== "ERROR"
+            ? !(pass === "PASS" || pass === true) && status !== "ERROR"
             : filter === "passed"
-              ? !!pass
+              ? pass === "PASS" || pass === true
               : filter === "error"
                 ? status === "ERROR"
                 : row.category === filter;
@@ -508,14 +531,13 @@ export default function TestLab() {
         String(row.id || "").toLowerCase().includes(q) ||
         String(row.category || "").toLowerCase().includes(q) ||
         String(row.input || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualTone || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualHidden || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualRegret || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualPressure || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualReply || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.actualVerdict || "").toLowerCase().includes(q) ||
-        String(row.evaluation?.mismatchReasons || [])
-          .join(" ")
+        String(row.evaluation?.actualTone || row.evaluation?.actual_tone || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualHidden || row.evaluation?.actual_signal || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualRegret || row.evaluation?.actual_regret || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualPressure || row.evaluation?.actual_pressure || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualReply || row.evaluation?.actual_reply_vibe || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.actualVerdict || row.evaluation?.actual_verdict || "").toLowerCase().includes(q) ||
+        String(row.evaluation?.mismatch_reasons || row.evaluation?.mismatchReasons || "")
           .toLowerCase()
           .includes(q);
 
@@ -529,36 +551,46 @@ export default function TestLab() {
   );
 
   return (
-    <div style={{ padding: 24, color: "#fff" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        padding: 24,
+        color: "#0f172a",
+        background:
+          "radial-gradient(circle at top left, rgba(93,214,255,0.20), transparent 26%), radial-gradient(circle at top right, rgba(124,92,255,0.18), transparent 22%), linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #fdf2f8 100%)",
+      }}
+    >
       <div style={{ maxWidth: 1320, margin: "0 auto", display: "grid", gap: 18 }}>
         <div
           style={{
             position: "sticky",
             top: 12,
             zIndex: 10,
-            borderRadius: 24,
+            borderRadius: 28,
             padding: 24,
             background:
-              "linear-gradient(180deg, rgba(27,27,40,0.98) 0%, rgba(20,20,30,0.98) 100%)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            backdropFilter: "blur(8px)",
+              "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.95))",
+            border: "1px solid rgba(124,92,255,0.16)",
+            backdropFilter: "blur(12px)",
+            boxShadow: "0 18px 42px rgba(99,102,241,0.10)",
           }}
         >
-          <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 8 }}>
+          <div style={{ fontSize: 13, color: "#7c3aed", fontWeight: 800, marginBottom: 8 }}>
             ToneCheck Consumer QA
           </div>
-          <h1 style={{ margin: 0, fontSize: 34 }}>ToneCheck Test Lab</h1>
+          <h1 style={{ margin: 0, fontSize: 36, color: "#1e1b4b" }}>ToneCheck Test Lab</h1>
           <p
             style={{
               marginTop: 10,
-              opacity: 0.8,
+              color: "#475569",
               maxWidth: 940,
-              lineHeight: 1.5,
+              lineHeight: 1.6,
+              fontSize: 15,
             }}
           >
-            This lab validates the consumer-facing output only: tone, hidden
-            signal, chance of regret, emotional pressure, reply vibe, send
-            verdict, advisory, and rewrite presence. No risk score checks here.
+            Make troubleshooting feel fast and visual. Validate tone, hidden signals,
+            regret, emotional pressure, reply vibe, verdict, rewrite quality, and advisory
+            without getting lost in backend noise.
           </p>
 
           <div
@@ -566,7 +598,7 @@ export default function TestLab() {
               display: "flex",
               gap: 12,
               flexWrap: "wrap",
-              marginTop: 16,
+              marginTop: 18,
             }}
           >
             <button
@@ -579,7 +611,8 @@ export default function TestLab() {
                 cursor: "pointer",
                 fontWeight: 800,
                 background: "linear-gradient(90deg, #7c5cff, #5dd6ff)",
-                color: "#101018",
+                color: "#fff",
+                boxShadow: "0 12px 26px rgba(124,92,255,0.20)",
               }}
             >
               {running
@@ -593,11 +626,11 @@ export default function TestLab() {
               style={{
                 padding: "12px 18px",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(239,68,68,0.16)",
                 cursor: running ? "pointer" : "not-allowed",
                 fontWeight: 700,
-                background: "rgba(255,255,255,0.05)",
-                color: "#fff",
+                background: "rgba(255,255,255,0.88)",
+                color: "#b91c1c",
               }}
             >
               Stop
@@ -609,11 +642,11 @@ export default function TestLab() {
               style={{
                 padding: "12px 18px",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(148,163,184,0.18)",
                 cursor: "pointer",
                 fontWeight: 700,
-                background: "rgba(255,255,255,0.05)",
-                color: "#fff",
+                background: "rgba(255,255,255,0.88)",
+                color: "#334155",
               }}
             >
               Upload CSV
@@ -625,11 +658,11 @@ export default function TestLab() {
               style={{
                 padding: "12px 18px",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(148,163,184,0.18)",
                 cursor: "pointer",
                 fontWeight: 700,
-                background: "rgba(255,255,255,0.05)",
-                color: "#fff",
+                background: "rgba(255,255,255,0.88)",
+                color: "#334155",
               }}
             >
               Load Default Cases
@@ -641,11 +674,11 @@ export default function TestLab() {
               style={{
                 padding: "12px 18px",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(148,163,184,0.18)",
                 cursor: rows.length ? "pointer" : "not-allowed",
                 fontWeight: 700,
-                background: "rgba(255,255,255,0.05)",
-                color: "#fff",
+                background: "rgba(255,255,255,0.88)",
+                color: "#334155",
               }}
             >
               Download Results
@@ -657,11 +690,11 @@ export default function TestLab() {
               style={{
                 padding: "12px 18px",
                 borderRadius: 14,
-                border: "1px solid rgba(255,255,255,0.12)",
+                border: "1px solid rgba(148,163,184,0.18)",
                 cursor: rows.length ? "pointer" : "not-allowed",
                 fontWeight: 700,
-                background: "rgba(255,255,255,0.05)",
-                color: "#fff",
+                background: "rgba(255,255,255,0.88)",
+                color: "#334155",
               }}
             >
               Copy Failures
@@ -676,30 +709,9 @@ export default function TestLab() {
             />
           </div>
 
-          <div style={{ marginTop: 12, fontSize: 13, opacity: 0.76 }}>
+          <div style={{ marginTop: 14, fontSize: 13, color: "#64748b" }}>
             Dataset: {fileToCasesLabel(sourceName, testCases.length)} · Model:{" "}
             {topModelVersion(rows)}
-          </div>
-
-          <div
-            style={{
-              marginTop: 12,
-              padding: 12,
-              borderRadius: 12,
-              background: "rgba(93,214,255,0.08)",
-              border: "1px solid rgba(93,214,255,0.22)",
-              fontSize: 13,
-              lineHeight: 1.5,
-            }}
-          >
-            CSV columns for this lab:
-            <br />
-            <strong>
-              id, category, input, expected_tone, expected_hidden_signal,
-              expected_regret_band, expected_emotional_pressure_band,
-              expected_reply_vibe, expected_send_verdict,
-              expected_rewrite_present, expected_advisory_present, notes
-            </strong>
           </div>
 
           {running ? (
@@ -707,19 +719,19 @@ export default function TestLab() {
               <ProgressBar done={progress.done} total={progress.total} />
               <div
                 style={{
-                  padding: 12,
-                  borderRadius: 12,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
+                  padding: 14,
+                  borderRadius: 16,
+                  background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,246,255,0.96))",
+                  border: "1px solid rgba(93,214,255,0.20)",
                 }}
               >
-                <div style={{ fontSize: 12, opacity: 0.72 }}>
+                <div style={{ fontSize: 12, color: "#64748b" }}>
                   Currently running
                 </div>
-                <div style={{ marginTop: 6, fontWeight: 800 }}>
+                <div style={{ marginTop: 6, fontWeight: 900, color: "#1e1b4b" }}>
                   {progress.currentId || "—"}
                 </div>
-                <div style={{ marginTop: 4, opacity: 0.88 }}>
+                <div style={{ marginTop: 4, color: "#334155" }}>
                   {progress.currentInput || "Waiting..."}
                 </div>
               </div>
@@ -731,10 +743,10 @@ export default function TestLab() {
               style={{
                 marginTop: 12,
                 padding: 12,
-                borderRadius: 12,
-                background: "rgba(255,92,92,0.08)",
-                border: "1px solid rgba(255,92,92,0.28)",
-                color: "#ffb7b7",
+                borderRadius: 14,
+                background: "rgba(254,242,242,0.96)",
+                border: "1px solid rgba(239,68,68,0.18)",
+                color: "#b91c1c",
                 fontWeight: 700,
               }}
             >
@@ -760,13 +772,13 @@ export default function TestLab() {
           <StatCard
             label="Failed"
             value={stats.failed}
-            subtitle="UI mismatch"
+            subtitle="Needs tuning"
             tone="bad"
           />
           <StatCard
             label="Errors"
             value={stats.errored}
-            subtitle="Request/runtime issues"
+            subtitle="Runtime or API issues"
             tone="warn"
           />
           <StatCard
@@ -781,8 +793,8 @@ export default function TestLab() {
           />
         </div>
 
-        <div style={{ ...cardStyle(), padding: 16, display: "grid", gap: 12 }}>
-          <div style={{ fontWeight: 800, fontSize: 18 }}>Filters</div>
+        <div style={{ ...cardStyle({ bright: true }), padding: 16, display: "grid", gap: 12 }}>
+          <div style={{ fontWeight: 900, fontSize: 18, color: "#1e1b4b" }}>Filters</div>
 
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Pill active={filter === "all"} onClick={() => setFilter("all")}>
@@ -815,10 +827,10 @@ export default function TestLab() {
             style={{
               width: "100%",
               padding: "12px 14px",
-              borderRadius: 12,
-              border: "1px solid rgba(255,255,255,0.10)",
-              background: "rgba(255,255,255,0.05)",
-              color: "#fff",
+              borderRadius: 14,
+              border: "1px solid rgba(148,163,184,0.18)",
+              background: "rgba(255,255,255,0.90)",
+              color: "#0f172a",
               outline: "none",
             }}
           />
@@ -867,7 +879,7 @@ export default function TestLab() {
                       flexWrap: "wrap",
                     }}
                   >
-                    <div style={{ fontWeight: 800 }}>
+                    <div style={{ fontWeight: 900, color: "#1e1b4b" }}>
                       {row.id} · {row.category}
                     </div>
                     <div
@@ -875,17 +887,17 @@ export default function TestLab() {
                         fontWeight: 900,
                         color:
                           tone === "good"
-                            ? "#7df0a8"
+                            ? "#15803d"
                             : tone === "bad"
-                              ? "#ff8e8e"
-                              : "#ffd38e",
+                              ? "#dc2626"
+                              : "#b45309",
                       }}
                     >
                       {statusLabel(row)}
                     </div>
                   </div>
 
-                  <div style={{ marginTop: 10, fontSize: 17, lineHeight: 1.45 }}>
+                  <div style={{ marginTop: 10, fontSize: 17, lineHeight: 1.5, color: "#0f172a" }}>
                     {row.input}
                   </div>
 
@@ -897,24 +909,12 @@ export default function TestLab() {
                       flexWrap: "wrap",
                     }}
                   >
-                    <span style={chipStyle()}>
-                      Tone: {e.actualTone || "—"}
-                    </span>
-                    <span style={chipStyle()}>
-                      Hidden: {e.actualHidden || "—"}
-                    </span>
-                    <span style={chipStyle()}>
-                      Regret: {e.actualRegret || "—"}
-                    </span>
-                    <span style={chipStyle()}>
-                      Pressure: {e.actualPressure || "—"}
-                    </span>
-                    <span style={chipStyle()}>
-                      Reply vibe: {e.actualReply || "—"}
-                    </span>
-                    <span style={chipStyle()}>
-                      Verdict: {e.actualVerdict || "—"}
-                    </span>
+                    <span style={chipStyle()}>Tone: {e.actualTone || e.actual_tone || "—"}</span>
+                    <span style={chipStyle()}>Hidden: {e.actualHidden || e.actual_signal || "—"}</span>
+                    <span style={chipStyle()}>Regret: {e.actualRegret || e.actual_regret || "—"}</span>
+                    <span style={chipStyle()}>Pressure: {e.actualPressure || e.actual_pressure || "—"}</span>
+                    <span style={chipStyle()}>Reply vibe: {e.actualReply || e.actual_reply_vibe || "—"}</span>
+                    <span style={chipStyle()}>Verdict: {e.actualVerdict || e.actual_verdict || "—"}</span>
                   </div>
 
                   <div
@@ -924,90 +924,46 @@ export default function TestLab() {
                       gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                       gap: 10,
                       fontSize: 14,
-                      opacity: 0.92,
+                      color: "#334155",
                     }}
                   >
-                    <div>
-                      <strong>Expected tone:</strong> {row.expected_tone || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual tone:</strong> {e.actualTone || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected hidden:</strong>{" "}
-                      {row.expected_hidden_signal || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual hidden:</strong> {e.actualHidden || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected regret:</strong>{" "}
-                      {row.expected_regret_band || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual regret:</strong> {e.actualRegret || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected pressure:</strong>{" "}
-                      {row.expected_emotional_pressure_band || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual pressure:</strong> {e.actualPressure || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected reply vibe:</strong>{" "}
-                      {row.expected_reply_vibe || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual reply vibe:</strong> {e.actualReply || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected verdict:</strong>{" "}
-                      {row.expected_send_verdict || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual verdict:</strong> {e.actualVerdict || "-"}
-                    </div>
-                    <div>
-                      <strong>Expected rewrite:</strong>{" "}
-                      {row.expected_rewrite_present || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual rewrite:</strong>{" "}
-                      {typeof e.actualRewrite === "boolean"
-                        ? String(e.actualRewrite)
-                        : "-"}
-                    </div>
-                    <div>
-                      <strong>Expected advisory:</strong>{" "}
-                      {row.expected_advisory_present || "-"}
-                    </div>
-                    <div>
-                      <strong>Actual advisory:</strong>{" "}
-                      {typeof e.actualAdvisory === "boolean"
-                        ? String(e.actualAdvisory)
-                        : "-"}
-                    </div>
+                    <div><strong>Expected tone:</strong> {row.expected_tone || "-"}</div>
+                    <div><strong>Actual tone:</strong> {e.actualTone || e.actual_tone || "-"}</div>
+                    <div><strong>Expected hidden:</strong> {row.expected_hidden_signal || row.expected_signal || "-"}</div>
+                    <div><strong>Actual hidden:</strong> {e.actualHidden || e.actual_signal || "-"}</div>
+                    <div><strong>Expected regret:</strong> {row.expected_regret_band || row.expected_regret || "-"}</div>
+                    <div><strong>Actual regret:</strong> {e.actualRegret || e.actual_regret || "-"}</div>
+                    <div><strong>Expected pressure:</strong> {row.expected_emotional_pressure_band || row.expected_pressure || "-"}</div>
+                    <div><strong>Actual pressure:</strong> {e.actualPressure || e.actual_pressure || "-"}</div>
+                    <div><strong>Expected reply vibe:</strong> {row.expected_reply_vibe || "-"}</div>
+                    <div><strong>Actual reply vibe:</strong> {e.actualReply || e.actual_reply_vibe || "-"}</div>
+                    <div><strong>Expected verdict:</strong> {row.expected_send_verdict || row.expected_verdict || "-"}</div>
+                    <div><strong>Actual verdict:</strong> {e.actualVerdict || e.actual_verdict || "-"}</div>
                   </div>
 
                   {row.apiResult?.model_version ? (
-                    <div style={{ marginTop: 10, fontSize: 13, opacity: 0.72 }}>
+                    <div style={{ marginTop: 10, fontSize: 13, color: "#64748b" }}>
                       <strong>Model:</strong> {row.apiResult.model_version}
                     </div>
                   ) : null}
 
-                  {(e.mismatchReasons || []).length ? (
+                  {(e.mismatchReasons || e.mismatch_reasons || []).length ? (
                     <div
                       style={{
                         marginTop: 12,
                         padding: 12,
-                        borderRadius: 12,
-                        background: "rgba(0,0,0,0.18)",
-                        color: tone === "warn" ? "#ffd38e" : "#ffb7b7",
+                        borderRadius: 14,
+                        background: tone === "warn" ? "rgba(255,247,237,0.96)" : "rgba(254,242,242,0.96)",
+                        color: tone === "warn" ? "#b45309" : "#b91c1c",
                         fontWeight: 700,
+                        border: tone === "warn"
+                          ? "1px solid rgba(245,158,11,0.18)"
+                          : "1px solid rgba(239,68,68,0.14)",
                       }}
                     >
-                      {(e.mismatchReasons || []).join(", ")}
+                      {Array.isArray(e.mismatchReasons)
+                        ? e.mismatchReasons.join(", ")
+                        : e.mismatch_reasons || ""}
                     </div>
                   ) : null}
 
@@ -1017,9 +973,9 @@ export default function TestLab() {
                       style={{
                         padding: "10px 14px",
                         borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.10)",
-                        background: "rgba(255,255,255,0.04)",
-                        color: "#fff",
+                        border: "1px solid rgba(148,163,184,0.18)",
+                        background: "rgba(255,255,255,0.88)",
+                        color: "#334155",
                         cursor: "pointer",
                         fontWeight: 700,
                       }}
@@ -1033,11 +989,11 @@ export default function TestLab() {
                       style={{
                         padding: "10px 14px",
                         borderRadius: 12,
-                        border: "1px solid rgba(124,92,255,0.4)",
-                        background: "rgba(124,92,255,0.15)",
-                        color: "#fff",
+                        border: "1px solid rgba(124,92,255,0.24)",
+                        background: "linear-gradient(135deg, rgba(124,92,255,0.12), rgba(93,214,255,0.12))",
+                        color: "#312e81",
                         cursor: running || isSingleRunning ? "not-allowed" : "pointer",
-                        fontWeight: 700,
+                        fontWeight: 800,
                         opacity: running || isSingleRunning ? 0.6 : 1,
                       }}
                     >
@@ -1050,11 +1006,12 @@ export default function TestLab() {
                       style={{
                         marginTop: 14,
                         padding: 14,
-                        borderRadius: 14,
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.08)",
+                        borderRadius: 16,
+                        background: "rgba(255,255,255,0.86)",
+                        border: "1px solid rgba(148,163,184,0.14)",
                         display: "grid",
                         gap: 10,
+                        color: "#334155",
                       }}
                     >
                       {row.notes ? (
@@ -1075,9 +1032,9 @@ export default function TestLab() {
                               maxHeight: 240,
                               marginTop: 6,
                               padding: 10,
-                              background: "#000",
-                              borderRadius: 8,
-                              color: "#0f0",
+                              background: "#0f172a",
+                              borderRadius: 10,
+                              color: "#c7f9cc",
                             }}
                           >
                             {JSON.stringify(row.apiResult, null, 2)}
@@ -1122,21 +1079,21 @@ export default function TestLab() {
             {!running && rows.length === 0 ? (
               <div
                 style={{
-                  ...cardStyle(),
+                  ...cardStyle({ bright: true }),
                   padding: 18,
                   borderStyle: "dashed",
-                  opacity: 0.75,
+                  opacity: 0.92,
+                  color: "#475569",
                 }}
               >
-                Click <strong>Run All Tests</strong> to validate ToneCheck
-                consumer output, or upload a CSV first.
+                Click <strong>Run All Tests</strong> to validate ToneCheck consumer output, or upload a CSV first.
               </div>
             ) : null}
           </div>
 
           <div style={{ display: "grid", gap: 14 }}>
-            <div style={{ ...cardStyle(), padding: 16 }}>
-              <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+            <div style={{ ...cardStyle({ bright: true }), padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 12, color: "#1e1b4b" }}>
                 Category Summary
               </div>
               <div style={{ display: "grid", gap: 10 }}>
@@ -1146,9 +1103,10 @@ export default function TestLab() {
                       key={item.category}
                       style={{
                         padding: 12,
-                        borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        background: "rgba(255,255,255,0.03)",
+                        borderRadius: 14,
+                        border: "1px solid rgba(148,163,184,0.14)",
+                        background: "rgba(255,255,255,0.82)",
+                        color: "#334155",
                       }}
                     >
                       <div
@@ -1163,19 +1121,19 @@ export default function TestLab() {
                           {item.passed}/{item.total} pass
                         </span>
                       </div>
-                      <div style={{ marginTop: 6, fontSize: 13, opacity: 0.72 }}>
+                      <div style={{ marginTop: 6, fontSize: 13, color: "#64748b" }}>
                         Failed: {item.failed} · Error: {item.errored}
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div style={{ opacity: 0.7 }}>Run tests to see grouped failures.</div>
+                  <div style={{ color: "#64748b" }}>Run tests to see grouped failures.</div>
                 )}
               </div>
             </div>
 
-            <div style={{ ...cardStyle(), padding: 16 }}>
-              <div style={{ fontWeight: 800, fontSize: 18, marginBottom: 12 }}>
+            <div style={{ ...cardStyle({ bright: true }), padding: 16 }}>
+              <div style={{ fontWeight: 900, fontSize: 18, marginBottom: 12, color: "#1e1b4b" }}>
                 Mismatch Summary
               </div>
               <div style={{ display: "grid", gap: 10 }}>
@@ -1185,9 +1143,10 @@ export default function TestLab() {
                       key={item.reason}
                       style={{
                         padding: 12,
-                        borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        background: "rgba(255,255,255,0.03)",
+                        borderRadius: 14,
+                        border: "1px solid rgba(148,163,184,0.14)",
+                        background: "rgba(255,255,255,0.82)",
+                        color: "#334155",
                       }}
                     >
                       <div
@@ -1203,7 +1162,7 @@ export default function TestLab() {
                     </div>
                   ))
                 ) : (
-                  <div style={{ opacity: 0.7 }}>No mismatches yet.</div>
+                  <div style={{ color: "#64748b" }}>No mismatches yet.</div>
                 )}
               </div>
             </div>
