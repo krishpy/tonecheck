@@ -127,6 +127,24 @@ function inferVerdictFromSignals(
     };
   }
 
+  if (
+  hidden === "insult_signal" ||
+  hidden === "insult" ||
+  hidden === "profanity_signal" ||
+  hidden === "profanity" ||
+  hidden === "hostile_command_signal" ||
+  hidden === "hostile command"
+) {
+  return {
+    label: "Rethink Before Sending",
+    sublabel: "This may come across as harsh or insulting",
+    emoji: "⚠️",
+    tone: "danger",
+  };
+}
+
+
+
   if (combined >= 65 || riskScore >= 50) {
     return {
       label: "Careful — may be misunderstood",
@@ -155,8 +173,11 @@ function inferVerdictFromSignals(
 
 function getSendVerdict(payload) {
   const apiVerdict = verdictFromApiValue(
-    payload?.sendVerdict || payload?.send_verdict
-  );
+  payload?.sendDecision ||
+  payload?.send_decision ||
+  payload?.sendVerdict ||
+  payload?.send_verdict
+);
   if (apiVerdict) return apiVerdict;
 
   return inferVerdictFromSignals(
@@ -248,6 +269,7 @@ export default function SendDecisionCard({
   manipulationRisk = 0,
   threatScore = 0,
   tone = "",
+  
   hiddenSignal = "",
   replyVibe = "",
 }) {
@@ -260,6 +282,7 @@ export default function SendDecisionCard({
     primary_hidden_signal: hiddenSignal,
     reply_vibe: replyVibe,
     send_verdict: "",
+    send_decision: "",
   };
 
   const verdict = getSendVerdict({
@@ -271,6 +294,7 @@ export default function SendDecisionCard({
     tone: effectiveResult?.tone,
     hiddenSignal: effectiveResult?.primary_hidden_signal,
     replyVibe: effectiveResult?.reply_vibe,
+    sendDecision: effectiveResult?.send_decision,
   });
 
   const theme = getVerdictTheme(verdict.tone);
