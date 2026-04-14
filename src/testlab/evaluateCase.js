@@ -1,209 +1,404 @@
-function norm(value) {
-  return String(value || "").trim().toLowerCase();
+function normalize(value) {
+  return String(value ?? "").trim().toLowerCase();
 }
 
-function safeNumber(value, fallback = 0) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
+function normalizeTone(value) {
+  const v = normalize(value).replace(/_/g, " ");
 
-function toneNorm(value) {
-  const v = norm(value);
   const map = {
-    aggressive: "aggressive",
-    threatening: "threatening",
-    hostile: "aggressive",
-    accusatory: "accusatory",
-    manipulative: "manipulative",
-    frustrated: "frustrated",
-    tense: "tense",
-    emotional: "emotional",
-    firm: "firm",
-    professional: "professional",
-    polite: "polite",
-    friendly: "friendly",
-    neutral: "neutral",
+    passiveaggressive: "passive aggressive",
     passive_aggressive: "passive aggressive",
-    "passive aggressive": "passive aggressive",
   };
+
   return map[v] || v;
 }
 
-function signalNorm(value) {
-  const v = norm(value);
+function normalizeSignal(value) {
+  const v = normalize(value).replace(/_/g, " ");
+
+  if (!v || v === "none detected" || v === "none" || v === "neutral information") {
+    return "none";
+  }
+
   const map = {
-    "": "none",
-    none: "none",
-    "none detected": "none",
-    neutral: "none",
-    neutral_information: "none",
+  pressure: "pressure",
+  "pressure signal": "pressure",
+  pressure_signal: "pressure",
 
-    threat: "threat_signal",
-    threat_signal: "threat_signal",
+  "passive aggression": "passive aggression",
+  passive_aggression: "passive aggression",
+  "passive aggression signal": "passive aggression",
 
-    insult: "insult_signal",
-    insult_signal: "insult_signal",
+  threat: "threat",
+  "threat signal": "threat",
+  threat_signal: "threat",
 
-    profanity: "profanity_signal",
-    profanity_signal: "profanity_signal",
+  ultimatum: "ultimatum",
+  "ultimatum signal": "ultimatum",
+  ultimatum_signal: "ultimatum",
 
-    pressure: "pressure_signal",
-    pressure_signal: "pressure_signal",
+  insult: "insult",
+  "insult signal": "insult",
+  insult_signal: "insult",
 
-    accusation: "accusation_signal",
-    accusation_signal: "accusation_signal",
+  profanity: "profanity",
+  "profanity signal": "profanity",
+  profanity_signal: "profanity",
 
-    guilt_pressure: "guilt_pressure",
-    guilt_tripping: "guilt_pressure",
-    guilt_trip_signal: "guilt_pressure",
-
-    emotional_leverage: "emotional_leverage",
-    emotional_dependency: "emotional_dependency",
-
-    passive_aggression: "passive_aggression_signal",
-    passive_aggression_signal: "passive_aggression_signal",
-    "passive aggression": "passive_aggression_signal",
-
-    hostile_command: "hostile_command_signal",
-    hostile_command_signal: "hostile_command_signal",
-
-    boundary_signal: "boundary_signal",
-  };
+  boundary: "boundary",
+  "boundary setting": "boundary",
+  "boundary signal": "boundary",
+  boundary_signal: "boundary",
+};
   return map[v] || v;
 }
 
-function levelNorm(value) {
-  const v = norm(value);
-  if (["low", "medium", "high"].includes(v)) return v;
+function bucketScore(score) {
+  const n = Number(score || 0);
+  if (n >= 70) return "high";
+  if (n >= 40) return "medium";
   return "low";
 }
 
-function verdictNorm(value) {
-  const v = norm(value);
+function normalizePressure(value) {
+  const v = normalize(value);
+  if (!v) return "";
+
+  if (["low", "medium", "high"].includes(v)) return v;
+
   const map = {
-    send: "send",
-    safe: "send",
-    safe_to_send: "send",
-
-    refine: "review",
-    review: "review",
-    review_before_sending: "review",
-    rethink: "review",
-
-    do_not_send: "dont_send",
-    dont_send: "dont_send",
-    "don't send": "dont_send",
+    none: "low",
+    mild: "low",
   };
+
   return map[v] || v;
 }
 
-function getActualTone(result) {
-  return toneNorm(result?.tone || result?.label);
-}
+function normalizeReplyVibe(value) {
+  const v = normalize(value);
+  if (!v) return "";
 
-function getActualSignal(result) {
-  return signalNorm(
-    result?.primary_hidden_signal ||
-      result?.hidden_signal ||
-      result?.primary_manipulation_signal
-  );
-}
+  const map = {
+    good: "good",
+    positive: "good",
+    likely: "good",
 
-function getActualRegret(result) {
-  return levelNorm(result?.chance_of_regret || result?.regret_risk_band);
-}
+    mixed: "mixed",
+    uncertain: "mixed",
 
-function getActualPressure(result) {
-  return levelNorm(result?.emotional_pressure);
-}
-
-function getActualReplyVibe(result) {
-  return levelNorm(result?.reply_vibe);
-}
-
-function getActualVerdict(result) {
-  return verdictNorm(result?.send_decision || result?.send_verdict);
-}
-
-function compareField(expected, actual) {
-  if (!expected) return { pass: true };
-  return {
-    pass: expected === actual,
-    expected,
-    actual,
+    low: "low",
+    poor: "low",
+    unlikely: "low",
+    bad: "low",
   };
+
+  return map[v] || v;
 }
 
-export function evaluateCase(testCase, result) {
-  const expectedTone = toneNorm(testCase.expected_tone);
-  const expectedSignal = signalNorm(testCase.expected_signal);
-  const expectedRegret = levelNorm(testCase.expected_regret);
-  const expectedPressure = levelNorm(testCase.expected_pressure);
-  const expectedReplyVibe = levelNorm(testCase.expected_reply_vibe);
-  const expectedVerdict = verdictNorm(testCase.expected_verdict);
+function replyBandFromApi(apiResult) {
+  if (apiResult?.reply_vibe) {
+    return normalizeReplyVibe(apiResult.reply_vibe);
+  }
 
-  const actualTone = getActualTone(result);
-  const actualSignal = getActualSignal(result);
-  const actualRegret = getActualRegret(result);
-  const actualPressure = getActualPressure(result);
-  const actualReplyVibe = getActualReplyVibe(result);
-  const actualVerdict = getActualVerdict(result);
+  if (apiResult?.reply_likelihood_band) {
+    const band = normalize(apiResult.reply_likelihood_band);
+    if (band === "high") return "good";
+    if (band === "medium") return "mixed";
+    return "low";
+  }
 
-  const toneCheck = compareField(expectedTone, actualTone);
-  const signalCheck = compareField(expectedSignal, actualSignal);
-  const regretCheck = compareField(expectedRegret, actualRegret);
-  const pressureCheck = compareField(expectedPressure, actualPressure);
-  const replyCheck = compareField(expectedReplyVibe, actualReplyVibe);
-  const verdictCheck = compareField(expectedVerdict, actualVerdict);
+  const score = Number(apiResult?.reply_likelihood ?? 0);
+  if (score >= 70) return "good";
+  if (score >= 40) return "mixed";
+  return "low";
+}
 
-  const mismatches = [];
+function regretBandFromApi(apiResult) {
+  if (apiResult?.chance_of_regret) {
+    return normalize(apiResult.chance_of_regret);
+  }
 
-  if (!toneCheck.pass) mismatches.push(`tone: expected ${expectedTone}, got ${actualTone}`);
-  if (!signalCheck.pass) mismatches.push(`signal: expected ${expectedSignal}, got ${actualSignal}`);
-  if (!regretCheck.pass) mismatches.push(`regret: expected ${expectedRegret}, got ${actualRegret}`);
-  if (!pressureCheck.pass) mismatches.push(`pressure: expected ${expectedPressure}, got ${actualPressure}`);
-  if (!replyCheck.pass) mismatches.push(`reply_vibe: expected ${expectedReplyVibe}, got ${actualReplyVibe}`);
-  if (!verdictCheck.pass) mismatches.push(`verdict: expected ${expectedVerdict}, got ${actualVerdict}`);
+  if (apiResult?.regret_risk_band) {
+    return normalize(apiResult.regret_risk_band);
+  }
+
+  return bucketScore(apiResult?.regret_risk ?? 0);
+}
+
+function pressureBandFromApi(apiResult) {
+  if (apiResult?.emotional_pressure) {
+    return normalizePressure(apiResult.emotional_pressure);
+  }
+
+  return bucketScore(apiResult?.pressure_score ?? 0);
+}
+
+function verdictFromApi(apiResult) {
+  const sendDecision = normalize(apiResult?.send_decision);
+  const sendDecisionLabel = normalize(apiResult?.send_decision_label);
+  const sendVerdict = normalize(apiResult?.send_verdict);
+
+  const raw = sendDecision || sendVerdict || sendDecisionLabel;
+
+  if (!raw) return "";
+
+  if (
+    raw === "do_not_send" ||
+    raw === "dont send" ||
+    raw === "don't send" ||
+    raw.includes("do not send")
+  ) {
+    return "dont_send";
+  }
+
+  if (
+    raw === "review" ||
+    raw.includes("review") ||
+    raw.includes("careful") ||
+    raw.includes("misunderstood")
+  ) {
+    return "review";
+  }
+
+  if (
+    raw === "send" ||
+    raw.includes("safe to send") ||
+    raw.includes("looks okay to send") ||
+    raw.includes("safe")
+  ) {
+    return "send";
+  }
+
+  return raw;
+}
+
+function normalizeExpectedVerdict(value) {
+  const v = normalize(value);
+  if (!v) return "";
+
+  if (
+    v === "dont_send" ||
+    v === "do_not_send" ||
+    v === "don't send" ||
+    v === "dont send"
+  ) {
+    return "dont_send";
+  }
+
+  if (
+    v === "review" ||
+    v === "careful" ||
+    v.includes("refine") ||
+    v.includes("soften") ||
+    v.includes("misunderstood")
+  ) {
+    return "review";
+  }
+
+  if (
+    v === "send" ||
+    v.includes("safe") ||
+    v.includes("looks okay") ||
+    v.includes("safe to send")
+  ) {
+    return "send";
+  }
+
+  return v;
+}
+
+function hasRewrite(apiResult) {
+  const rewrite =
+    apiResult?.rewrite_suggestion ||
+    apiResult?.rewritten_text ||
+    "";
+
+  return normalize(rewrite).length > 0;
+}
+
+function hasAdvisory(apiResult) {
+  return normalize(apiResult?.advisory).length > 0;
+}
+
+function buildFailureHints({
+  expectedTone,
+  actualTone,
+  expectedHidden,
+  actualHidden,
+  expectedRegret,
+  actualRegret,
+  expectedPressure,
+  actualPressure,
+  expectedReply,
+  actualReply,
+  expectedVerdict,
+  actualVerdict,
+}) {
+  const hints = [];
+
+  if (expectedTone && expectedTone !== actualTone) {
+    hints.push({
+      type: "tone",
+      title: "Tone mismatch",
+      expected: expectedTone,
+      actual: actualTone || "(empty)",
+      suggestion: "Check tone_label ordering and phrase guards before fallback scoring.",
+    });
+  }
+
+  if (expectedHidden && expectedHidden !== actualHidden) {
+    hints.push({
+      type: "hidden_signal",
+      title: "Hidden signal mismatch",
+      expected: expectedHidden,
+      actual: actualHidden || "(empty)",
+      suggestion: "Check primary_hidden_signal derivation and phrase override ordering.",
+    });
+  }
+
+  if (expectedRegret && expectedRegret !== actualRegret) {
+    hints.push({
+      type: "regret",
+      title: "Regret band mismatch",
+      expected: expectedRegret,
+      actual: actualRegret || "(empty)",
+      suggestion: "Check regret_risk band mapping and UI output mapping.",
+    });
+  }
+
+  if (expectedPressure && expectedPressure !== actualPressure) {
+    hints.push({
+      type: "pressure",
+      title: "Pressure mismatch",
+      expected: expectedPressure,
+      actual: actualPressure || "(empty)",
+      suggestion: "Check pressure signal thresholds and emotional_pressure mapping.",
+    });
+  }
+
+  if (expectedReply && expectedReply !== actualReply) {
+    hints.push({
+      type: "reply_vibe",
+      title: "Reply vibe mismatch",
+      expected: expectedReply,
+      actual: actualReply || "(empty)",
+      suggestion: "Check reply likelihood to reply vibe conversion.",
+    });
+  }
+
+  if (expectedVerdict && expectedVerdict !== actualVerdict) {
+    hints.push({
+      type: "verdict",
+      title: "Verdict mismatch",
+      expected: expectedVerdict,
+      actual: actualVerdict || "(empty)",
+      suggestion: "Check send_decision and consumer output layer mapping.",
+    });
+  }
+
+  return hints;
+}
+
+export function evaluateCase(testCase, apiResult) {
+  const expectedTone = normalizeTone(testCase?.expected_tone);
+  const actualTone = normalizeTone(apiResult?.tone || apiResult?.label);
+
+  const expectedHidden = normalizeSignal(testCase?.expected_signal);
+  const actualHidden = normalizeSignal(
+    apiResult?.hidden_signal || apiResult?.primary_hidden_signal
+  );
+
+  const expectedRegret = normalize(testCase?.expected_regret || testCase?.expected_regret_band);
+  const actualRegret = regretBandFromApi(apiResult);
+
+  const expectedPressure = normalizePressure(testCase?.expected_pressure);
+  const actualPressure = pressureBandFromApi(apiResult);
+
+  const expectedReply = normalizeReplyVibe(testCase?.expected_reply_vibe);
+  const actualReply = replyBandFromApi(apiResult);
+
+  const expectedVerdict = normalizeExpectedVerdict(testCase?.expected_verdict);
+  const actualVerdict = verdictFromApi(apiResult);
+
+  const tonePass = !expectedTone || expectedTone === actualTone;
+  const hiddenPass = !expectedHidden || expectedHidden === actualHidden;
+  const regretPass = !expectedRegret || expectedRegret === actualRegret;
+  const pressurePass = !expectedPressure || expectedPressure === actualPressure;
+  const replyPass = !expectedReply || expectedReply === actualReply;
+  const verdictPass = !expectedVerdict || expectedVerdict === actualVerdict;
+
+  const mismatchReasons = [];
+  if (!tonePass) mismatchReasons.push(`tone expected "${expectedTone}" got "${actualTone}"`);
+  if (!hiddenPass) mismatchReasons.push(`signal expected "${expectedHidden}" got "${actualHidden}"`);
+  if (!regretPass) mismatchReasons.push(`regret expected "${expectedRegret}" got "${actualRegret}"`);
+  if (!pressurePass) mismatchReasons.push(`pressure expected "${expectedPressure}" got "${actualPressure}"`);
+  if (!replyPass) mismatchReasons.push(`reply vibe expected "${expectedReply}" got "${actualReply}"`);
+  if (!verdictPass) mismatchReasons.push(`verdict expected "${expectedVerdict}" got "${actualVerdict}"`);
+
+  const pass =
+    tonePass &&
+    hiddenPass &&
+    regretPass &&
+    pressurePass &&
+    replyPass &&
+    verdictPass;
+
   return {
-    id: testCase.id,
-    category: testCase.category,
-    input: testCase.input,
+    pass,
+    status: pass ? "PASS" : "FAIL",
 
-    expected_tone: expectedTone,
-    actual_tone: actualTone,
+    expectedTone,
     actualTone,
 
-    expected_signal: expectedSignal,
-    actual_signal: actualSignal,
-    actualHidden: actualSignal,
+    expectedHidden,
+    actualHidden,
 
-    expected_regret: expectedRegret,
-    actual_regret: actualRegret,
+    expectedRegret,
     actualRegret,
 
-    expected_pressure: expectedPressure,
-    actual_pressure: actualPressure,
+    expectedPressure,
     actualPressure,
 
-    expected_reply_vibe: expectedReplyVibe,
-    actual_reply_vibe: actualReplyVibe,
-    actualReply: actualReplyVibe,
+    expectedReply,
+    actualReply,
 
-    expected_verdict: expectedVerdict,
-    actual_verdict: actualVerdict,
+    expectedVerdict,
     actualVerdict,
 
-    pass: mismatches.length === 0 ? "PASS" : "FAIL",
-    mismatch_reasons: mismatches.join(" | "),
-    mismatchReasons: mismatches,
+    actualRewrite: hasRewrite(apiResult),
+    actualAdvisory: hasAdvisory(apiResult),
 
-    api_tone: result?.tone || "",
-    api_hidden_signal: result?.primary_hidden_signal || result?.hidden_signal || "",
-    api_risk_score: safeNumber(result?.communication_risk_score ?? result?.risk_score),
-    api_regret_risk: safeNumber(result?.regret_risk),
-    api_reply_likelihood: safeNumber(result?.reply_likelihood),
-    api_send_decision: result?.send_decision || result?.send_verdict || "",
-    rewrite: result?.rewritten_text || result?.rewrite_suggestion || "",
-    advisory: result?.advisory || "",
+    mismatchReasons,
+    failureHints: buildFailureHints({
+      expectedTone,
+      actualTone,
+      expectedHidden,
+      actualHidden,
+      expectedRegret,
+      actualRegret,
+      expectedPressure,
+      actualPressure,
+      expectedReply,
+      actualReply,
+      expectedVerdict,
+      actualVerdict,
+    }),
+
+    apiTone: apiResult?.tone || apiResult?.label || "",
+    apiHiddenSignal:
+      apiResult?.hidden_signal || apiResult?.primary_hidden_signal || "",
+    apiRiskScore: apiResult?.communication_risk_score ?? apiResult?.risk_score ?? "",
+    apiRegretRisk: apiResult?.regret_risk ?? "",
+    apiReplyLikelihood: apiResult?.reply_likelihood ?? "",
+    apiSendDecision:
+      apiResult?.send_decision ||
+      apiResult?.send_decision_label ||
+      apiResult?.send_verdict ||
+      "",
+    rewrite:
+      apiResult?.rewrite_suggestion ||
+      apiResult?.rewritten_text ||
+      "",
+    advisory: apiResult?.advisory || "",
   };
 }
