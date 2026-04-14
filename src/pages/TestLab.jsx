@@ -346,56 +346,55 @@ export default function TestLab() {
     });
 
     try {
-      await runAllTests(
-        testCases,
-        API_BASE_URL,
-        (done, total, currentCase, latestRow) => {
-          setProgress({
-            done,
-            total,
-            currentId: currentCase?.id || "",
-            currentInput: currentCase?.input || "",
-          });
+ await runAllTests(
+  testCases,
+  (done, total, currentCase, latestRow) => {
+    setProgress({
+      done,
+      total,
+      currentId: currentCase?.id || "",
+      currentInput: currentCase?.input || "",
+    });
 
-          if (!latestRow) return;
+    if (!latestRow) return;
 
-          const evaluatedRow =
-            latestRow.error || !latestRow.apiResult
-              ? {
-                  ...latestRow,
-                  evaluation: {
-                    pass: false,
-                    status: "ERROR",
-                    actualTone: "",
-                    actualHidden: "",
-                    actualRegret: "",
-                    actualPressure: "",
-                    actualReply: "",
-                    actualVerdict: "",
-                    actualRewrite: false,
-                    actualAdvisory: false,
-                    mismatchReasons: [latestRow.error || "no result"],
-                    failureHints: [
-                      {
-                        type: "error",
-                        title: "Request/runtime error",
-                        expected: "successful API response",
-                        actual: latestRow.error || "no result",
-                        suggestion:
-                          "Check backend logs, endpoint availability, and response schema.",
-                      },
-                    ],
-                  },
-                }
-              : {
-                  ...latestRow,
-                  evaluation: evaluateCase(latestRow, latestRow.apiResult),
-                };
+    const evaluatedRow =
+      latestRow.error || !latestRow.apiResult
+        ? {
+            ...latestRow,
+            evaluation: {
+              pass: false,
+              status: "ERROR",
+              actualTone: "",
+              actualHidden: "",
+              actualRegret: "",
+              actualPressure: "",
+              actualReply: "",
+              actualVerdict: "",
+              actualRewrite: false,
+              actualAdvisory: false,
+              mismatchReasons: [latestRow.error || "no result"],
+              failureHints: [
+                {
+                  type: "error",
+                  title: "Request/runtime error",
+                  expected: "successful API response",
+                  actual: latestRow.error || "no result",
+                  suggestion:
+                    "Check backend logs, endpoint availability, and response schema.",
+                },
+              ],
+            },
+          }
+        : {
+            ...latestRow,
+            evaluation: evaluateCase(latestRow, latestRow.apiResult),
+          };
 
-          setRows((prev) => [...prev, evaluatedRow]);
-        },
-        controller.signal
-      );
+    setRows((prev) => [...prev, evaluatedRow]);
+  },
+  controller.signal
+);
     } finally {
       setRunning(false);
       abortRef.current = null;
