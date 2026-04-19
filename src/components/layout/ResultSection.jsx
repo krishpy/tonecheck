@@ -3,26 +3,28 @@ import { RewriteCard, DetectedSignals } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
+import { submitFeedback } from "../lib/api";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(
-          result?.send_decision || result?.send_verdict || ""
-        ).toLowerCase().trim();
+    result?.send_decision || result?.send_verdict || ""
+  )
+    .toLowerCase()
+    .trim();
+
   const risk = Number(result?.communication_risk_score || 0);
   const hidden = String(
     result?.hidden_signal || result?.primary_hidden_signal || ""
   ).toLowerCase();
   const tone = String(result?.tone || "").toLowerCase();
 
-
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
   const hasRewrite =
-  !!result?.rewrite_suggestion?.trim() &&
-  result?.rewrite_source !== "blocked_safe_message" &&
-  result?.rewrite_source !== "blocked_invalid_safe_rewrite"
+    !!result?.rewrite_suggestion?.trim() &&
+    result?.rewrite_source !== "blocked_safe_message" &&
+    result?.rewrite_source !== "blocked_invalid_safe_rewrite";
 
-  // Trust backend first
   if (apiVerdict === "do_not_send") {
     return {
       tone: "danger",
@@ -59,7 +61,6 @@ function buildSendVerdict(result) {
     };
   }
 
-  // Fallback only if backend verdict is missing
   if (risk <= 20 && isSafeHidden) {
     return {
       tone: "safe",
@@ -300,9 +301,48 @@ export default function ResultSection({
   setCopyState,
   setMessage,
 }) {
+  const isMobile = useIsMobile();
+
+  const [feedbackSent, setFeedbackSent] = React.useState(false);
+  const [showNegativeOptions, setShowNegativeOptions] = React.useState(false);
+  const [feedbackLoading, setFeedbackLoading] = React.useState(false);
+  const [feedbackError, setFeedbackError] = React.useState("");
+
+  React.useEffect(() => {
+    setFeedbackSent(false);
+    setShowNegativeOptions(false);
+    setFeedbackLoading(false);
+    setFeedbackError("");
+  }, [result?.analysis_event_id]);
+
   if (!result || result.error) return null;
 
-  const isMobile = useIsMobile();
+  async function handleFeedback(feedback_rating, wrong_area = null) {
+    if (!result?.analysis_event_id) {
+      setFeedbackError("Feedback is unavailable for this result.");
+      return;
+    }
+
+    try {
+      setFeedbackLoading(true);
+      setFeedbackError("");
+
+      await submitFeedback({
+        analysis_event_id: result.analysis_event_id,
+        feedback_rating,
+        wrong_area,
+        comment: null,
+      });
+
+      setFeedbackSent(true);
+      setShowNegativeOptions(false);
+    } catch (err) {
+      console.error(err);
+      setFeedbackError("Could not save feedback. Please try again.");
+    } finally {
+      setFeedbackLoading(false);
+    }
+  }
 
   const backendRisk = Number(result?.communication_risk_score || 0);
 
@@ -316,16 +356,23 @@ export default function ResultSection({
   const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
   const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
 
-const toneLabel = result?.tone || result?.label || "Neutral";
-const toneEmoji =
-  String(toneLabel).toLowerCase() === "aggressive" ? "😠" :
-  String(toneLabel).toLowerCase() === "threatening" ? "⛔" :
-  String(toneLabel).toLowerCase() === "accusatory" ? "⚠️" :
-  String(toneLabel).toLowerCase() === "frustrated" ? "😤" :
-  String(toneLabel).toLowerCase() === "tense" ? "😬" :
-  String(toneLabel).toLowerCase() === "friendly" ? "🙂" :
-  String(toneLabel).toLowerCase() === "polite" ? "🙂" :
-  "🙂";
+  const toneLabel = result?.tone || result?.label || "Neutral";
+  const toneEmoji =
+    String(toneLabel).toLowerCase() === "aggressive"
+      ? "😠"
+      : String(toneLabel).toLowerCase() === "threatening"
+      ? "⛔"
+      : String(toneLabel).toLowerCase() === "accusatory"
+      ? "⚠️"
+      : String(toneLabel).toLowerCase() === "frustrated"
+      ? "😤"
+      : String(toneLabel).toLowerCase() === "tense"
+      ? "😬"
+      : String(toneLabel).toLowerCase() === "friendly"
+      ? "🙂"
+      : String(toneLabel).toLowerCase() === "polite"
+      ? "🙂"
+      : "🙂";
 
   const sendVerdict = buildSendVerdict(result);
 
@@ -336,8 +383,7 @@ const toneEmoji =
   });
 
   const safeRewrite =
-    backendRisk <= 20 &&
-    ["none", "none detected", ""].includes(backendHidden)
+    backendRisk <= 20 && ["none", "none detected", ""].includes(backendHidden)
       ? ""
       : backendRewrite;
 
@@ -393,6 +439,17 @@ const toneEmoji =
   const shouldShowSignalChip = !topCardChipHiddenLabels.has(
     String(adaptiveVerdict.chipLabel || "").trim().toLowerCase()
   );
+
+  const feedbackButtonStyle = {
+    border: "1px solid rgba(15,23,42,0.10)",
+    background: "rgba(255,255,255,0.92)",
+    color: "#0f172a",
+    borderRadius: "12px",
+    padding: "10px 14px",
+    fontSize: "13px",
+    fontWeight: 800,
+    cursor: "pointer",
+  };
 
   return (
     <>
@@ -783,6 +840,184 @@ const toneEmoji =
             getHiddenSignalLabel={getHiddenSignalLabel}
           />
         )}
+
+        <div
+          style={{
+            ...cardStyle,
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.92), rgba(248,250,252,0.96))",
+            border: "1px solid rgba(15,23,42,0.08)",
+          }}
+        >
+          {!feedbackSent ? (
+            <>
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#64748b",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                HELP IMPROVE TONECHECK
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontSize: "18px",
+                  color: "#111827",
+                  fontWeight: 700,
+                }}
+              >
+                Was this result accurate?
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  color: "#64748b",
+                  fontSize: "14px",
+                  lineHeight: 1.6,
+                }}
+              >
+                Your feedback helps improve tone, hidden signal, rewrite, and verdict quality.
+              </div>
+
+              <div
+                style={{
+                  marginTop: "14px",
+                  display: "flex",
+                  gap: "10px",
+                  flexWrap: "wrap",
+                }}
+              >
+                <button
+                  type="button"
+                  className="tc-button-hover"
+                  disabled={feedbackLoading}
+                  onClick={() => handleFeedback("positive")}
+                  style={feedbackButtonStyle}
+                >
+                  👍 Yes, accurate
+                </button>
+
+                <button
+                  type="button"
+                  className="tc-button-hover"
+                  disabled={feedbackLoading}
+                  onClick={() => setShowNegativeOptions((prev) => !prev)}
+                  style={feedbackButtonStyle}
+                >
+                  👎 Not quite
+                </button>
+              </div>
+
+              {showNegativeOptions && (
+                <div
+                  style={{
+                    marginTop: "14px",
+                    display: "flex",
+                    gap: "8px",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="tc-button-hover"
+                    disabled={feedbackLoading}
+                    onClick={() => handleFeedback("negative", "tone")}
+                    style={feedbackButtonStyle}
+                  >
+                    Wrong tone
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tc-button-hover"
+                    disabled={feedbackLoading}
+                    onClick={() => handleFeedback("negative", "hidden_signal")}
+                    style={feedbackButtonStyle}
+                  >
+                    Wrong hidden signal
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tc-button-hover"
+                    disabled={feedbackLoading}
+                    onClick={() => handleFeedback("negative", "rewrite")}
+                    style={feedbackButtonStyle}
+                  >
+                    Bad rewrite
+                  </button>
+
+                  <button
+                    type="button"
+                    className="tc-button-hover"
+                    disabled={feedbackLoading}
+                    onClick={() => handleFeedback("negative", "verdict")}
+                    style={feedbackButtonStyle}
+                  >
+                    Wrong verdict
+                  </button>
+                </div>
+              )}
+
+              {feedbackError ? (
+                <div
+                  style={{
+                    marginTop: "12px",
+                    fontSize: "13px",
+                    fontWeight: 700,
+                    color: "#b91c1c",
+                  }}
+                >
+                  {feedbackError}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div
+              style={{
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "13px",
+                  color: "#166534",
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                }}
+              >
+                FEEDBACK SAVED
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  fontSize: "18px",
+                  color: "#111827",
+                  fontWeight: 700,
+                }}
+              >
+                Thanks — this helps improve ToneCheck.
+              </div>
+
+              <div
+                style={{
+                  marginTop: "8px",
+                  color: "#64748b",
+                  fontSize: "14px",
+                  lineHeight: 1.6,
+                }}
+              >
+                We’ll use this to improve tone, hidden signal, rewrite, and verdict accuracy.
+              </div>
+            </div>
+          )}
+        </div>
 
         <div style={cardStyle}>
           <div
