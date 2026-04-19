@@ -33,6 +33,23 @@ function Card({ title, value }) {
   );
 }
 
+function StatGrid({ items, columns = "repeat(4, minmax(0, 1fr))" }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: columns,
+        gap: "16px",
+        marginBottom: "24px",
+      }}
+    >
+      {items.map((item) => (
+        <Card key={item.title} title={item.title} value={item.value} />
+      ))}
+    </div>
+  );
+}
+
 function getRiskColor(level) {
   if (level === "high" || level === "severe") return "#ef4444";
   if (level === "medium") return "#f59e0b";
@@ -154,6 +171,24 @@ export default function AdminDashboard() {
 const topSignal = formatLabel(
   data?.top_hidden_signals?.find((x) => x.hidden_signal !== "none")?.hidden_signal || "-"
 );
+
+  const feedbackByRating = data?.feedback_summary?.by_rating || [];
+  const negativeByWrongArea = data?.feedback_summary?.negative_by_wrong_area || [];
+  const dailyFeedbackTrend = data?.feedback_summary?.daily_feedback_trend || [];
+
+  const positiveFeedback =
+    feedbackByRating.find((x) => x.feedback_rating === "positive")?.count || 0;
+
+  const negativeFeedback =
+    feedbackByRating.find((x) => x.feedback_rating === "negative")?.count || 0;
+
+  const topWrongArea =
+    negativeByWrongArea?.[0]?.wrong_area
+      ? formatLabel(negativeByWrongArea[0].wrong_area)
+      : "-";
+
+  const apiUsage = data?.api_usage_overview || {};
+  const toneLogs = data?.tone_logs_summary || {};
   const topPage =
     data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
   const rewriteRate =
@@ -209,34 +244,46 @@ const topSignal = formatLabel(
 
         {!loading && data && (
           <>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(5, minmax(0, 1fr))",
-                gap: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <Card title="Total Analyses" value={data.overview?.total_analyses || 0} />
-              <Card title="Unique Visitors" value={data.overview?.unique_visitors || 0} />
-              <Card title="Unique Sessions" value={data.overview?.unique_sessions || 0} />
-              <Card title="Unique Users" value={data.overview?.unique_users || 0} />
-              <Card title="Rewrites Shown" value={data.overview?.rewrites_shown || 0} />
-            </div>
+           <StatGrid
+  columns="repeat(5, minmax(0, 1fr))"
+  items={[
+    { title: "Total Analyses", value: data.overview?.total_analyses || 0 },
+    { title: "Unique Visitors", value: data.overview?.unique_visitors || 0 },
+    { title: "Unique Sessions", value: data.overview?.unique_sessions || 0 },
+    { title: "Unique Users", value: data.overview?.unique_users || 0 },
+    { title: "Rewrites Shown", value: data.overview?.rewrites_shown || 0 },
+  ]}
+/>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
-                gap: "16px",
-                marginBottom: "24px",
-              }}
-            >
-              <Card title="Top Tone" value={topTone} />
-              <Card title="Top Hidden Signal" value={topSignal} />
-              <Card title="Top Page" value={topPage} />
-              <Card title="Rewrite Rate" value={`${rewriteRate}%`} />
-            </div>
+       <StatGrid
+  columns="repeat(4, minmax(0, 1fr))"
+  items={[
+    { title: "Top Tone", value: topTone },
+    { title: "Top Hidden Signal", value: topSignal },
+    { title: "Top Page", value: topPage },
+    { title: "Rewrite Rate", value: `${rewriteRate}%` },
+  ]}
+/>
+
+<StatGrid
+  columns="repeat(4, minmax(0, 1fr))"
+  items={[
+    { title: "Active API Keys", value: apiUsage.active_api_keys || 0 },
+    { title: "Active Tenants", value: apiUsage.active_tenants || 0 },
+    { title: "API Requests", value: apiUsage.total_requests || 0 },
+    { title: "Top Wrong Area", value: topWrongArea },
+  ]}
+/>
+
+<StatGrid
+  columns="repeat(4, minmax(0, 1fr))"
+  items={[
+    { title: "Positive Feedback", value: positiveFeedback },
+    { title: "Negative Feedback", value: negativeFeedback },
+    { title: "Tone Logs", value: toneLogs.total_tone_logs || 0 },
+    { title: "Avg Aggression", value: toneLogs.avg_aggression || 0 },
+  ]}
+/>
 
             <div
               style={{
@@ -293,6 +340,39 @@ const topSignal = formatLabel(
                 columns={["day", "total", "rewrites_shown"]}
                 rows={data.rewrite_trend}
               />
+
+              <TableBlock
+  title="API Usage by Endpoint"
+  columns={["endpoint", "total_requests"]}
+  rows={data.api_usage_overview?.top_endpoints || []}
+/>
+
+<TableBlock
+  title="Feedback by Rating"
+  columns={["feedback_rating", "count"]}
+  rows={feedbackByRating}
+  sortByCount={true}
+/>
+
+<TableBlock
+  title="Negative Feedback by Wrong Area"
+  columns={["wrong_area", "count"]}
+  rows={negativeByWrongArea}
+  sortByCount={true}
+/>
+
+<TableBlock
+  title="Daily Feedback Trend"
+  columns={["day", "total_feedback", "positive_count", "negative_count"]}
+  rows={dailyFeedbackTrend}
+/>
+
+<TableBlock
+  title="Top Tone Log Labels"
+  columns={["label", "count"]}
+  rows={data.tone_logs_summary?.top_tone_log_labels || []}
+  sortByCount={true}
+/>
 
               <TableBlock
                     title="Top Risk Messages"
