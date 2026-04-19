@@ -74,6 +74,18 @@ function normalizePressure(value) {
   return map[v] || v;
 }
 
+
+function normalizeRegret(apiResult) {
+  // ✅ correct source
+  const band = (apiResult.regret_risk_band || "").toLowerCase();
+
+  if (band.includes("high")) return "high";
+  if (band.includes("medium")) return "medium";
+  if (band.includes("low")) return "low";
+
+  return "";
+}
+
 function normalizeReplyVibe(value) {
   const v = normalize(value);
   if (!v) return "";
