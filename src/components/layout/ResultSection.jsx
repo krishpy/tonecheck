@@ -3,7 +3,7 @@ import { RewriteCard, DetectedSignals } from "../results";
 import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
-import { submitFeedback } from "../lib/api";
+import { submitFeedback } from "../../lib/api";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(
