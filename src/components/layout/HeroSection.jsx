@@ -668,6 +668,21 @@ export default function HeroSection({
         >
           {subDescription}
         </p>
+
+            <div
+      style={{
+        marginTop: "10px",
+        padding: "6px 10px",
+        background: "#fff3cd",
+        color: "#856404",
+        borderRadius: "8px",
+        fontSize: "12px",
+        fontWeight: 700,
+        display: "inline-block",
+      }}
+    >
+      Beta — results may occasionally miss context. Review before relying on it.
+    </div>
       </div>
 
       <div
