@@ -86,7 +86,7 @@ export const DEFAULT_TEST_CASES = [
   expected_pressure: "high",
   expected_reply_vibe: "low",
   expected_verdict: "dont_send",
-}
+},
 
 
 {
