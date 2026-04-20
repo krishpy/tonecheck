@@ -27,10 +27,10 @@ function getShareMode({ risk, hiddenSignal, tone }) {
 
   if (risk >= 40 || hidden.includes("pressure") || hidden.includes("passive")) {
     return {
-      eyebrow: "THIS MIGHT BACKFIRE",
+      eyebrow: "YOU MIGHT REGRET SENDING THIS",
       title: "ToneCheck",
       outcomeLabel: "Likely outcome",
-      outcomeValue: "Misunderstanding or defensiveness",
+      outcomeValue: "They may get defensive or shut down",
       rewriteLabel: "SMOOTHER VERSION",
       accent: "#d97706",
       rewriteBorder: "rgba(245,158,11,0.18)",
@@ -52,6 +52,57 @@ function getShareMode({ risk, hiddenSignal, tone }) {
   };
 }
 
+
+function getPunchLine({ risk, hiddenSignal, tone }) {
+  const hidden = String(hiddenSignal || "").toLowerCase();
+  const toneLabel = String(tone || "").toLowerCase();
+
+  if (
+    risk >= 75 ||
+    hidden.includes("threat") ||
+    hidden.includes("hostile") ||
+    hidden.includes("insult") ||
+    hidden.includes("profanity") ||
+    toneLabel.includes("threat")
+  ) {
+    return "This could escalate fast.";
+  }
+
+  if (
+    hidden.includes("accus") ||
+    toneLabel.includes("accusatory") ||
+    hidden.includes("blame")
+  ) {
+    return "Most arguments start like this.";
+  }
+
+  if (
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt")
+  ) {
+    return "This can create pressure without sounding obvious.";
+  }
+
+  if (
+    toneLabel.includes("frustrated") ||
+    toneLabel.includes("tense") ||
+    risk >= 40
+  ) {
+    return "A small wording change can change the whole outcome.";
+  }
+
+  if (
+    toneLabel.includes("friendly") ||
+    toneLabel.includes("polite") ||
+    risk <= 20
+  ) {
+    return "Clear messages build better conversations.";
+  }
+
+  return "How you say it changes what happens next.";
+}
+
 export default function ShareCard({
   toolTitle,
   message,
@@ -62,7 +113,7 @@ export default function ShareCard({
   showSignalChip = true,
 }) {
   const shareMode = getShareMode({ risk, hiddenSignal, tone });
-
+  const punchLine = getPunchLine({ risk, hiddenSignal, tone });
   return (
     <div
       id="tone-share-card"
@@ -283,6 +334,16 @@ export default function ShareCard({
             </div>
           </div>
         ) : null}
+      <div
+        style={{
+          marginTop: "18px",
+          fontSize: "18px",
+          fontWeight: 700,
+          color: "#475569",
+        }}
+      >
+        {punchLine}
+      </div>
 
         <div
           style={{
