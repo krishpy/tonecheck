@@ -4,3 +4,4 @@ export { default as StatsRow } from "./StatsRow";
 export { default as DetectedSignals } from "./DetectedSignals";
 export { default as AdvisoryCard } from "./AdvisoryCard";
 export { default as SendDecisionCard } from "./SendDecisionCard";
+export { default as ShareCard } from ".share/ShareCard";

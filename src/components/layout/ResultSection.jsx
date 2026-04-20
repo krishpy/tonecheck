@@ -4,6 +4,7 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 import { submitFeedback } from "../../lib/api";
+import { ShareCard } from "../share";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(
@@ -19,11 +20,6 @@ function buildSendVerdict(result) {
   const tone = String(result?.tone || "").toLowerCase();
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
-
-  const hasRewrite =
-    !!result?.rewrite_suggestion?.trim() &&
-    result?.rewrite_source !== "blocked_safe_message" &&
-    result?.rewrite_source !== "blocked_invalid_safe_rewrite";
 
   if (apiVerdict === "do_not_send") {
     return {
@@ -187,7 +183,13 @@ function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
   };
 }
 
-function getToneCardStyle({ isMobile, toneTheme, hiddenSignalLabel, toneLabel, riskScore }) {
+function getToneCardStyle({
+  isMobile,
+  toneTheme,
+  hiddenSignalLabel,
+  toneLabel,
+  riskScore,
+}) {
   const hidden = String(hiddenSignalLabel || "").toLowerCase();
   const tone = String(toneLabel || "").toLowerCase();
 
@@ -201,7 +203,8 @@ function getToneCardStyle({ isMobile, toneTheme, hiddenSignalLabel, toneLabel, r
 
   if (shouldWarmNeutral) {
     return {
-      background: "linear-gradient(135deg, rgba(254,249,195,0.92), rgba(255,251,235,0.9))",
+      background:
+        "linear-gradient(135deg, rgba(254,249,195,0.92), rgba(255,251,235,0.9))",
       color: "#a16207",
       border: "rgba(245,158,11,0.24)",
       glow: "rgba(245,158,11,0.14)",
@@ -233,7 +236,8 @@ function getVerdictTheme(tone) {
     danger: {
       title: "#c81e1e",
       subtitle: "#7f1d1d",
-      iconBg: "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
+      iconBg:
+        "linear-gradient(135deg, #ef4444 0%, #dc2626 55%, #b91c1c 100%)",
       iconGlow: "rgba(239,68,68,0.26)",
       tipBg: "rgba(254,242,242,0.92)",
       tipBorder: "1px solid rgba(239,68,68,0.18)",
@@ -242,7 +246,8 @@ function getVerdictTheme(tone) {
     warning: {
       title: "#d97706",
       subtitle: "#9a3412",
-      iconBg: "linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%)",
+      iconBg:
+        "linear-gradient(135deg, #fb923c 0%, #f97316 55%, #ea580c 100%)",
       iconGlow: "rgba(249,115,22,0.24)",
       tipBg: "rgba(255,247,237,0.94)",
       tipBorder: "1px solid rgba(249,115,22,0.18)",
@@ -251,7 +256,8 @@ function getVerdictTheme(tone) {
     neutral: {
       title: "#374151",
       subtitle: "#6b7280",
-      iconBg: "linear-gradient(135deg, #eab308 0%, #f59e0b 55%, #d97706 100%)",
+      iconBg:
+        "linear-gradient(135deg, #eab308 0%, #f59e0b 55%, #d97706 100%)",
       iconGlow: "rgba(245,158,11,0.25)",
       tipBg: "rgba(255,251,235,0.9)",
       tipBorder: "1px solid rgba(245,158,11,0.2)",
@@ -260,7 +266,8 @@ function getVerdictTheme(tone) {
     safe: {
       title: "#166534",
       subtitle: "#15803d",
-      iconBg: "linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%)",
+      iconBg:
+        "linear-gradient(135deg, #22c55e 0%, #16a34a 55%, #15803d 100%)",
       iconGlow: "rgba(34,197,94,0.28)",
       tipBg: "rgba(240,253,244,0.9)",
       tipBorder: "1px solid rgba(34,197,94,0.2)",
@@ -354,7 +361,8 @@ export default function ResultSection({
 
   const hiddenSignalLabel = getHiddenSignalLabel(hiddenSignalKey);
   const backendHidden = String(hiddenSignalLabel || "").toLowerCase();
-  const backendRewrite = result?.rewritten_text || result?.rewrite_suggestion || "";
+  const backendRewrite =
+    result?.rewritten_text || result?.rewrite_suggestion || "";
 
   const toneLabel = result?.tone || result?.label || "Neutral";
   const toneEmoji =
@@ -395,19 +403,6 @@ export default function ResultSection({
       : backendRisk >= 40
       ? "A cleaner version that sounds easier to receive."
       : "A polished version that keeps your meaning but sounds smoother.";
-
-  const signalChipStyle = {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "8px",
-    padding: isMobile ? "9px 12px" : "10px 14px",
-    borderRadius: "999px",
-    background: toneTheme.chipBg,
-    border: `1px solid ${toneTheme.border}`,
-    color: toneTheme.chipText,
-    fontWeight: 800,
-    fontSize: isMobile ? "13px" : "14px",
-  };
 
   const toneCard = getToneCardStyle({
     isMobile,
@@ -462,165 +457,15 @@ export default function ResultSection({
           opacity: 0,
         }}
       >
-        <div
-          id="tone-share-card"
-          style={{
-            width: "1080px",
-            background:
-              "linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #f5f3ff 100%)",
-            padding: "40px",
-            fontFamily:
-              "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-            color: "#0f172a",
-          }}
-        >
-          <div
-            style={{
-              background: "rgba(255,255,255,0.92)",
-              border: "1px solid rgba(255,255,255,0.82)",
-              borderRadius: "32px",
-              padding: "32px",
-              boxShadow:
-                "0 18px 46px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "flex-start",
-                gap: "24px",
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: 800,
-                    letterSpacing: "0.18em",
-                    textTransform: "uppercase",
-                    color: "#6366f1",
-                  }}
-                >
-                  ToneCheck Result
-                </div>
-
-                <div
-                  style={{
-                    marginTop: "10px",
-                    fontSize: "44px",
-                    lineHeight: 1,
-                    fontWeight: 900,
-                    letterSpacing: "-0.06em",
-                    background:
-                      "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
-                    backgroundSize: "200% 200%",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                >
-                  {location.pathname === "/" ? "ToneCheck" : currentTool.title}
-                </div>
-              </div>
-
-              {shouldShowSignalChip ? (
-                <div style={signalChipStyle}>{hiddenSignalLabel}</div>
-              ) : null}
-            </div>
-
-            <div
-              style={{
-                marginTop: "26px",
-                borderRadius: "24px",
-                padding: "22px",
-                background: "rgba(255,255,255,0.84)",
-                border: "1px solid rgba(15,23,42,0.06)",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "12px",
-                  fontWeight: 800,
-                  letterSpacing: "0.08em",
-                  color: "#64748b",
-                }}
-              >
-                MESSAGE
-              </div>
-              <div
-                style={{
-                  marginTop: "10px",
-                  fontSize: "28px",
-                  lineHeight: 1.6,
-                  color: "#111827",
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {message}
-              </div>
-            </div>
-
-            {shouldShowRewriteCard ? (
-              <div
-                style={{
-                  marginTop: "22px",
-                  borderRadius: "24px",
-                  padding: "22px",
-                  background:
-                    "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
-                  border: "1px solid rgba(251,146,60,0.18)",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: 800,
-                    letterSpacing: "0.08em",
-                    color: "#9a3412",
-                  }}
-                >
-                  BETTER VERSION
-                </div>
-                <div
-                  style={{
-                    marginTop: "10px",
-                    fontSize: "26px",
-                    lineHeight: 1.7,
-                    color: "#111827",
-                    whiteSpace: "pre-wrap",
-                  }}
-                >
-                  {safeRewrite}
-                </div>
-              </div>
-            ) : null}
-
-            <div
-              style={{
-                marginTop: "28px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                gap: "16px",
-              }}
-            >
-              <div style={{ color: "#64748b", fontSize: "18px" }}>
-                Check yours at trytonecheck.com
-              </div>
-              <div
-                style={{
-                  fontSize: "22px",
-                  fontWeight: 900,
-                  letterSpacing: "-0.04em",
-                  color: "#312e81",
-                }}
-              >
-                T✓ ToneCheck
-              </div>
-            </div>
-          </div>
-        </div>
+        <ShareCard
+          toolTitle={location.pathname === "/" ? "ToneCheck" : currentTool.title}
+          message={message}
+          rewrite={shouldShowRewriteCard ? safeRewrite : ""}
+          tone={toneLabel}
+          risk={backendRisk}
+          hiddenSignal={shouldShowSignalChip ? hiddenSignalLabel : ""}
+          showSignalChip={shouldShowSignalChip}
+        />
       </div>
 
       <div style={{ marginTop: "24px", display: "grid", gap: "18px" }}>
@@ -780,7 +625,9 @@ export default function ResultSection({
                 minWidth: toneCard.minWidth,
                 width: toneCard.width,
                 marginTop: toneCard.marginTop,
-                boxShadow: `0 8px 22px ${toneCard.glow || "rgba(15,23,42,0.08)"}`,
+                boxShadow: `0 8px 22px ${
+                  toneCard.glow || "rgba(15,23,42,0.08)"
+                }`,
               }}
             >
               <div
@@ -881,7 +728,8 @@ export default function ResultSection({
                   lineHeight: 1.6,
                 }}
               >
-                Your feedback helps improve tone, hidden signal, rewrite, and verdict quality.
+                Your feedback helps improve tone, hidden signal, rewrite, and
+                verdict quality.
               </div>
 
               <div
@@ -936,7 +784,9 @@ export default function ResultSection({
                     type="button"
                     className="tc-button-hover"
                     disabled={feedbackLoading}
-                    onClick={() => handleFeedback("negative", "hidden_signal")}
+                    onClick={() =>
+                      handleFeedback("negative", "hidden_signal")
+                    }
                     style={feedbackButtonStyle}
                   >
                     Wrong hidden signal
@@ -1013,7 +863,8 @@ export default function ResultSection({
                   lineHeight: 1.6,
                 }}
               >
-                We’ll use this to improve tone, hidden signal, rewrite, and verdict accuracy.
+                We’ll use this to improve tone, hidden signal, rewrite, and
+                verdict accuracy.
               </div>
             </div>
           )}
@@ -1040,8 +891,15 @@ export default function ResultSection({
               >
                 Share ToneCheck Result
               </div>
-              <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
-                Copy includes tone, risk, hidden signal, advisory, and suggested rewrite.
+              <div
+                style={{
+                  marginTop: "6px",
+                  color: "#64748b",
+                  fontSize: "14px",
+                }}
+              >
+                Copy includes tone, risk, hidden signal, advisory, and suggested
+                rewrite.
               </div>
             </div>
 
@@ -1078,7 +936,11 @@ export default function ResultSection({
                 />
               }
             />
-            <button className="tc-button-hover" onClick={copyResult} style={actionButtonStyle}>
+            <button
+              className="tc-button-hover"
+              onClick={copyResult}
+              style={actionButtonStyle}
+            >
               📋 Copy result
             </button>
             <ShareButton
@@ -1104,7 +966,11 @@ export default function ResultSection({
                 />
               }
             />
-            <button className="tc-button-hover" onClick={downloadCard} style={primaryButtonStyle}>
+            <button
+              className="tc-button-hover"
+              onClick={downloadCard}
+              style={primaryButtonStyle}
+            >
               📸 Download Share Card
             </button>
           </div>
