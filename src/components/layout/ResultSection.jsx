@@ -4,7 +4,7 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 import { submitFeedback } from "../../lib/api";
-import { ShareCard } from "../share";
+import ShareCard from "../share/ShareCard";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(
