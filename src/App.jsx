@@ -277,53 +277,93 @@ function AppContent() {
     }
   }
 
-  function buildShareText() {
-    return `✨ ToneCheck Result
+function getHumanImpactLine({ toneLabel, hiddenSignalLabel, riskScore }) {
+  const tone = String(toneLabel || "").toLowerCase();
+  const hidden = String(hiddenSignalLabel || "").toLowerCase();
+  const risk = Number(riskScore || 0);
 
-📝 Message:
-"${message}"
-
-${getToneEmoji()} Tone: ${getToneLabel()}
-⚠️ Risk Score: ${result?.risk_score ?? ""}/100
-📊 Risk Level: ${result?.risk_level ?? ""}
-💭 Regret Risk: ${result?.regret_risk ?? ""}
-📬 Reply Likelihood: ${result?.reply_likelihood ?? ""}
-🕵️ Hidden Signal: ${primaryHiddenSignalLabel}
-💡 Advisory: ${result?.advisory ?? ""}${
-      finalRewrite
-        ? `
-
-✍️ Suggested Rewrite:
-${finalRewrite}`
-        : ""
-    }
-
-Check yours at:
-https://trytonecheck.com`;
+  if (
+    hidden.includes("threat") ||
+    hidden.includes("hostile") ||
+    hidden.includes("insult") ||
+    hidden.includes("profanity") ||
+    tone.includes("threat")
+  ) {
+    return "This could escalate fast.";
   }
 
-  function buildShareHtml() {
-    return `
-      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
-        <h2 style="margin:0 0 12px 0;">✨ ToneCheck Result</h2>
-        <p style="margin:0 0 12px 0;"><strong>📝 Message:</strong><br/>"${escapeHtml(message)}"</p>
-        <p style="margin:0 0 8px 0;"><strong>${getToneEmoji()} Tone:</strong> ${escapeHtml(getToneLabel())}</p>
-        <p style="margin:0 0 8px 0;"><strong>⚠️ Risk Score:</strong> ${result?.risk_score ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>📊 Risk Level:</strong> ${escapeHtml(result?.risk_level ?? "")}</p>
-        <p style="margin:0 0 8px 0;"><strong>💭 Regret Risk:</strong> ${result?.regret_risk ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>📬 Reply Likelihood:</strong> ${result?.reply_likelihood ?? ""}</p>
-        <p style="margin:0 0 8px 0;"><strong>🕵️ Hidden Signal:</strong> ${escapeHtml(primaryHiddenSignalLabel)}</p>
-        <p style="margin:0 0 12px 0;"><strong>💡 Advisory:</strong> ${escapeHtml(result?.advisory ?? "")}</p>
-        ${
-          finalRewrite
-            ? `<p style="margin:0 0 12px 0;"><strong>✍️ Suggested Rewrite:</strong><br/>${escapeHtml(finalRewrite)}</p>`
-            : ""
-        }
-        <p style="margin:0;"><strong>🔗 Check yours at:</strong> https://trytonecheck.com</p>
-      </div>
-    `;
+  if (
+    hidden.includes("accus") ||
+    hidden.includes("blame") ||
+    tone.includes("accusatory")
+  ) {
+    return "This might make the other person defensive.";
   }
 
+  if (
+    hidden.includes("passive") ||
+    hidden.includes("pressure") ||
+    hidden.includes("guilt")
+  ) {
+    return "This may create pressure or tension.";
+  }
+
+  if (tone.includes("frustrated") || tone.includes("tense") || risk >= 40) {
+    return "This may come across more sharply than intended.";
+  }
+
+  if (tone.includes("friendly") || tone.includes("polite") || risk <= 20) {
+    return "This sounds clear and safe to send.";
+  }
+
+  return "How you say it can change how this lands.";
+}
+
+function buildShareText() {
+  const toneLabel = getToneLabel();
+  const impactLine = getHumanImpactLine({
+    toneLabel,
+    hiddenSignalLabel: primaryHiddenSignalLabel,
+    riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
+  });
+
+  return `${message}
+
+Tone: ${toneLabel}
+${impactLine}${
+    finalRewrite
+      ? `
+
+Better way to say it:
+"${finalRewrite}"`
+      : ""
+  }
+
+Try yours: trytonecheck.com`;
+}
+
+function buildShareHtml() {
+  const toneLabel = getToneLabel();
+  const impactLine = getHumanImpactLine({
+    toneLabel,
+    hiddenSignalLabel: primaryHiddenSignalLabel,
+    riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
+  });
+
+  return `
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
+      <p style="margin:0 0 14px 0;font-size:18px;">${escapeHtml(message)}</p>
+      <p style="margin:0 0 8px 0;"><strong>Tone:</strong> ${escapeHtml(toneLabel)}</p>
+      <p style="margin:0 0 12px 0;">${escapeHtml(impactLine)}</p>
+      ${
+        finalRewrite
+          ? `<p style="margin:0 0 12px 0;"><strong>Better way to say it:</strong><br/>"${escapeHtml(finalRewrite)}"</p>`
+          : ""
+      }
+      <p style="margin:0;"><strong>Try yours:</strong> trytonecheck.com</p>
+    </div>
+  `;
+}
   async function copyRewriteOnly() {
     if (!finalRewrite) return;
     try {
