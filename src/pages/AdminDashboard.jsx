@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_KEY =
+  import.meta.env.VITE_API_KEY || "test-default-key";
 
 function formatLabel(value) {
   if (!value) return "-";
@@ -12,23 +14,46 @@ function formatLabel(value) {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function Card({ title, value }) {
+function safeNumber(value, fallback = 0) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : fallback;
+}
+
+function getRiskColor(level) {
+  const normalized = String(level || "").toLowerCase();
+  if (normalized === "high" || normalized === "severe") return "#dc2626";
+  if (normalized === "medium") return "#d97706";
+  return "#16a34a";
+}
+
+function getHealthTone(score) {
+  if (score >= 80) return { label: "Strong", color: "#166534", bg: "#ecfdf5", border: "#bbf7d0" };
+  if (score >= 60) return { label: "Watch", color: "#b45309", bg: "#fffbeb", border: "#fde68a" };
+  return { label: "Weak", color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" };
+}
+
+function Card({ title, value, subtitle = "", accent = "#111827" }) {
   return (
     <div
       style={{
         background: "#ffffff",
         border: "1px solid #e5e7eb",
-        borderRadius: "16px",
+        borderRadius: "18px",
         padding: "18px",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+        boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
       }}
     >
-      <div style={{ fontSize: "13px", color: "#6b7280", marginBottom: "8px" }}>
+      <div style={{ fontSize: "12px", color: "#6b7280", marginBottom: "8px", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase" }}>
         {title}
       </div>
-      <div style={{ fontSize: "28px", fontWeight: 800, color: "#111827" }}>
+      <div style={{ fontSize: "30px", fontWeight: 900, color: accent, letterSpacing: "-0.04em" }}>
         {value}
       </div>
+      {subtitle ? (
+        <div style={{ marginTop: "8px", fontSize: "13px", color: "#64748b", lineHeight: 1.5 }}>
+          {subtitle}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -44,42 +69,100 @@ function StatGrid({ items, columns = "repeat(4, minmax(0, 1fr))" }) {
       }}
     >
       {items.map((item) => (
-        <Card key={item.title} title={item.title} value={item.value} />
+        <Card
+          key={item.title}
+          title={item.title}
+          value={item.value}
+          subtitle={item.subtitle || ""}
+          accent={item.accent || "#111827"}
+        />
       ))}
     </div>
   );
 }
 
-function getRiskColor(level) {
-  if (level === "high" || level === "severe") return "#ef4444";
-  if (level === "medium") return "#f59e0b";
-  return "#10b981";
-}
-
-function TableBlock({ 
-    title, 
-    columns, 
-    rows, 
-    sortByCount = false,
-    onRowClick = null,
-
- }) {
-  const finalRows = sortByCount
-    ? [...(rows || [])].sort((a, b) => (b.count || 0) - (a.count || 0))
-    : rows || [];
-
+function SectionCard({ title, subtitle = "", children }) {
   return (
     <div
       style={{
         background: "#ffffff",
         border: "1px solid #e5e7eb",
-        borderRadius: "16px",
+        borderRadius: "18px",
         padding: "18px",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.05)",
+        boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
       }}
     >
-      <h3 style={{ marginTop: 0, marginBottom: "14px" }}>{title}</h3>
+      <div style={{ marginBottom: "14px" }}>
+        <div style={{ fontSize: "18px", fontWeight: 800, color: "#111827" }}>{title}</div>
+        {subtitle ? (
+          <div style={{ marginTop: "6px", fontSize: "13px", color: "#64748b", lineHeight: 1.5 }}>
+            {subtitle}
+          </div>
+        ) : null}
+      </div>
+      {children}
+    </div>
+  );
+}
 
+function InsightRow({ label, value, tone = "neutral" }) {
+  const map = {
+    danger: {
+      bg: "#fef2f2",
+      border: "#fecaca",
+      color: "#b91c1c",
+    },
+    warning: {
+      bg: "#fffbeb",
+      border: "#fde68a",
+      color: "#b45309",
+    },
+    success: {
+      bg: "#ecfdf5",
+      border: "#bbf7d0",
+      color: "#166534",
+    },
+    neutral: {
+      bg: "#f8fafc",
+      border: "#e2e8f0",
+      color: "#334155",
+    },
+  };
+
+  const theme = map[tone] || map.neutral;
+
+  return (
+    <div
+      style={{
+        padding: "12px 14px",
+        borderRadius: "14px",
+        background: theme.bg,
+        border: `1px solid ${theme.border}`,
+        display: "flex",
+        justifyContent: "space-between",
+        gap: "12px",
+        alignItems: "center",
+      }}
+    >
+      <div style={{ fontSize: "14px", fontWeight: 700, color: "#0f172a" }}>{label}</div>
+      <div style={{ fontSize: "14px", fontWeight: 900, color: theme.color, textAlign: "right" }}>{value}</div>
+    </div>
+  );
+}
+
+function TableBlock({
+  title,
+  columns,
+  rows,
+  sortByCount = false,
+  onRowClick = null,
+}) {
+  const finalRows = sortByCount
+    ? [...(rows || [])].sort((a, b) => safeNumber(b.count) - safeNumber(a.count))
+    : rows || [];
+
+  return (
+    <SectionCard title={title}>
       <table style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
           <tr>
@@ -88,10 +171,12 @@ function TableBlock({
                 key={col}
                 style={{
                   textAlign: "left",
-                  fontSize: "13px",
+                  fontSize: "12px",
                   color: "#6b7280",
                   borderBottom: "1px solid #e5e7eb",
                   padding: "10px 8px",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
                 }}
               >
                 {col}
@@ -102,13 +187,13 @@ function TableBlock({
 
         <tbody>
           {finalRows.map((row, index) => (
-           <tr
-  key={index}
-  onClick={() => onRowClick && onRowClick(row)}
-  style={{
-    cursor: onRowClick ? "pointer" : "default",
-  }}
->
+            <tr
+              key={index}
+              onClick={() => onRowClick && onRowClick(row)}
+              style={{
+                cursor: onRowClick ? "pointer" : "default",
+              }}
+            >
               {columns.map((col) => (
                 <td
                   key={col}
@@ -119,12 +204,13 @@ function TableBlock({
                       col === "risk_level"
                         ? getRiskColor(String(row[col] || "").toLowerCase())
                         : "#111827",
-                    fontWeight: col === "risk_level" ? 700 : 400,
+                    fontWeight: col === "risk_level" ? 800 : 500,
+                    fontSize: "14px",
                   }}
                 >
-  {col === "tone" || col === "hidden_signal" || col === "risk_level"
-  ? formatLabel(row[col])
-  : row[col] ?? ""}
+                  {col === "tone" || col === "hidden_signal" || col === "risk_level" || col === "wrong_area" || col === "feedback_rating" || col === "label"
+                    ? formatLabel(row[col])
+                    : row[col] ?? ""}
                 </td>
               ))}
             </tr>
@@ -137,6 +223,117 @@ function TableBlock({
           No data yet.
         </div>
       )}
+    </SectionCard>
+  );
+}
+
+function ActionItem({ title, reason, severity = "neutral" }) {
+  const colors = {
+    danger: { bg: "#fef2f2", border: "#fecaca", title: "#b91c1c" },
+    warning: { bg: "#fffbeb", border: "#fde68a", title: "#b45309" },
+    success: { bg: "#ecfdf5", border: "#bbf7d0", title: "#166534" },
+    neutral: { bg: "#f8fafc", border: "#e2e8f0", title: "#334155" },
+  };
+
+  const theme = colors[severity] || colors.neutral;
+
+  return (
+    <div
+      style={{
+        background: theme.bg,
+        border: `1px solid ${theme.border}`,
+        borderRadius: "14px",
+        padding: "14px",
+      }}
+    >
+      <div style={{ fontSize: "14px", fontWeight: 900, color: theme.title }}>{title}</div>
+      <div style={{ marginTop: "6px", fontSize: "13px", color: "#475569", lineHeight: 1.6 }}>{reason}</div>
+    </div>
+  );
+}
+
+function RiskDetailDrawer({ item, onClose }) {
+  if (!item) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(15,23,42,0.42)",
+        display: "flex",
+        justifyContent: "flex-end",
+        zIndex: 50,
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: "min(520px, 100%)",
+          height: "100%",
+          background: "#ffffff",
+          padding: "24px",
+          boxShadow: "-12px 0 30px rgba(15,23,42,0.16)",
+          overflowY: "auto",
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", alignItems: "center" }}>
+          <div>
+            <div style={{ fontSize: "12px", fontWeight: 900, letterSpacing: "0.1em", textTransform: "uppercase", color: "#64748b" }}>
+              Risk Event
+            </div>
+            <div style={{ marginTop: "6px", fontSize: "24px", fontWeight: 900, color: "#111827", letterSpacing: "-0.04em" }}>
+              Message #{item.id}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={onClose}
+            style={{
+              border: "1px solid #e5e7eb",
+              background: "#fff",
+              borderRadius: "12px",
+              padding: "10px 12px",
+              cursor: "pointer",
+              fontWeight: 800,
+            }}
+          >
+            Close
+          </button>
+        </div>
+
+        <div style={{ display: "grid", gap: "12px", marginTop: "20px" }}>
+          <InsightRow label="Risk Score" value={item.risk_score} tone={item.risk_score >= 75 ? "danger" : item.risk_score >= 40 ? "warning" : "success"} />
+          <InsightRow label="Risk Level" value={formatLabel(item.risk_level)} tone={String(item.risk_level).toLowerCase() === "high" || String(item.risk_level).toLowerCase() === "severe" ? "danger" : String(item.risk_level).toLowerCase() === "medium" ? "warning" : "success"} />
+          <InsightRow label="Tone" value={formatLabel(item.tone)} />
+          <InsightRow label="Hidden Signal" value={formatLabel(item.hidden_signal)} />
+          <InsightRow label="Page" value={item.page_slug || "-"} />
+          <InsightRow label="Created At" value={item.created_at || "-"} />
+        </div>
+
+        <div style={{ marginTop: "22px" }}>
+          <div style={{ fontSize: "13px", fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", color: "#64748b" }}>
+            Message Preview
+          </div>
+          <div
+            style={{
+              marginTop: "10px",
+              padding: "14px",
+              background: "#f8fafc",
+              border: "1px solid #e2e8f0",
+              borderRadius: "14px",
+              fontSize: "14px",
+              lineHeight: 1.7,
+              color: "#111827",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {item.message_preview || "Message text not saved for this event."}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -146,17 +343,33 @@ export default function AdminDashboard() {
   const [days, setDays] = useState(30);
   const [loading, setLoading] = useState(true);
   const [selectedRiskEvent, setSelectedRiskEvent] = useState(null);
+  const [error, setError] = useState("");
 
   async function loadDashboard(selectedDays) {
     try {
       setLoading(true);
+      setError("");
+
       const res = await fetch(
-        `${API_BASE_URL}/admin/analytics/dashboard?days=${selectedDays}`
+        `${API_BASE_URL}/admin/analytics/dashboard?days=${selectedDays}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": API_KEY,
+          },
+        }
       );
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Failed to load dashboard");
+      }
+
       const json = await res.json();
       setData(json);
-    } catch (error) {
-      console.error("Dashboard load failed:", error);
+    } catch (loadError) {
+      console.error("Dashboard load failed:", loadError);
+      setError(loadError.message || "Dashboard load failed");
       setData(null);
     } finally {
       setLoading(false);
@@ -167,235 +380,666 @@ export default function AdminDashboard() {
     loadDashboard(days);
   }, [days]);
 
-  const topTone = formatLabel(data?.top_tones?.[0]?.tone || "-");
-const topSignal = formatLabel(
-  data?.top_hidden_signals?.find((x) => x.hidden_signal !== "none")?.hidden_signal || "-"
-);
+  const derived = useMemo(() => {
+    const overview = data?.overview || {};
+    const topTones = data?.top_tones || [];
+    const topHiddenSignals = data?.top_hidden_signals || [];
+    const feedbackByRating = data?.feedback_summary?.by_rating || [];
+    const negativeByWrongArea = data?.feedback_summary?.negative_by_wrong_area || [];
+    const dailyFeedbackTrend = data?.feedback_summary?.daily_feedback_trend || [];
+    const apiUsage = data?.api_usage_overview || {};
+    const toneLogs = data?.tone_logs_summary || {};
+    const riskDistribution = data?.risk_distribution || [];
+    const topRiskMessages = data?.top_risk_messages || [];
+    const pageBreakdown = data?.page_slug_breakdown || [];
 
-  const feedbackByRating = data?.feedback_summary?.by_rating || [];
-  const negativeByWrongArea = data?.feedback_summary?.negative_by_wrong_area || [];
-  const dailyFeedbackTrend = data?.feedback_summary?.daily_feedback_trend || [];
+    const totalAnalyses = safeNumber(overview.total_analyses);
+    const rewritesShown = safeNumber(overview.rewrites_shown);
+    const rewriteRate = totalAnalyses ? Math.round((rewritesShown / totalAnalyses) * 100) : 0;
 
-  const positiveFeedback =
-    feedbackByRating.find((x) => x.feedback_rating === "positive")?.count || 0;
-
-  const negativeFeedback =
-    feedbackByRating.find((x) => x.feedback_rating === "negative")?.count || 0;
-
-  const topWrongArea =
-    negativeByWrongArea?.[0]?.wrong_area
-      ? formatLabel(negativeByWrongArea[0].wrong_area)
-      : "-";
-
-  const apiUsage = data?.api_usage_overview || {};
-  const toneLogs = data?.tone_logs_summary || {};
-  const topPage =
-    data?.page_slug_breakdown?.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
-  const rewriteRate =
-    data?.overview?.total_analyses
-      ? Math.round((data.overview.rewrites_shown / data.overview.total_analyses) * 100)
+    const positiveFeedback =
+      safeNumber(feedbackByRating.find((x) => x.feedback_rating === "positive")?.count);
+    const negativeFeedback =
+      safeNumber(feedbackByRating.find((x) => x.feedback_rating === "negative")?.count);
+    const totalFeedback = positiveFeedback + negativeFeedback;
+    const feedbackAccuracyRate = totalFeedback
+      ? Math.round((positiveFeedback / totalFeedback) * 100)
       : 0;
+
+    const topTone = formatLabel(topTones[0]?.tone || "-");
+    const topSignal = formatLabel(
+      topHiddenSignals.find((x) => x.hidden_signal !== "none")?.hidden_signal || "-"
+    );
+    const topWrongArea = formatLabel(negativeByWrongArea?.[0]?.wrong_area || "-");
+    const topPage = pageBreakdown.find((x) => x.page_slug !== "unknown")?.page_slug || "-";
+
+    const highRiskCount = safeNumber(
+      riskDistribution.find(
+        (x) =>
+          String(x.risk_level).toLowerCase() === "high" ||
+          String(x.risk_level).toLowerCase() === "severe"
+      )?.count
+    );
+    const mediumRiskCount = safeNumber(
+      riskDistribution.find((x) => String(x.risk_level).toLowerCase() === "medium")?.count
+    );
+
+    const highestRisk = topRiskMessages[0] || null;
+
+    const riskPenalty = Math.min(35, highRiskCount * 2 + mediumRiskCount * 0.75);
+    const rewritePenalty = Math.min(25, rewriteRate * 0.25);
+    const feedbackPenalty =
+      totalFeedback > 0 ? Math.min(30, Math.round((negativeFeedback / totalFeedback) * 100 * 0.4)) : 0;
+    const healthScore = Math.max(0, Math.min(100, Math.round(100 - riskPenalty - rewritePenalty - feedbackPenalty)));
+    const healthTone = getHealthTone(healthScore);
+
+    const decisionSummary = [];
+    if (healthScore < 60) {
+      decisionSummary.push({
+        title: "Stability risk is too high",
+        reason:
+          "Dashboard health is weak. Stop adding features and fix output quality before pushing more traffic.",
+        severity: "danger",
+      });
+    } else {
+      decisionSummary.push({
+        title: "System is stable enough to iterate",
+        reason:
+          "The core engine is usable. Move with targeted fixes instead of broad tuning.",
+        severity: "success",
+      });
+    }
+
+    if (rewriteRate >= 70) {
+      decisionSummary.push({
+        title: "Rewrite dependency is too high",
+        reason:
+          "Too many messages need rewriting. Base detection and original-message safety need improvement.",
+        severity: "warning",
+      });
+    } else if (rewriteRate >= 40) {
+      decisionSummary.push({
+        title: "Rewrite is doing meaningful work",
+        reason:
+          "This is acceptable, but monitor whether rewrites are compensating for weak tone classification.",
+        severity: "neutral",
+      });
+    } else {
+      decisionSummary.push({
+        title: "Rewrite usage is controlled",
+        reason:
+          "Base output is standing on its own more often. That is healthier long term.",
+        severity: "success",
+      });
+    }
+
+    if (negativeFeedback > 0) {
+      decisionSummary.push({
+        title: `Top user complaint: ${topWrongArea}`,
+        reason:
+          topWrongArea === "-"
+            ? "Negative feedback exists, but the reason is not being captured cleanly yet."
+            : `User feedback says the main issue is ${topWrongArea.toLowerCase()}. That should drive the next tuning pass.`,
+        severity: "warning",
+      });
+    } else {
+      decisionSummary.push({
+        title: "No negative feedback trend yet",
+        reason:
+          "Good sign, but volume may still be low. Keep collecting data before declaring the engine strong.",
+        severity: "success",
+      });
+    }
+
+    if (String(topSignal).toLowerCase() !== "-" && String(topSignal).toLowerCase() !== "none") {
+      decisionSummary.push({
+        title: `Dominant risk pattern: ${topSignal}`,
+        reason:
+          "This signal is showing up most often. Check whether it reflects real user traffic or false positives from one pattern family.",
+        severity: "neutral",
+      });
+    }
+
+    return {
+      overview,
+      topTones,
+      topHiddenSignals,
+      feedbackByRating,
+      negativeByWrongArea,
+      dailyFeedbackTrend,
+      apiUsage,
+      toneLogs,
+      riskDistribution,
+      topRiskMessages,
+      pageBreakdown,
+      topTone,
+      topSignal,
+      topWrongArea,
+      topPage,
+      rewriteRate,
+      positiveFeedback,
+      negativeFeedback,
+      totalFeedback,
+      feedbackAccuracyRate,
+      highRiskCount,
+      mediumRiskCount,
+      highestRisk,
+      healthScore,
+      healthTone,
+      decisionSummary,
+    };
+  }, [data]);
+
+  const headlineCards = [
+    {
+      title: "Platform Health",
+      value: `${derived.healthScore}/100`,
+      subtitle: derived.healthTone.label,
+      accent: derived.healthTone.color,
+    },
+    {
+      title: "Total Analyses",
+      value: safeNumber(derived.overview.total_analyses),
+      subtitle: `${safeNumber(derived.overview.unique_visitors)} unique visitors`,
+    },
+    {
+      title: "High Risk Cases",
+      value: derived.highRiskCount,
+      subtitle: `${derived.mediumRiskCount} medium-risk cases`,
+      accent: derived.highRiskCount > 0 ? "#dc2626" : "#111827",
+    },
+    {
+      title: "Rewrite Rate",
+      value: `${derived.rewriteRate}%`,
+      subtitle: `${safeNumber(derived.overview.rewrites_shown)} rewrites shown`,
+      accent: derived.rewriteRate >= 70 ? "#b45309" : "#111827",
+    },
+  ];
+
+  const businessCards = [
+    {
+      title: "Top Tone",
+      value: derived.topTone,
+      subtitle: "Most common tone classification",
+    },
+    {
+      title: "Top Hidden Signal",
+      value: derived.topSignal,
+      subtitle: "Most common hidden signal",
+    },
+    {
+      title: "Top Page",
+      value: derived.topPage,
+      subtitle: "Most active tool/page",
+    },
+    {
+      title: "API Requests",
+      value: safeNumber(derived.apiUsage.total_requests),
+      subtitle: `${safeNumber(derived.apiUsage.active_api_keys)} active API keys`,
+    },
+  ];
+
+  const feedbackCards = [
+    {
+      title: "Positive Feedback",
+      value: derived.positiveFeedback,
+      subtitle: "User-confirmed accurate results",
+      accent: "#166534",
+    },
+    {
+      title: "Negative Feedback",
+      value: derived.negativeFeedback,
+      subtitle: "User-reported misses",
+      accent: derived.negativeFeedback > 0 ? "#b91c1c" : "#111827",
+    },
+    {
+      title: "Accuracy Rate",
+      value: derived.totalFeedback ? `${derived.feedbackAccuracyRate}%` : "-",
+      subtitle: "Positive / total feedback",
+      accent: derived.totalFeedback && derived.feedbackAccuracyRate < 70 ? "#b45309" : "#111827",
+    },
+    {
+      title: "Top Wrong Area",
+      value: derived.topWrongArea,
+      subtitle: "Biggest user complaint",
+    },
+  ];
+
+  const toneLogCards = [
+    {
+      title: "Tone Logs",
+      value: safeNumber(derived.toneLogs.total_tone_logs),
+      subtitle: "Raw tone log entries",
+    },
+    {
+      title: "Avg Aggression",
+      value: safeNumber(derived.toneLogs.avg_aggression),
+      subtitle: "Mean aggression score",
+    },
+    {
+      title: "Avg Politeness",
+      value: safeNumber(derived.toneLogs.avg_politeness),
+      subtitle: "Mean politeness score",
+    },
+    {
+      title: "Avg Clarity",
+      value: safeNumber(derived.toneLogs.avg_clarity),
+      subtitle: "Mean clarity score",
+    },
+  ];
 
   return (
     <div
       style={{
         minHeight: "100vh",
-        background: "#f9fafb",
+        background: "#f8fafc",
         padding: "32px",
         fontFamily:
           "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
     >
-      <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+      <div style={{ maxWidth: "1320px", margin: "0 auto" }}>
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "flex-start",
+            gap: "16px",
             marginBottom: "24px",
+            flexWrap: "wrap",
           }}
         >
           <div>
-            <h1 style={{ margin: 0, fontSize: "32px", color: "#111827" }}>
-              Analytics Dashboard
+            <div
+              style={{
+                fontSize: "12px",
+                fontWeight: 900,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: "#6366f1",
+              }}
+            >
+              Admin
+            </div>
+            <h1 style={{ margin: "10px 0 0 0", fontSize: "36px", color: "#111827", letterSpacing: "-0.05em" }}>
+              Product Decision Dashboard
             </h1>
-            <div style={{ color: "#6b7280", marginTop: "6px" }}>
-              Communication Intelligence Platform
+            <div style={{ color: "#64748b", marginTop: "8px", fontSize: "15px" }}>
+              Use this to decide what to fix next, not just to stare at numbers.
             </div>
           </div>
 
-          <select
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            style={{
-              padding: "10px 14px",
-              borderRadius: "12px",
-              border: "1px solid #d1d5db",
-              background: "#fff",
-            }}
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <select
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "12px",
+                border: "1px solid #d1d5db",
+                background: "#fff",
+                fontWeight: 700,
+              }}
+            >
+              <option value={7}>Last 7 days</option>
+              <option value={30}>Last 30 days</option>
+              <option value={90}>Last 90 days</option>
+            </select>
+
+            <button
+              type="button"
+              onClick={() => loadDashboard(days)}
+              style={{
+                padding: "10px 14px",
+                borderRadius: "12px",
+                border: "1px solid #d1d5db",
+                background: "#fff",
+                cursor: "pointer",
+                fontWeight: 800,
+              }}
+            >
+              Refresh
+            </button>
+          </div>
         </div>
 
-        {loading && <div>Loading dashboard...</div>}
+        {loading && (
+          <SectionCard title="Loading dashboard">
+            <div style={{ color: "#64748b", fontSize: "14px" }}>Fetching latest analytics...</div>
+          </SectionCard>
+        )}
 
-        {!loading && data && (
+        {!loading && error && (
+          <SectionCard title="Dashboard error" subtitle="The admin payload did not load.">
+            <div style={{ color: "#b91c1c", fontSize: "14px", fontWeight: 700 }}>{error}</div>
+          </SectionCard>
+        )}
+
+        {!loading && !error && data && (
           <>
-           <StatGrid
-  columns="repeat(5, minmax(0, 1fr))"
-  items={[
-    { title: "Total Analyses", value: data.overview?.total_analyses || 0 },
-    { title: "Unique Visitors", value: data.overview?.unique_visitors || 0 },
-    { title: "Unique Sessions", value: data.overview?.unique_sessions || 0 },
-    { title: "Unique Users", value: data.overview?.unique_users || 0 },
-    { title: "Rewrites Shown", value: data.overview?.rewrites_shown || 0 },
-  ]}
-/>
+            <div
+              style={{
+                marginBottom: "24px",
+                padding: "22px",
+                borderRadius: "20px",
+                background: derived.healthTone.bg,
+                border: `1px solid ${derived.healthTone.border}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "12px",
+                  fontWeight: 900,
+                  letterSpacing: "0.14em",
+                  textTransform: "uppercase",
+                  color: derived.healthTone.color,
+                }}
+              >
+                Executive Read
+              </div>
 
-       <StatGrid
-  columns="repeat(4, minmax(0, 1fr))"
-  items={[
-    { title: "Top Tone", value: topTone },
-    { title: "Top Hidden Signal", value: topSignal },
-    { title: "Top Page", value: topPage },
-    { title: "Rewrite Rate", value: `${rewriteRate}%` },
-  ]}
-/>
+              <div
+                style={{
+                  marginTop: "10px",
+                  fontSize: "30px",
+                  fontWeight: 900,
+                  letterSpacing: "-0.05em",
+                  color: "#111827",
+                }}
+              >
+                Platform health is {derived.healthTone.label.toLowerCase()} at {derived.healthScore}/100.
+              </div>
 
-<StatGrid
-  columns="repeat(4, minmax(0, 1fr))"
-  items={[
-    { title: "Active API Keys", value: apiUsage.active_api_keys || 0 },
-    { title: "Active Tenants", value: apiUsage.active_tenants || 0 },
-    { title: "API Requests", value: apiUsage.total_requests || 0 },
-    { title: "Top Wrong Area", value: topWrongArea },
-  ]}
-/>
+              <div
+                style={{
+                  marginTop: "10px",
+                  fontSize: "15px",
+                  color: "#334155",
+                  lineHeight: 1.7,
+                  maxWidth: "980px",
+                }}
+              >
+                {derived.healthScore < 60
+                  ? "Do not chase new features. Fix the weakest output areas first, especially negative feedback drivers and high-risk misclassifications."
+                  : derived.healthScore < 80
+                  ? "The system is usable, but it still needs guided improvement. Focus on the top complaint area and the dominant signal family."
+                  : "The system is in a healthy state for controlled growth. Keep shipping, but use feedback and high-risk samples to guide the next tuning cycle."}
+              </div>
+            </div>
 
-<StatGrid
-  columns="repeat(4, minmax(0, 1fr))"
-  items={[
-    { title: "Positive Feedback", value: positiveFeedback },
-    { title: "Negative Feedback", value: negativeFeedback },
-    { title: "Tone Logs", value: toneLogs.total_tone_logs || 0 },
-    { title: "Avg Aggression", value: toneLogs.avg_aggression || 0 },
-  ]}
-/>
+            <StatGrid columns="repeat(4, minmax(0, 1fr))" items={headlineCards} />
+            <StatGrid columns="repeat(4, minmax(0, 1fr))" items={businessCards} />
+            <StatGrid columns="repeat(4, minmax(0, 1fr))" items={feedbackCards} />
+            <StatGrid columns="repeat(4, minmax(0, 1fr))" items={toneLogCards} />
 
             <div
               style={{
                 display: "grid",
-                gridTemplateColumns: "1fr",
-                gap: "20px",
+                gridTemplateColumns: "1.2fr 0.8fr",
+                gap: "18px",
+                marginBottom: "24px",
               }}
             >
-              <TableBlock
-                title="Daily Visits"
-                columns={[
-                  "day",
-                  "unique_visitors",
-                  "unique_sessions",
-                  "unique_users",
-                  "total_analyses",
-                ]}
-                rows={data.daily_visits}
-              />
+              <SectionCard
+                title="What to Fix Next"
+                subtitle="This should drive your next sprint. If you ignore this block, you’ll slip back into random tuning."
+              >
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {derived.decisionSummary.map((item) => (
+                    <ActionItem
+                      key={item.title}
+                      title={item.title}
+                      reason={item.reason}
+                      severity={item.severity}
+                    />
+                  ))}
+                </div>
+              </SectionCard>
 
-              <TableBlock
-                title="Top Tones"
-                columns={["tone", "count"]}
-                rows={data.top_tones}
-                sortByCount={true}
-              />
+              <SectionCard
+                title="Quick Product Signals"
+                subtitle="A harsh, pragmatic read of current behavior."
+              >
+                <div style={{ display: "grid", gap: "12px" }}>
+                  <InsightRow
+                    label="Feedback Quality"
+                    value={
+                      derived.totalFeedback
+                        ? `${derived.feedbackAccuracyRate}% positive`
+                        : "No meaningful sample yet"
+                    }
+                    tone={
+                      !derived.totalFeedback
+                        ? "neutral"
+                        : derived.feedbackAccuracyRate >= 75
+                        ? "success"
+                        : derived.feedbackAccuracyRate >= 55
+                        ? "warning"
+                        : "danger"
+                    }
+                  />
 
-             <TableBlock
-                title="Top Hidden Signals"
-                columns={["hidden_signal", "count"]}
-                rows={(data.top_hidden_signals || []).filter(
-                    (row) => row.hidden_signal !== "none"
-                )}
-                sortByCount={true}
+                  <InsightRow
+                    label="Rewrite Dependency"
+                    value={`${derived.rewriteRate}%`}
+                    tone={
+                      derived.rewriteRate >= 70
+                        ? "danger"
+                        : derived.rewriteRate >= 40
+                        ? "warning"
+                        : "success"
+                    }
+                  />
+
+                  <InsightRow
+                    label="Dominant Complaint"
+                    value={derived.topWrongArea}
+                    tone={derived.topWrongArea === "-" ? "neutral" : "warning"}
+                  />
+
+                  <InsightRow
+                    label="Dominant Signal"
+                    value={derived.topSignal}
+                    tone={derived.topSignal === "-" ? "neutral" : "neutral"}
+                  />
+
+                  <InsightRow
+                    label="Most Active Page"
+                    value={derived.topPage}
+                    tone="neutral"
+                  />
+
+                  <InsightRow
+                    label="API Surface"
+                    value={`${safeNumber(derived.apiUsage.active_api_keys)} active keys`}
+                    tone={safeNumber(derived.apiUsage.active_api_keys) > 0 ? "success" : "neutral"}
+                  />
+                </div>
+              </SectionCard>
+            </div>
+
+            {derived.highestRisk && (
+              <SectionCard
+                title="Highest-Risk Message Right Now"
+                subtitle="This is the fastest way to inspect whether the engine is seeing the real danger or just noise."
+              >
+                <div
+                  style={{
+                    padding: "16px",
+                    borderRadius: "16px",
+                    background: "#fef2f2",
+                    border: "1px solid #fecaca",
+                  }}
+                >
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
+                    <div style={{ fontSize: "14px", fontWeight: 800, color: "#991b1b" }}>
+                      Risk {derived.highestRisk.risk_score} • {formatLabel(derived.highestRisk.risk_level)} • {formatLabel(derived.highestRisk.tone)}
+                    </div>
+
+                    <div style={{ fontSize: "13px", color: "#7f1d1d", fontWeight: 700 }}>
+                      Signal: {formatLabel(derived.highestRisk.hidden_signal)}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      marginTop: "12px",
+                      fontSize: "14px",
+                      color: "#111827",
+                      lineHeight: 1.7,
+                      whiteSpace: "pre-wrap",
+                    }}
+                  >
+                    {derived.highestRisk.message_preview || "Message text not saved for this event."}
+                  </div>
+
+                  <div style={{ marginTop: "14px" }}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedRiskEvent(derived.highestRisk)}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: "12px",
+                        border: "1px solid #fca5a5",
+                        background: "#ffffff",
+                        cursor: "pointer",
+                        fontWeight: 800,
+                        color: "#991b1b",
+                      }}
+                    >
+                      Inspect this event
+                    </button>
+                  </div>
+                </div>
+              </SectionCard>
+            )}
+
+            <details
+              open={false}
+              style={{
+                marginTop: "24px",
+                background: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: "18px",
+                padding: "18px",
+                boxShadow: "0 8px 24px rgba(15,23,42,0.05)",
+              }}
+            >
+              <summary
+                style={{
+                  cursor: "pointer",
+                  fontWeight: 900,
+                  color: "#111827",
+                  fontSize: "18px",
+                  outline: "none",
+                }}
+              >
+                Detailed Analytics
+              </summary>
+
+              <div
+                style={{
+                  marginTop: "18px",
+                  display: "grid",
+                  gridTemplateColumns: "1fr",
+                  gap: "20px",
+                }}
+              >
+                <TableBlock
+                  title="Daily Visits"
+                  columns={["day", "unique_visitors", "unique_sessions", "unique_users", "total_analyses"]}
+                  rows={data.daily_visits}
                 />
 
-              <TableBlock
-                title="Risk Distribution"
-                columns={["risk_level", "count"]}
-                rows={data.risk_distribution}
-                sortByCount={true}
-              />
+                <TableBlock
+                  title="Top Tones"
+                  columns={["tone", "count"]}
+                  rows={data.top_tones}
+                  sortByCount={true}
+                />
 
-              <TableBlock
-                title="Page Breakdown"
-                columns={["page_slug", "total_analyses", "unique_visitors"]}
-                rows={(data.page_slug_breakdown || []).filter(
-                  (row) => row.page_slug !== "unknown"
-                )}
-              />
+                <TableBlock
+                  title="Top Hidden Signals"
+                  columns={["hidden_signal", "count"]}
+                  rows={(data.top_hidden_signals || []).filter((row) => row.hidden_signal !== "none")}
+                  sortByCount={true}
+                />
 
-              <TableBlock
-                title="Rewrite Trend"
-                columns={["day", "total", "rewrites_shown"]}
-                rows={data.rewrite_trend}
-              />
+                <TableBlock
+                  title="Risk Distribution"
+                  columns={["risk_level", "count"]}
+                  rows={data.risk_distribution}
+                  sortByCount={true}
+                />
 
-              <TableBlock
-  title="API Usage by Endpoint"
-  columns={["endpoint", "total_requests"]}
-  rows={data.api_usage_overview?.top_endpoints || []}
-/>
+                <TableBlock
+                  title="Page Breakdown"
+                  columns={["page_slug", "total_analyses", "unique_visitors"]}
+                  rows={(data.page_slug_breakdown || []).filter((row) => row.page_slug !== "unknown")}
+                />
 
-<TableBlock
-  title="Feedback by Rating"
-  columns={["feedback_rating", "count"]}
-  rows={feedbackByRating}
-  sortByCount={true}
-/>
+                <TableBlock
+                  title="Rewrite Trend"
+                  columns={["day", "total", "rewrites_shown"]}
+                  rows={data.rewrite_trend}
+                />
 
-<TableBlock
-  title="Negative Feedback by Wrong Area"
-  columns={["wrong_area", "count"]}
-  rows={negativeByWrongArea}
-  sortByCount={true}
-/>
+                <TableBlock
+                  title="API Usage by Endpoint"
+                  columns={["endpoint", "total_requests"]}
+                  rows={data.api_usage_overview?.top_endpoints || []}
+                />
 
-<TableBlock
-  title="Daily Feedback Trend"
-  columns={["day", "total_feedback", "positive_count", "negative_count"]}
-  rows={dailyFeedbackTrend}
-/>
+                <TableBlock
+                  title="Feedback by Rating"
+                  columns={["feedback_rating", "count"]}
+                  rows={derived.feedbackByRating}
+                  sortByCount={true}
+                />
 
-<TableBlock
-  title="Top Tone Log Labels"
-  columns={["label", "count"]}
-  rows={data.tone_logs_summary?.top_tone_log_labels || []}
-  sortByCount={true}
-/>
+                <TableBlock
+                  title="Negative Feedback by Wrong Area"
+                  columns={["wrong_area", "count"]}
+                  rows={derived.negativeByWrongArea}
+                  sortByCount={true}
+                />
 
-              <TableBlock
-                    title="Top Risk Messages"
-                    columns={[
-                        "id",
-                        "risk_score",
-                        "risk_level",
-                        "tone",
-                        "hidden_signal",
-                        "page_slug",
-                        "message_preview",
-                        "created_at",
-                    ]}
-                    rows={data.top_risk_messages}
-                    sortByCount={false}
-                    onRowClick={setSelectedRiskEvent}
-                    
-                    
-                    />
-            </div>
+                <TableBlock
+                  title="Daily Feedback Trend"
+                  columns={["day", "total_feedback", "positive_count", "negative_count"]}
+                  rows={derived.dailyFeedbackTrend}
+                />
+
+                <TableBlock
+                  title="Top Tone Log Labels"
+                  columns={["label", "count"]}
+                  rows={data.tone_logs_summary?.top_tone_log_labels || []}
+                  sortByCount={true}
+                />
+
+                <TableBlock
+                  title="Top Risk Messages"
+                  columns={[
+                    "id",
+                    "risk_score",
+                    "risk_level",
+                    "tone",
+                    "hidden_signal",
+                    "page_slug",
+                    "message_preview",
+                    "created_at",
+                  ]}
+                  rows={data.top_risk_messages}
+                  sortByCount={false}
+                  onRowClick={setSelectedRiskEvent}
+                />
+              </div>
+            </details>
           </>
         )}
       </div>
+
+      <RiskDetailDrawer item={selectedRiskEvent} onClose={() => setSelectedRiskEvent(null)} />
     </div>
   );
 }
