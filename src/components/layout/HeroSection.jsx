@@ -534,6 +534,11 @@ export default function HeroSection({
         ...heroCardStyle,
         background:
           "radial-gradient(circle at top right, rgba(99,102,241,0.10), rgba(99,102,241,0) 24%), radial-gradient(circle at bottom left, rgba(236,72,153,0.10), rgba(236,72,153,0) 28%), rgba(255,255,255,0.68)",
+        width: "100%",
+        maxWidth: "100%",
+        boxSizing: "border-box",
+        overflow: "hidden",
+        padding: isMobile ? "20px 16px 24px" : heroCardStyle?.padding,
       }}
     >
       <div className="tc-light-sweep" />
@@ -581,6 +586,7 @@ export default function HeroSection({
                 "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
               border: "1px solid rgba(255,255,255,0.28)",
               overflow: "hidden",
+              flexShrink: 0,
             }}
           >
             <div
@@ -608,7 +614,7 @@ export default function HeroSection({
             </div>
           </div>
 
-          <div>
+          <div style={{ minWidth: 0 }}>
             <div
               style={{
                 fontSize: "12px",
@@ -626,7 +632,7 @@ export default function HeroSection({
               className="tc-title tc-shimmer"
               style={{
                 margin: 0,
-                fontSize: isMobile ? "50px" : "76px",
+                fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "76px",
                 lineHeight: 0.92,
                 letterSpacing: "-0.09em",
                 fontWeight: 950,
@@ -635,6 +641,7 @@ export default function HeroSection({
                 backgroundSize: "200% 200%",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
+                wordBreak: "break-word",
               }}
             >
               {location.pathname === "/" ? "ToneCheck" : currentTool.title}
@@ -647,8 +654,8 @@ export default function HeroSection({
             margin: "10px 0 0 0",
             maxWidth: "720px",
             color: "#334155",
-            fontSize: isMobile ? "28px" : "34px",
-            lineHeight: 1.18,
+            fontSize: isMobile ? "clamp(24px, 8vw, 34px)" : "34px",
+            lineHeight: isMobile ? 1.12 : 1.18,
             fontWeight: 850,
             letterSpacing: "-0.04em",
           }}
@@ -669,20 +676,22 @@ export default function HeroSection({
           {subDescription}
         </p>
 
-            <div
-      style={{
-        marginTop: "10px",
-        padding: "6px 10px",
-        background: "#fff3cd",
-        color: "#856404",
-        borderRadius: "8px",
-        fontSize: "12px",
-        fontWeight: 700,
-        display: "inline-block",
-      }}
-    >
-      Beta — results may occasionally miss context. Review before relying on it.
-    </div>
+        <div
+          style={{
+            marginTop: "12px",
+            padding: isMobile ? "10px 12px" : "6px 10px",
+            background: "#fff3cd",
+            color: "#856404",
+            borderRadius: "10px",
+            fontSize: isMobile ? "13px" : "12px",
+            lineHeight: 1.4,
+            fontWeight: 700,
+            display: "inline-block",
+            maxWidth: isMobile ? "100%" : "fit-content",
+          }}
+        >
+          Beta — results may occasionally miss context. Review before relying on it.
+        </div>
       </div>
 
       <div
@@ -703,6 +712,11 @@ export default function HeroSection({
               background: "rgba(255,255,255,0.82)",
               border: "1px solid rgba(15,23,42,0.06)",
               fontWeight: 750,
+              width: isMobile ? "100%" : "auto",
+              justifyContent: "flex-start",
+              textAlign: "left",
+              padding: isMobile ? "14px 16px" : chipStyle?.padding,
+              lineHeight: 1.35,
             }}
             onClick={() => setExample(example.text)}
           >
@@ -715,16 +729,18 @@ export default function HeroSection({
         <div
           style={{
             marginTop: "12px",
-            padding: "10px 14px",
+            padding: isMobile ? "16px" : "10px 14px",
             borderRadius: "16px",
             background: livePreview.bg,
             border: livePreview.border,
             color: livePreview.color,
-            fontSize: "13px",
+            fontSize: isMobile ? "14px" : "13px",
             fontWeight: 700,
-            display: "inline-flex",
+            display: "flex",
             alignItems: "center",
             gap: "8px",
+            width: isMobile ? "100%" : "inline-flex",
+            boxSizing: "border-box",
           }}
         >
           <span>{livePreview.emoji}</span>
@@ -732,7 +748,7 @@ export default function HeroSection({
         </div>
       )}
 
-      <div style={{ marginTop: "24px", position: "relative" }}>
+      <div style={{ marginTop: "24px" }}>
         <textarea
           className="tc-textarea"
           value={message}
@@ -740,12 +756,12 @@ export default function HeroSection({
             setMessage(e.target.value);
             setResult(null);
             setCopyState("");
-            }}
+          }}
           placeholder={currentTool.placeholder}
           style={{
             width: "100%",
-            minHeight: isMobile ? "190px" : "240px",
-            padding: isMobile ? "18px 18px 74px" : "24px 24px 72px",
+            minHeight: isMobile ? "180px" : "240px",
+            padding: isMobile ? "18px" : "24px 24px 72px",
             fontSize: isMobile ? "18px" : "24px",
             lineHeight: 1.6,
             borderRadius: "28px",
@@ -762,12 +778,12 @@ export default function HeroSection({
 
         <div
           style={{
-            position: "absolute",
-            right: "16px",
-            bottom: "16px",
+            marginTop: "12px",
             display: "flex",
             gap: "10px",
-            flexWrap: "wrap",
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            flexDirection: isMobile ? "row" : "row",
+            alignItems: "stretch",
           }}
         >
           <button
@@ -778,7 +794,14 @@ export default function HeroSection({
               setResult(null);
               setCopyState("");
             }}
-            style={actionButtonStyle}
+            style={{
+              ...actionButtonStyle,
+              minWidth: isMobile ? "96px" : actionButtonStyle?.minWidth,
+              width: isMobile ? "auto" : actionButtonStyle?.width,
+              padding: isMobile ? "0 18px" : actionButtonStyle?.padding,
+              minHeight: isMobile ? "54px" : actionButtonStyle?.minHeight,
+              flexShrink: 0,
+            }}
           >
             Clear
           </button>
@@ -791,6 +814,9 @@ export default function HeroSection({
             style={{
               ...primaryButtonStyle,
               opacity: loading || !message.trim() ? 0.7 : 1,
+              minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
+              width: isMobile ? "100%" : primaryButtonStyle?.width,
+              flex: isMobile ? 1 : "unset",
             }}
           >
             {loading ? "Analyzing..." : currentTool.analyzeLabel}
@@ -800,14 +826,15 @@ export default function HeroSection({
 
       <div
         style={{
-          marginTop: "10px",
+          marginTop: "12px",
           display: "flex",
           alignItems: "center",
           gap: "10px",
           flexWrap: "wrap",
           color: "#64748b",
-          fontSize: "12px",
+          fontSize: isMobile ? "13px" : "12px",
           fontWeight: 700,
+          lineHeight: 1.5,
         }}
       >
         <span>🧠 Live tone check</span>
