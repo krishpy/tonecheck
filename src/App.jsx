@@ -454,6 +454,7 @@ function buildShareHtml() {
       session_id: getSessionId(),
       user_id: null,
       page_slug: window.location.pathname,
+      consent_to_save_text: consentToSaveText,
     }),
   }
 );
