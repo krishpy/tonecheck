@@ -10,6 +10,17 @@ import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
 import TestLab from "./pages/TestLab";
 import AdminDashboard from "./pages/AdminDashboard";
+import { trackEvent } from "./utils/analytics";
+
+
+function getSessionId() {
+  let sessionId = localStorage.getItem("tonecheck_session_id");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    localStorage.setItem("tonecheck_session_id", sessionId);
+  }
+  return sessionId;
+}
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -18,27 +29,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function getSessionId() {
-  let sessionId = localStorage.getItem("tonecheck_session_id");
-
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem("tonecheck_session_id", sessionId);
-  }
-
-  return sessionId;
-}
-
-
-function getTonecheckSessionId() {
-  let sessionId = localStorage.getItem("tonecheck_session_id");
-  if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem("tonecheck_session_id", sessionId);
-  }
-  return sessionId;
 }
 
 function RedirectHome() {
@@ -60,15 +50,24 @@ function AppContent() {
   const [rewriteLoading, setRewriteLoading] = useState(false);
   const [consentToSaveText, setConsentToSaveText] = React.useState(false);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const sessionId = getSessionId();
+
+useEffect(() => {
+  trackEvent({
+    event_type: "page_view",
+    session_id: sessionId,
+    page_slug: location.pathname,
+  });
+}, [sessionId, location.pathname]);
+
   useEffect(() => {
     if (!result || !message.trim()) return;
     analyze(rewriteTone, { isRewriteOnly: true });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rewriteTone]);
-
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const currentTool = useMemo(() => {
     return getToolConfigFromPath(location.pathname) || MINI_TOOLS.home;
@@ -423,48 +422,50 @@ function buildShareHtml() {
     );
   }
 
-  async function analyze(selectedStyleArg = rewriteTone, options = {}) {
-    const startedAt = Date.now();
-    const selectedStyle =
-      typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
+async function analyze(selectedStyleArg = rewriteTone, options = {}) {
+  const startedAt = Date.now();
+  const selectedStyle =
+    typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
 
-    const { isRewriteOnly = false } = options;
+  const { isRewriteOnly = false } = options;
 
-    try {
-      if (isRewriteOnly) {
-        setRewriteLoading(true);
-      } else {
-        setLoading(true);
-        setResult(null);
+  try {
+    if (isRewriteOnly) {
+      setRewriteLoading(true);
+    } else {
+      setLoading(true);
+      setResult(null);
+    }
+
+    setCopyState("");
+
+    if (!isRewriteOnly) {
+      trackEvent({
+        event_type: "analyze_click",
+        session_id: sessionId,
+        page_slug: location.pathname,
+        input_length: message.length,
+      });
+    }
+
+    const response = await fetch(
+      "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": "test-default-key",
+        },
+        body: JSON.stringify({
+          message_text: message,
+          rewrite_style: selectedStyle,
+          session_id: sessionId,
+          user_id: null,
+          page_slug: location.pathname,
+          consent_to_save_text: consentToSaveText,
+        }),
       }
-
-      setCopyState("");
-
-     const response = await fetch(
-  "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-  {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": "test-default-key",
-    },
-    body: JSON.stringify({
-      message_text: message,
-      rewrite_style: selectedStyle,
-      session_id: getSessionId(),
-      user_id: null,
-      page_slug: window.location.pathname,
-      consent_to_save_text: consentToSaveText,
-    }),
-  }
-);
-
-
-      
-
-
-
-
+    );
       const rawText = await response.text();
       let data = {};
 
@@ -477,6 +478,24 @@ function buildShareHtml() {
       if (!response.ok) {
         throw new Error(data?.detail || "Something went wrong. Please try again.");
       }
+
+      if (!response.ok) {
+  throw new Error(data?.detail || "Something went wrong. Please try again.");
+}
+
+if (!isRewriteOnly) {
+  trackEvent({
+    event_type: "result_shown",
+    session_id: sessionId,
+    page_slug: location.pathname,
+    tone: data.tone,
+    hidden_signal: data.primary_hidden_signal,
+    risk_score: data.communication_risk_score,
+    rewrite_shown: !!data.rewrite_suggestion,
+  });
+}
+
+
 
       setResult(data);
     } catch (error) {
