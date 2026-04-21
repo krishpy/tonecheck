@@ -795,6 +795,7 @@ export default function HeroSection({
               setMessage("");
               setResult(null);
               setCopyState("");
+              setConsentToSaveText(false);
             }}
             style={{
               ...actionButtonStyle,

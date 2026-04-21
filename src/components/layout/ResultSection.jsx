@@ -1025,6 +1025,7 @@ export default function ResultSection({
                 setResult(null);
                 setCopyState("");
                 setRewriteTone("balanced");
+                setConsentToSaveText(false);
                 if (setMessage) setMessage("");
                 setTimeout(() => {
                   const textarea = document.querySelector(".tc-textarea");
