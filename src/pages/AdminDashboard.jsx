@@ -19,6 +19,11 @@ function safeNumber(value, fallback = 0) {
   return Number.isFinite(num) ? num : fallback;
 }
 
+function safePct(value, fallback = 0) {
+  const num = Number(value);
+  return Number.isFinite(num) ? `${num.toFixed(2)}%` : `${fallback.toFixed(2)}%`;
+}
+
 function getRiskColor(level) {
   const normalized = String(level || "").toLowerCase();
   if (normalized === "high" || normalized === "severe") return "#dc2626";
@@ -30,6 +35,14 @@ function getHealthTone(score) {
   if (score >= 80) return { label: "Strong", color: "#166534", bg: "#ecfdf5", border: "#bbf7d0" };
   if (score >= 60) return { label: "Watch", color: "#b45309", bg: "#fffbeb", border: "#fde68a" };
   return { label: "Weak", color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" };
+}
+
+function getDecisionTone(severity) {
+  const s = String(severity || "").toLowerCase();
+  if (s === "danger") return { bg: "#fef2f2", border: "#fecaca", color: "#b91c1c" };
+  if (s === "warning") return { bg: "#fffbeb", border: "#fde68a", color: "#b45309" };
+  if (s === "success") return { bg: "#ecfdf5", border: "#bbf7d0", color: "#166534" };
+  return { bg: "#f8fafc", border: "#e2e8f0", color: "#334155" };
 }
 
 function Card({ title, value, subtitle = "", accent = "#111827" }) {
@@ -208,7 +221,12 @@ function TableBlock({
                     fontSize: "14px",
                   }}
                 >
-                  {col === "tone" || col === "hidden_signal" || col === "risk_level" || col === "wrong_area" || col === "feedback_rating" || col === "label"
+                  {col === "tone" ||
+                  col === "hidden_signal" ||
+                  col === "risk_level" ||
+                  col === "wrong_area" ||
+                  col === "feedback_rating" ||
+                  col === "label"
                     ? formatLabel(row[col])
                     : row[col] ?? ""}
                 </td>
@@ -248,6 +266,37 @@ function ActionItem({ title, reason, severity = "neutral" }) {
     >
       <div style={{ fontSize: "14px", fontWeight: 900, color: theme.title }}>{title}</div>
       <div style={{ marginTop: "6px", fontSize: "13px", color: "#475569", lineHeight: 1.6 }}>{reason}</div>
+    </div>
+  );
+}
+
+function AutoDecisionCard({ item }) {
+  const tone = getDecisionTone(item?.severity);
+  return (
+    <div
+      style={{
+        padding: "14px",
+        borderRadius: "14px",
+        background: tone.bg,
+        border: `1px solid ${tone.border}`,
+      }}
+    >
+      <div style={{ fontSize: "14px", fontWeight: 900, color: tone.color }}>
+        {item?.title || "Decision"}
+      </div>
+      <div style={{ marginTop: "6px", fontSize: "13px", color: "#334155", lineHeight: 1.6 }}>
+        {item?.reason || ""}
+      </div>
+      {item?.action ? (
+        <div style={{ marginTop: "8px", fontSize: "13px", color: "#0f172a", fontWeight: 700 }}>
+          Next action: {item.action}
+        </div>
+      ) : null}
+      {item?.metric && item.metric !== "none" ? (
+        <div style={{ marginTop: "8px", fontSize: "12px", color: "#64748b", fontWeight: 700 }}>
+          Metric: {item.metric} {item?.value !== null && item?.value !== undefined ? `(${item.value})` : ""}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -392,6 +441,8 @@ export default function AdminDashboard() {
     const riskDistribution = data?.risk_distribution || [];
     const topRiskMessages = data?.top_risk_messages || [];
     const pageBreakdown = data?.page_slug_breakdown || [];
+    const frontendFunnel = data?.frontend_funnel || {};
+    const autoDecisions = data?.auto_decisions || [];
 
     const totalAnalyses = safeNumber(overview.total_analyses);
     const rewritesShown = safeNumber(overview.rewrites_shown);
@@ -426,11 +477,25 @@ export default function AdminDashboard() {
 
     const highestRisk = topRiskMessages[0] || null;
 
+    const funnelSessions = frontendFunnel.sessions || {};
+    const funnelEvents = frontendFunnel.events || {};
+    const funnelRates = frontendFunnel.rates || {};
+    const funnelPages = frontendFunnel.pages || [];
+
     const riskPenalty = Math.min(35, highRiskCount * 2 + mediumRiskCount * 0.75);
     const rewritePenalty = Math.min(25, rewriteRate * 0.25);
     const feedbackPenalty =
       totalFeedback > 0 ? Math.min(30, Math.round((negativeFeedback / totalFeedback) * 100 * 0.4)) : 0;
-    const healthScore = Math.max(0, Math.min(100, Math.round(100 - riskPenalty - rewritePenalty - feedbackPenalty)));
+
+    const funnelPenalty =
+      (safeNumber(funnelRates.typing_to_abandon_pct) > 35 ? 10 : 0) +
+      (safeNumber(funnelRates.analyze_to_result_pct) < 90 && safeNumber(funnelSessions.analyze_click) >= 10 ? 10 : 0) +
+      (safeNumber(funnelRates.typing_to_analyze_pct) < 45 && safeNumber(funnelSessions.typing_started) >= 10 ? 8 : 0);
+
+    const healthScore = Math.max(
+      0,
+      Math.min(100, Math.round(100 - riskPenalty - rewritePenalty - feedbackPenalty - funnelPenalty))
+    );
     const healthTone = getHealthTone(healthScore);
 
     const decisionSummary = [];
@@ -527,6 +592,12 @@ export default function AdminDashboard() {
       healthScore,
       healthTone,
       decisionSummary,
+      frontendFunnel,
+      funnelSessions,
+      funnelEvents,
+      funnelRates,
+      funnelPages,
+      autoDecisions,
     };
   }, [data]);
 
@@ -628,6 +699,44 @@ export default function AdminDashboard() {
     },
   ];
 
+  const funnelCards = [
+    {
+      title: "Page View Sessions",
+      value: safeNumber(derived.funnelSessions.page_view),
+      subtitle: `${safeNumber(derived.funnelEvents.page_view)} total events`,
+    },
+    {
+      title: "Typing Started",
+      value: safeNumber(derived.funnelSessions.typing_started),
+      subtitle: safePct(derived.funnelRates.page_to_typing_pct),
+      accent: safeNumber(derived.funnelRates.page_to_typing_pct) < 35 ? "#b91c1c" : "#111827",
+    },
+    {
+      title: "Analyze Clicked",
+      value: safeNumber(derived.funnelSessions.analyze_click),
+      subtitle: safePct(derived.funnelRates.typing_to_analyze_pct),
+      accent: safeNumber(derived.funnelRates.typing_to_analyze_pct) < 45 ? "#b91c1c" : "#111827",
+    },
+    {
+      title: "Results Shown",
+      value: safeNumber(derived.funnelSessions.result_shown),
+      subtitle: safePct(derived.funnelRates.analyze_to_result_pct),
+      accent: safeNumber(derived.funnelRates.analyze_to_result_pct) < 90 ? "#b91c1c" : "#111827",
+    },
+    {
+      title: "Abandon Sessions",
+      value: safeNumber(derived.funnelSessions.abandon),
+      subtitle: safePct(derived.funnelRates.typing_to_abandon_pct),
+      accent: safeNumber(derived.funnelRates.typing_to_abandon_pct) > 35 ? "#b91c1c" : "#111827",
+    },
+    {
+      title: "Rewrite Used",
+      value: safeNumber(derived.funnelSessions.rewrite_used),
+      subtitle: safePct(derived.funnelRates.result_to_rewrite_used_pct),
+      accent: safeNumber(derived.funnelRates.result_to_rewrite_used_pct) >= 20 ? "#166534" : "#111827",
+    },
+  ];
+
   return (
     <div
       style={{
@@ -665,7 +774,7 @@ export default function AdminDashboard() {
               Product Decision Dashboard
             </h1>
             <div style={{ color: "#64748b", marginTop: "8px", fontSize: "15px" }}>
-              Use this to decide what to fix next, not just to stare at numbers.
+              Backend-driven analytics, funnel visibility, and automatic next actions.
             </div>
           </div>
 
@@ -760,10 +869,10 @@ export default function AdminDashboard() {
                 }}
               >
                 {derived.healthScore < 60
-                  ? "Do not chase new features. Fix the weakest output areas first, especially negative feedback drivers and high-risk misclassifications."
+                  ? "Do not chase new features. Fix the weakest output areas and funnel breakdowns first."
                   : derived.healthScore < 80
-                  ? "The system is usable, but it still needs guided improvement. Focus on the top complaint area and the dominant signal family."
-                  : "The system is in a healthy state for controlled growth. Keep shipping, but use feedback and high-risk samples to guide the next tuning cycle."}
+                  ? "The system is usable, but still needs guided improvement. Focus on the top complaint area and the biggest funnel drop."
+                  : "The system is in a healthy state for controlled growth. Use message-level feedback and funnel analytics to choose the next iteration."}
               </div>
             </div>
 
@@ -772,62 +881,93 @@ export default function AdminDashboard() {
             <StatGrid columns="repeat(4, minmax(0, 1fr))" items={feedbackCards} />
             <StatGrid columns="repeat(4, minmax(0, 1fr))" items={toneLogCards} />
 
+            <SectionCard
+              title="Frontend Funnel"
+              subtitle="This tells you where users are dropping. Fix these before doing random model tuning."
+            >
+              <StatGrid columns="repeat(3, minmax(0, 1fr))" items={funnelCards} />
+            </SectionCard>
+
             <div
               style={{
                 display: "grid",
                 gridTemplateColumns: "1.2fr 0.8fr",
                 gap: "18px",
+                marginTop: "24px",
                 marginBottom: "24px",
               }}
             >
               <SectionCard
-                title="What to Fix Next"
-                subtitle="This should drive your next sprint. If you ignore this block, you’ll slip back into random tuning."
+                title="Auto Decisions"
+                subtitle="Backend-generated next actions. This should remove guesswork from what to fix next."
               >
                 <div style={{ display: "grid", gap: "12px" }}>
-                  {derived.decisionSummary.map((item) => (
-                    <ActionItem
-                      key={item.title}
-                      title={item.title}
-                      reason={item.reason}
-                      severity={item.severity}
-                    />
+                  {(derived.autoDecisions || []).map((item, index) => (
+                    <AutoDecisionCard key={`${item.title}-${index}`} item={item} />
                   ))}
                 </div>
               </SectionCard>
 
               <SectionCard
                 title="Quick Product Signals"
-                subtitle="A harsh, pragmatic read of current behavior."
+                subtitle="A hard read of current behavior."
               >
                 <div style={{ display: "grid", gap: "12px" }}>
                   <InsightRow
-                    label="Feedback Quality"
-                    value={
-                      derived.totalFeedback
-                        ? `${derived.feedbackAccuracyRate}% positive`
-                        : "No meaningful sample yet"
-                    }
+                    label="Page → Typing"
+                    value={safePct(derived.funnelRates.page_to_typing_pct)}
                     tone={
-                      !derived.totalFeedback
-                        ? "neutral"
-                        : derived.feedbackAccuracyRate >= 75
-                        ? "success"
-                        : derived.feedbackAccuracyRate >= 55
+                      safeNumber(derived.funnelRates.page_to_typing_pct) < 35
+                        ? "danger"
+                        : safeNumber(derived.funnelRates.page_to_typing_pct) < 50
                         ? "warning"
-                        : "danger"
+                        : "success"
                     }
                   />
 
                   <InsightRow
-                    label="Rewrite Dependency"
-                    value={`${derived.rewriteRate}%`}
+                    label="Typing → Analyze"
+                    value={safePct(derived.funnelRates.typing_to_analyze_pct)}
                     tone={
-                      derived.rewriteRate >= 70
+                      safeNumber(derived.funnelRates.typing_to_analyze_pct) < 45
                         ? "danger"
-                        : derived.rewriteRate >= 40
+                        : safeNumber(derived.funnelRates.typing_to_analyze_pct) < 60
                         ? "warning"
                         : "success"
+                    }
+                  />
+
+                  <InsightRow
+                    label="Analyze → Result"
+                    value={safePct(derived.funnelRates.analyze_to_result_pct)}
+                    tone={
+                      safeNumber(derived.funnelRates.analyze_to_result_pct) < 90
+                        ? "danger"
+                        : "success"
+                    }
+                  />
+
+                  <InsightRow
+                    label="Typing → Abandon"
+                    value={safePct(derived.funnelRates.typing_to_abandon_pct)}
+                    tone={
+                      safeNumber(derived.funnelRates.typing_to_abandon_pct) > 35
+                        ? "danger"
+                        : safeNumber(derived.funnelRates.typing_to_abandon_pct) > 20
+                        ? "warning"
+                        : "success"
+                    }
+                  />
+
+                  <InsightRow
+                    label="Result → Rewrite Used"
+                    value={safePct(derived.funnelRates.result_to_rewrite_used_pct)}
+                    tone={
+                      safeNumber(derived.funnelRates.result_to_rewrite_used_pct) >= 20
+                        ? "success"
+                        : safeNumber(derived.funnelRates.result_to_rewrite_used_pct) >= 10
+                        ? "warning"
+                        : "neutral"
                     }
                   />
 
@@ -836,24 +976,6 @@ export default function AdminDashboard() {
                     value={derived.topWrongArea}
                     tone={derived.topWrongArea === "-" ? "neutral" : "warning"}
                   />
-
-                  <InsightRow
-                    label="Dominant Signal"
-                    value={derived.topSignal}
-                    tone={derived.topSignal === "-" ? "neutral" : "neutral"}
-                  />
-
-                  <InsightRow
-                    label="Most Active Page"
-                    value={derived.topPage}
-                    tone="neutral"
-                  />
-
-                  <InsightRow
-                    label="API Surface"
-                    value={`${safeNumber(derived.apiUsage.active_api_keys)} active keys`}
-                    tone={safeNumber(derived.apiUsage.active_api_keys) > 0 ? "success" : "neutral"}
-                  />
                 </div>
               </SectionCard>
             </div>
@@ -861,7 +983,7 @@ export default function AdminDashboard() {
             {derived.highestRisk && (
               <SectionCard
                 title="Highest-Risk Message Right Now"
-                subtitle="This is the fastest way to inspect whether the engine is seeing the real danger or just noise."
+                subtitle="Fastest way to inspect whether the engine is seeing real danger or just noise."
               >
                 <div
                   style={{
@@ -945,6 +1067,20 @@ export default function AdminDashboard() {
                   gap: "20px",
                 }}
               >
+                <TableBlock
+                  title="Frontend Funnel by Page"
+                  columns={[
+                    "page_slug",
+                    "page_view_sessions",
+                    "typing_started_sessions",
+                    "analyze_click_sessions",
+                    "result_shown_sessions",
+                    "abandon_sessions",
+                    "rewrite_used_sessions",
+                  ]}
+                  rows={derived.funnelPages}
+                />
+
                 <TableBlock
                   title="Daily Visits"
                   columns={["day", "unique_visitors", "unique_sessions", "unique_users", "total_analyses"]}

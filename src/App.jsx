@@ -1,17 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Link, Route, Routes, useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import * as htmlToImage from "html-to-image";
 import { Helmet } from "react-helmet-async";
 import STAT_EXPLANATIONS from "./config/statExplanations";
 import { MINI_TOOLS, getToolConfigFromPath } from "./config/miniTools";
-import SendDecisionCard from "./components/results/SendDecisionCard";
-import SeoContentBlock from "./components/layout/SeoContentBlock";
 import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
 import TestLab from "./pages/TestLab";
 import AdminDashboard from "./pages/AdminDashboard";
 import { trackEvent } from "./utils/analytics";
-
 
 function getSessionId() {
   let sessionId = localStorage.getItem("tonecheck_session_id");
@@ -48,26 +45,48 @@ function AppContent() {
   const [copyState, setCopyState] = useState("");
   const [rewriteTone, setRewriteTone] = useState("balanced");
   const [rewriteLoading, setRewriteLoading] = useState(false);
-  const [consentToSaveText, setConsentToSaveText] = React.useState(false);
+  const [consentToSaveText, setConsentToSaveText] = useState(false);
 
   const location = useLocation();
   const navigate = useNavigate();
   const sessionId = getSessionId();
 
-useEffect(() => {
-  trackEvent({
-    event_type: "page_view",
-    session_id: sessionId,
-    page_slug: location.pathname,
-  });
-}, [sessionId, location.pathname]);
+  const hasTypedRef = useRef(false);
+  const hasTrackedAbandonRef = useRef(false);
+  const lastAnalyzeStartedRef = useRef(false);
+
+  useEffect(() => {
+    trackEvent({
+      event_type: "page_view",
+      session_id: sessionId,
+      page_slug: location.pathname,
+    });
+  }, [sessionId, location.pathname]);
 
   useEffect(() => {
     if (!result || !message.trim()) return;
     analyze(rewriteTone, { isRewriteOnly: true });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rewriteTone]);
+
+  useEffect(() => {
+    return () => {
+      if (
+        message.trim().length > 5 &&
+        !result &&
+        hasTypedRef.current &&
+        !hasTrackedAbandonRef.current
+      ) {
+        hasTrackedAbandonRef.current = true;
+        trackEvent({
+          event_type: "abandon",
+          session_id: sessionId,
+          page_slug: location.pathname,
+          input_length: message.trim().length,
+        });
+      }
+    };
+  }, [message, result, sessionId, location.pathname]);
 
   const currentTool = useMemo(() => {
     return getToolConfigFromPath(location.pathname) || MINI_TOOLS.home;
@@ -254,6 +273,94 @@ useEffect(() => {
     result?.primary_hidden_signal || result?.primary_manipulation_signal
   );
 
+  function getHumanImpactLine({ toneLabel, hiddenSignalLabel, riskScore }) {
+    const tone = String(toneLabel || "").toLowerCase();
+    const hidden = String(hiddenSignalLabel || "").toLowerCase();
+    const risk = Number(riskScore || 0);
+
+    if (
+      hidden.includes("threat") ||
+      hidden.includes("hostile") ||
+      hidden.includes("insult") ||
+      hidden.includes("profanity") ||
+      tone.includes("threat")
+    ) {
+      return "This could escalate fast.";
+    }
+
+    if (
+      hidden.includes("accus") ||
+      hidden.includes("blame") ||
+      tone.includes("accusatory")
+    ) {
+      return "This might make the other person defensive.";
+    }
+
+    if (
+      hidden.includes("passive") ||
+      hidden.includes("pressure") ||
+      hidden.includes("guilt")
+    ) {
+      return "This may create pressure or tension.";
+    }
+
+    if (tone.includes("frustrated") || tone.includes("tense") || risk >= 40) {
+      return "This may come across more sharply than intended.";
+    }
+
+    if (tone.includes("friendly") || tone.includes("polite") || risk <= 20) {
+      return "This sounds clear and safe to send.";
+    }
+
+    return "How you say it can change how this lands.";
+  }
+
+  function buildShareText() {
+    const toneLabel = getToneLabel();
+    const impactLine = getHumanImpactLine({
+      toneLabel,
+      hiddenSignalLabel: primaryHiddenSignalLabel,
+      riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
+    });
+
+    return `${message}
+
+Tone: ${toneLabel}
+${impactLine}${
+      finalRewrite
+        ? `
+
+Better way to say it:
+"${finalRewrite}"`
+        : ""
+    }
+
+Try yours: trytonecheck.com`;
+  }
+
+  function buildShareHtml() {
+    const toneLabel = getToneLabel();
+    const impactLine = getHumanImpactLine({
+      toneLabel,
+      hiddenSignalLabel: primaryHiddenSignalLabel,
+      riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
+    });
+
+    return `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
+        <p style="margin:0 0 14px 0;font-size:18px;">${escapeHtml(message)}</p>
+        <p style="margin:0 0 8px 0;"><strong>Tone:</strong> ${escapeHtml(toneLabel)}</p>
+        <p style="margin:0 0 12px 0;">${escapeHtml(impactLine)}</p>
+        ${
+          finalRewrite
+            ? `<p style="margin:0 0 12px 0;"><strong>Better way to say it:</strong><br/>"${escapeHtml(finalRewrite)}"</p>`
+            : ""
+        }
+        <p style="margin:0;"><strong>Try yours:</strong> trytonecheck.com</p>
+      </div>
+    `;
+  }
+
   async function copyResult() {
     try {
       const text = buildShareText();
@@ -269,6 +376,12 @@ useEffect(() => {
         await navigator.clipboard.writeText(text);
       }
 
+      trackEvent({
+        event_type: "copy_result",
+        session_id: sessionId,
+        page_slug: location.pathname,
+      });
+
       setCopyState("Copied");
       setTimeout(() => setCopyState(""), 1800);
     } catch {
@@ -277,97 +390,17 @@ useEffect(() => {
     }
   }
 
-function getHumanImpactLine({ toneLabel, hiddenSignalLabel, riskScore }) {
-  const tone = String(toneLabel || "").toLowerCase();
-  const hidden = String(hiddenSignalLabel || "").toLowerCase();
-  const risk = Number(riskScore || 0);
-
-  if (
-    hidden.includes("threat") ||
-    hidden.includes("hostile") ||
-    hidden.includes("insult") ||
-    hidden.includes("profanity") ||
-    tone.includes("threat")
-  ) {
-    return "This could escalate fast.";
-  }
-
-  if (
-    hidden.includes("accus") ||
-    hidden.includes("blame") ||
-    tone.includes("accusatory")
-  ) {
-    return "This might make the other person defensive.";
-  }
-
-  if (
-    hidden.includes("passive") ||
-    hidden.includes("pressure") ||
-    hidden.includes("guilt")
-  ) {
-    return "This may create pressure or tension.";
-  }
-
-  if (tone.includes("frustrated") || tone.includes("tense") || risk >= 40) {
-    return "This may come across more sharply than intended.";
-  }
-
-  if (tone.includes("friendly") || tone.includes("polite") || risk <= 20) {
-    return "This sounds clear and safe to send.";
-  }
-
-  return "How you say it can change how this lands.";
-}
-
-function buildShareText() {
-  const toneLabel = getToneLabel();
-  const impactLine = getHumanImpactLine({
-    toneLabel,
-    hiddenSignalLabel: primaryHiddenSignalLabel,
-    riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
-  });
-
-  return `${message}
-
-Tone: ${toneLabel}
-${impactLine}${
-    finalRewrite
-      ? `
-
-Better way to say it:
-"${finalRewrite}"`
-      : ""
-  }
-
-Try yours: trytonecheck.com`;
-}
-
-function buildShareHtml() {
-  const toneLabel = getToneLabel();
-  const impactLine = getHumanImpactLine({
-    toneLabel,
-    hiddenSignalLabel: primaryHiddenSignalLabel,
-    riskScore: result?.risk_score ?? result?.communication_risk_score ?? 0,
-  });
-
-  return `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;line-height:1.6;color:#111827;">
-      <p style="margin:0 0 14px 0;font-size:18px;">${escapeHtml(message)}</p>
-      <p style="margin:0 0 8px 0;"><strong>Tone:</strong> ${escapeHtml(toneLabel)}</p>
-      <p style="margin:0 0 12px 0;">${escapeHtml(impactLine)}</p>
-      ${
-        finalRewrite
-          ? `<p style="margin:0 0 12px 0;"><strong>Better way to say it:</strong><br/>"${escapeHtml(finalRewrite)}"</p>`
-          : ""
-      }
-      <p style="margin:0;"><strong>Try yours:</strong> trytonecheck.com</p>
-    </div>
-  `;
-}
   async function copyRewriteOnly() {
     if (!finalRewrite) return;
     try {
       await navigator.clipboard.writeText(finalRewrite);
+
+      trackEvent({
+        event_type: "copy_rewrite",
+        session_id: sessionId,
+        page_slug: location.pathname,
+      });
+
       setCopyState("Rewrite copied");
       setTimeout(() => setCopyState(""), 1800);
     } catch {
@@ -378,8 +411,17 @@ function buildShareHtml() {
 
   function useRewriteMessage() {
     if (!finalRewrite) return;
+
+    trackEvent({
+      event_type: "rewrite_used",
+      session_id: sessionId,
+      page_slug: location.pathname,
+    });
+
     setMessage(finalRewrite);
     setResult(null);
+    hasTrackedAbandonRef.current = false;
+    hasTypedRef.current = true;
 
     setTimeout(() => {
       const textarea = document.querySelector(".tc-textarea");
@@ -387,30 +429,39 @@ function buildShareHtml() {
     }, 50);
   }
 
-  function openShare(url) {
+  function openShare(url, platform = "share") {
+    trackEvent({
+      event_type: "share_result",
+      session_id: sessionId,
+      page_slug: location.pathname,
+      tone: platform,
+    });
+
     window.open(url, "_blank", "noopener,noreferrer");
   }
 
   function sendRewriteWhatsApp() {
     if (!finalRewrite) return;
-    openShare(`https://wa.me/?text=${encodeURIComponent(finalRewrite)}`);
+    openShare(`https://wa.me/?text=${encodeURIComponent(finalRewrite)}`, "whatsapp_rewrite");
   }
 
   function shareWhatsApp() {
-    openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`);
+    openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, "whatsapp");
   }
 
   function shareFacebook() {
     openShare(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
         "https://trytonecheck.com"
-      )}&quote=${encodeURIComponent(buildShareText())}`
+      )}&quote=${encodeURIComponent(buildShareText())}`,
+      "facebook"
     );
   }
 
   function shareX() {
     openShare(
-      `https://twitter.com/intent/tweet?text=${encodeURIComponent(buildShareText())}`
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(buildShareText())}`,
+      "x"
     );
   }
 
@@ -418,54 +469,55 @@ function buildShareHtml() {
     openShare(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
         "https://trytonecheck.com"
-      )}`
+      )}`,
+      "linkedin"
     );
   }
 
-async function analyze(selectedStyleArg = rewriteTone, options = {}) {
-  const startedAt = Date.now();
-  const selectedStyle =
-    typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
+  async function analyze(selectedStyleArg = rewriteTone, options = {}) {
+    const startedAt = Date.now();
+    const selectedStyle =
+      typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
 
-  const { isRewriteOnly = false } = options;
+    const { isRewriteOnly = false } = options;
 
-  try {
-    if (isRewriteOnly) {
-      setRewriteLoading(true);
-    } else {
-      setLoading(true);
-      setResult(null);
-    }
+    try {
+      if (isRewriteOnly) {
+        setRewriteLoading(true);
+      } else {
+        setLoading(true);
+        setResult(null);
+        lastAnalyzeStartedRef.current = true;
 
-    setCopyState("");
-
-    if (!isRewriteOnly) {
-      trackEvent({
-        event_type: "analyze_click",
-        session_id: sessionId,
-        page_slug: location.pathname,
-        input_length: message.length,
-      });
-    }
-
-    const response = await fetch(
-      "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": "test-default-key",
-        },
-        body: JSON.stringify({
-          message_text: message,
-          rewrite_style: selectedStyle,
+        trackEvent({
+          event_type: "analyze_click",
           session_id: sessionId,
-          user_id: null,
           page_slug: location.pathname,
-          consent_to_save_text: consentToSaveText,
-        }),
+          input_length: message.length,
+        });
       }
-    );
+
+      setCopyState("");
+
+      const response = await fetch(
+        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "test-default-key",
+          },
+          body: JSON.stringify({
+            message_text: message,
+            rewrite_style: selectedStyle,
+            session_id: sessionId,
+            user_id: null,
+            page_slug: location.pathname,
+            consent_to_save_text: consentToSaveText,
+          }),
+        }
+      );
+
       const rawText = await response.text();
       let data = {};
 
@@ -479,23 +531,19 @@ async function analyze(selectedStyleArg = rewriteTone, options = {}) {
         throw new Error(data?.detail || "Something went wrong. Please try again.");
       }
 
-      if (!response.ok) {
-  throw new Error(data?.detail || "Something went wrong. Please try again.");
-}
+      if (!isRewriteOnly) {
+        trackEvent({
+          event_type: "result_shown",
+          session_id: sessionId,
+          page_slug: location.pathname,
+          tone: data.tone,
+          hidden_signal: data.primary_hidden_signal,
+          risk_score: data.communication_risk_score,
+          rewrite_shown: !!data.rewrite_suggestion,
+        });
 
-if (!isRewriteOnly) {
-  trackEvent({
-    event_type: "result_shown",
-    session_id: sessionId,
-    page_slug: location.pathname,
-    tone: data.tone,
-    hidden_signal: data.primary_hidden_signal,
-    risk_score: data.communication_risk_score,
-    rewrite_shown: !!data.rewrite_suggestion,
-  });
-}
-
-
+        hasTrackedAbandonRef.current = false;
+      }
 
       setResult(data);
     } catch (error) {
@@ -539,6 +587,12 @@ if (!isRewriteOnly) {
       link.href = dataUrl;
       link.click();
 
+      trackEvent({
+        event_type: "download_card",
+        session_id: sessionId,
+        page_slug: location.pathname,
+      });
+
       setCopyState("Card downloaded");
       setTimeout(() => setCopyState(""), 1800);
     } catch (err) {
@@ -551,6 +605,25 @@ if (!isRewriteOnly) {
   function setExample(text) {
     setMessage(text);
     setCopyState("");
+    setResult(null);
+    hasTrackedAbandonRef.current = false;
+  }
+
+  function handleMessageChange(value) {
+    setMessage(value);
+    setResult(null);
+    setCopyState("");
+    hasTrackedAbandonRef.current = false;
+
+    if (!hasTypedRef.current && value.trim().length > 5) {
+      hasTypedRef.current = true;
+      trackEvent({
+        event_type: "typing_started",
+        session_id: sessionId,
+        page_slug: location.pathname,
+        input_length: value.trim().length,
+      });
+    }
   }
 
   const regretRisk = Number(result?.regret_risk ?? 0);
@@ -673,7 +746,7 @@ if (!isRewriteOnly) {
               navigate={navigate}
               currentTool={currentTool}
               message={message}
-              setMessage={setMessage}
+              setMessage={handleMessageChange}
               setResult={setResult}
               setCopyState={setCopyState}
               analyze={analyze}
@@ -764,8 +837,8 @@ export default function App() {
       <Route path="/is-this-message-rude" element={<AppContent />} />
       <Route path="/desperate-text-checker" element={<AppContent />} />
       <Route path="/test-lab" element={<TestLab />} />
-      <Route path="*" element={<RedirectHome />} />
       <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="*" element={<RedirectHome />} />
     </Routes>
   );
 }
