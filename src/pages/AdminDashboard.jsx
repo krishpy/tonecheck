@@ -5,6 +5,9 @@ const API_BASE_URL =
 const API_KEY =
   import.meta.env.VITE_API_KEY || "test-default-key";
 
+const ADMIN_API_KEY =
+  import.meta.env.VITE_ADMIN_API_KEY || "abc123";
+
 function formatLabel(value) {
   if (!value) return "-";
 
@@ -404,7 +407,7 @@ export default function AdminDashboard() {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": API_KEY,
+            "x-api-key": ADMIN_API_KEY,
           },
         }
       );
