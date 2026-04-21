@@ -407,7 +407,7 @@ export default function AdminDashboard() {
         {
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": ADMIN_API_KEY,
+            "x-admin-key": ADMIN_API_KEY,
           },
         }
       );
