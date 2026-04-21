@@ -446,6 +446,8 @@ export default function HeroSection({
   primaryButtonStyle,
   result,
   getHiddenSignalLabel,
+  consentToSaveText,
+  setConsentToSaveText,
 }) {
   const isMobile = useIsMobile();
 
@@ -822,6 +824,37 @@ export default function HeroSection({
             {loading ? "Analyzing..." : currentTool.analyzeLabel}
           </button>
         </div>
+      </div>
+
+
+
+            <div
+        style={{
+          marginTop: "12px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          color: "#475569",
+          fontSize: "13px",
+          lineHeight: 1.5,
+        }}
+      >
+        <input
+          id="consent-to-save-text"
+          type="checkbox"
+          checked={consentToSaveText}
+          onChange={(e) => setConsentToSaveText(e.target.checked)}
+          style={{
+            marginTop: "2px",
+            width: "16px",
+            height: "16px",
+            accentColor: "#6366f1",
+            flexShrink: 0,
+          }}
+        />
+        <label htmlFor="consent-to-save-text" style={{ cursor: "pointer" }}>
+          Allow saving this message to improve ToneCheck.
+        </label>
       </div>
 
       <div

@@ -58,6 +58,7 @@ function AppContent() {
   const [copyState, setCopyState] = useState("");
   const [rewriteTone, setRewriteTone] = useState("balanced");
   const [rewriteLoading, setRewriteLoading] = useState(false);
+  const [consentToSaveText, setConsentToSaveText] = React.useState(false);
 
   useEffect(() => {
     if (!result || !message.trim()) return;
@@ -664,6 +665,8 @@ function buildShareHtml() {
               primaryButtonStyle={primaryButtonStyle}
               result={result}
               getHiddenSignalLabel={getHiddenSignalLabel}
+              consentToSaveText={consentToSaveText}
+              setConsentToSaveText={setConsentToSaveText}
             />
 
             {result?.error && (
