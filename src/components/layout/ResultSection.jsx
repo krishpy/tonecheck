@@ -1018,25 +1018,25 @@ export default function ResultSection({
             Great for texts, emails, Slack messages, and difficult conversations.
           </div>
 
-          <div style={{ marginTop: "16px" }}>
-            <button
-              className="tc-button-hover"
-              onClick={() => {
-                setResult(null);
-                setCopyState("");
-                setRewriteTone("balanced");
-                setConsentToSaveText(false);
-                if (setMessage) setMessage("");
-                setTimeout(() => {
-                  const textarea = document.querySelector(".tc-textarea");
-                  if (textarea) textarea.focus();
-                }, 50);
-              }}
-              style={primaryButtonStyle}
-            >
-              ✨ Try Another Message
-            </button>
-          </div>
+            <div style={{ marginTop: "16px" }}>
+        <button
+          className="tc-button-hover"
+          onClick={() => {
+            if (setMessage) setMessage("");
+            setResult(null);
+            setCopyState("");
+            setRewriteTone("balanced");
+            setConsentToSaveText(false);
+
+            setTimeout(() => {
+              window.location.reload();
+            }, 100);
+          }}
+          style={primaryButtonStyle}
+        >
+          ✨ Try Another Message
+        </button>
+      </div>
         </div>
 
         {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
