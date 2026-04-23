@@ -450,21 +450,22 @@ export default function ResultSection({
     <>
       <div
         style={{
-          position: "absolute",
-          left: "-99999px",
+           position: "fixed",
+          left: "-20000px",
           top: 0,
+          opacity: 1,
           pointerEvents: "none",
-          opacity: 0,
+          zIndex: -1,
         }}
       >
         <ShareCard
-          toolTitle={location.pathname === "/" ? "ToneCheck" : currentTool.title}
-          message={message}
-          rewrite={shouldShowRewriteCard ? safeRewrite : ""}
-          tone={toneLabel}
-          risk={backendRisk}
-          hiddenSignal={shouldShowSignalChip ? hiddenSignalLabel : ""}
-          showSignalChip={shouldShowSignalChip}
+         toolTitle={location.pathname === "/" ? "ToneCheck" : currentTool.title}
+        message={message}
+        rewrite={shouldShowRewriteCard ? safeRewrite : ""}
+        tone={toneLabel}
+        risk={backendRisk}
+        hiddenSignal={shouldShowSignalChip ? hiddenSignalLabel : ""}
+        showSignalChip={shouldShowSignalChip}
         />
       </div>
 

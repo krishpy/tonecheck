@@ -576,11 +576,16 @@ Try yours: trytonecheck.com`;
         return;
       }
 
-      const dataUrl = await htmlToImage.toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-      });
+  const dataUrl = await htmlToImage.toPng(node, {
+  cacheBust: true,
+  pixelRatio: 3,
+  backgroundColor: "#f7f2ff",
+  skipAutoScale: true,
+  style: {
+    transform: "scale(1)",
+    transformOrigin: "top left",
+  },
+});
 
       const link = document.createElement("a");
       link.download = "tonecheck-result.png";

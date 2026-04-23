@@ -1,57 +1,251 @@
 import React from "react";
 
-function getShareMode({ risk, hiddenSignal, tone }) {
-  const hidden = String(hiddenSignal || "").toLowerCase();
-  const toneLabel = String(tone || "").toLowerCase();
+function getToneConfig(tone = "", risk = 0) {
+  const t = String(tone || "").toLowerCase();
 
-  if (
-    risk >= 70 ||
-    hidden.includes("threat") ||
-    hidden.includes("hostile") ||
-    hidden.includes("insult") ||
-    hidden.includes("profanity") ||
-    toneLabel.includes("threat")
-  ) {
+  if (t.includes("threat") || risk >= 85) {
     return {
-      eyebrow: "YOU ALMOST SENT THIS",
-      title: "ToneCheck",
-      outcomeLabel: "Likely outcome",
-      outcomeValue: "Conflict or escalation",
-      rewriteLabel: "BETTER VERSION",
-      accent: "#dc2626",
-      rewriteBorder: "rgba(251,146,60,0.18)",
-      rewriteBg:
-        "linear-gradient(135deg, rgba(255,255,255,0.94), rgba(255,247,237,0.96))",
+      emoji: "🚨",
+      title: "Threatening",
+      subtitle: "Severe intensity",
+      bg: "linear-gradient(180deg, #fff1f2 0%, #ffffff 100%)",
+      border: "#fecdd3",
+      iconBg: "#fecdd3",
+      iconFg: "#b91c1c",
+      chipBg: "#ffe4e6",
+      chipFg: "#be123c",
     };
   }
 
-  if (risk >= 40 || hidden.includes("pressure") || hidden.includes("passive")) {
+  if (t.includes("aggressive") || risk >= 70) {
     return {
-      eyebrow: "YOU MIGHT REGRET SENDING THIS",
-      title: "ToneCheck",
-      outcomeLabel: "Likely outcome",
-      outcomeValue: "They may get defensive or shut down",
-      rewriteLabel: "SMOOTHER VERSION",
-      accent: "#d97706",
-      rewriteBorder: "rgba(245,158,11,0.18)",
-      rewriteBg:
-        "linear-gradient(135deg, rgba(255,251,235,0.96), rgba(255,255,255,0.94))",
+      emoji: "😡",
+      title: "Aggressive",
+      subtitle: "High intensity",
+      bg: "linear-gradient(180deg, #fff1f2 0%, #ffffff 100%)",
+      border: "#fecdd3",
+      iconBg: "#fecdd3",
+      iconFg: "#dc2626",
+      chipBg: "#ffe4e6",
+      chipFg: "#e11d48",
+    };
+  }
+
+  if (t.includes("passive")) {
+    return {
+      emoji: "😒",
+      title: "Passive Aggressive",
+      subtitle: "Indirect tension",
+      bg: "linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)",
+      border: "#e9d5ff",
+      iconBg: "#e9d5ff",
+      iconFg: "#7c3aed",
+      chipBg: "#f3e8ff",
+      chipFg: "#7e22ce",
+    };
+  }
+
+  if (t.includes("frustrated") || t.includes("tense") || risk >= 40) {
+    return {
+      emoji: "😬",
+      title: tone || "Tense",
+      subtitle: "Moderate intensity",
+      bg: "linear-gradient(180deg, #fffbeb 0%, #ffffff 100%)",
+      border: "#fde68a",
+      iconBg: "#fde68a",
+      iconFg: "#b45309",
+      chipBg: "#fef3c7",
+      chipFg: "#a16207",
     };
   }
 
   return {
-    eyebrow: "THIS LOOKS GOOD",
-    title: "ToneCheck",
-    outcomeLabel: "Likely outcome",
-    outcomeValue: "Clear and safe delivery",
-    rewriteLabel: "POLISHED VERSION",
-    accent: "#16a34a",
-    rewriteBorder: "rgba(34,197,94,0.18)",
-    rewriteBg:
-      "linear-gradient(135deg, rgba(240,253,244,0.96), rgba(255,255,255,0.94))",
+    emoji: "🙂",
+    title: tone || "Neutral",
+    subtitle: "Low intensity",
+    bg: "linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%)",
+    border: "#bbf7d0",
+    iconBg: "#bbf7d0",
+    iconFg: "#15803d",
+    chipBg: "#dcfce7",
+    chipFg: "#166534",
   };
 }
 
+function getOutcomeConfig(risk = 0, tone = "") {
+  const t = String(tone || "").toLowerCase();
+
+  if (t.includes("threat") || risk >= 85) {
+    return {
+      title: "Conflict or escalation",
+      subtitle: "Very high chance",
+      bg: "linear-gradient(180deg, #fff7ed 0%, #ffffff 100%)",
+      border: "#fed7aa",
+      iconBg: "#fde68a",
+      iconFg: "#c2410c",
+      chipBg: "#ffedd5",
+      chipFg: "#c2410c",
+      emoji: "⚠️",
+    };
+  }
+
+  if (t.includes("aggressive") || risk >= 70) {
+    return {
+      title: "Conflict or escalation",
+      subtitle: "High chance",
+      bg: "linear-gradient(180deg, #fff7ed 0%, #ffffff 100%)",
+      border: "#fed7aa",
+      iconBg: "#fde68a",
+      iconFg: "#c2410c",
+      chipBg: "#ffedd5",
+      chipFg: "#d97706",
+      emoji: "⚠️",
+    };
+  }
+
+  if (risk >= 40) {
+    return {
+      title: "May create defensiveness",
+      subtitle: "Medium chance",
+      bg: "linear-gradient(180deg, #fffaf0 0%, #ffffff 100%)",
+      border: "#fde68a",
+      iconBg: "#fde68a",
+      iconFg: "#a16207",
+      chipBg: "#fef3c7",
+      chipFg: "#a16207",
+      emoji: "⚠️",
+    };
+  }
+
+  return {
+    title: "Likely to land well",
+    subtitle: "Low chance",
+    bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+    border: "#bbf7d0",
+    iconBg: "#bbf7d0",
+    iconFg: "#166534",
+    chipBg: "#dcfce7",
+    chipFg: "#166534",
+    emoji: "✅",
+  };
+}
+
+function getSignalConfig(hiddenSignal = "") {
+  const value = String(hiddenSignal || "").trim();
+  const lower = value.toLowerCase();
+
+  if (!value || lower === "none" || lower === "none detected") {
+    return {
+      title: "None detected",
+      subtitle: "No clear hidden signal",
+      bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+      border: "#bbf7d0",
+      iconBg: "#d1fae5",
+      iconFg: "#15803d",
+      chipBg: "#dcfce7",
+      chipFg: "#15803d",
+      emoji: "🌿",
+    };
+  }
+
+  if (lower.includes("shock") || lower.includes("disrespect")) {
+    return {
+      title: value,
+      subtitle: "Provokes, not connects",
+      bg: "linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)",
+      border: "#e9d5ff",
+      iconBg: "#e9d5ff",
+      iconFg: "#7c3aed",
+      chipBg: "#f3e8ff",
+      chipFg: "#7e22ce",
+      emoji: "👁️",
+    };
+  }
+
+  if (lower.includes("pressure") || lower.includes("guilt")) {
+    return {
+      title: value,
+      subtitle: "May feel emotionally heavy",
+      bg: "linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)",
+      border: "#e9d5ff",
+      iconBg: "#e9d5ff",
+      iconFg: "#7c3aed",
+      chipBg: "#f3e8ff",
+      chipFg: "#7e22ce",
+      emoji: "👁️",
+    };
+  }
+
+  return {
+    title: value,
+    subtitle: "Could change how this lands",
+    bg: "linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)",
+    border: "#e9d5ff",
+    iconBg: "#e9d5ff",
+    iconFg: "#7c3aed",
+    chipBg: "#f3e8ff",
+    chipFg: "#7e22ce",
+    emoji: "👁️",
+  };
+}
+
+function getDecisionConfig(risk = 0, tone = "") {
+  const t = String(tone || "").toLowerCase();
+
+  if (t.includes("threat") || risk >= 85) {
+    return {
+      title: "Do not send",
+      subtitle: "Severe risk to relationship",
+      bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+      border: "#bbf7d0",
+      iconBg: "#bbf7d0",
+      iconFg: "#15803d",
+      chipBg: "#dcfce7",
+      chipFg: "#15803d",
+      emoji: "🛩️",
+    };
+  }
+
+  if (t.includes("aggressive") || risk >= 70) {
+    return {
+      title: "Not recommended",
+      subtitle: "High risk to relationship",
+      bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+      border: "#bbf7d0",
+      iconBg: "#bbf7d0",
+      iconFg: "#15803d",
+      chipBg: "#dcfce7",
+      chipFg: "#15803d",
+      emoji: "🛩️",
+    };
+  }
+
+  if (risk >= 40) {
+    return {
+      title: "Send after softening",
+      subtitle: "A calmer version is better",
+      bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+      border: "#bbf7d0",
+      iconBg: "#bbf7d0",
+      iconFg: "#15803d",
+      chipBg: "#dcfce7",
+      chipFg: "#15803d",
+      emoji: "🛩️",
+    };
+  }
+
+  return {
+    title: "Safe to send",
+    subtitle: "Low risk to relationship",
+    bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
+    border: "#bbf7d0",
+    iconBg: "#bbf7d0",
+    iconFg: "#15803d",
+    chipBg: "#dcfce7",
+    chipFg: "#15803d",
+    emoji: "🛩️",
+  };
+}
 
 function getPunchLine({ risk, hiddenSignal, tone }) {
   const hidden = String(hiddenSignal || "").toLowerCase();
@@ -103,6 +297,99 @@ function getPunchLine({ risk, hiddenSignal, tone }) {
   return "How you say it changes what happens next.";
 }
 
+function InfoCard({
+  eyebrow,
+  title,
+  subtitle,
+  emoji,
+  bg,
+  border,
+  iconBg,
+  iconFg,
+  chipBg,
+  chipFg,
+}) {
+  return (
+    <div
+      style={{
+        borderRadius: "30px",
+        border: `2px solid ${border}`,
+        background: bg,
+        padding: "28px 30px",
+        minHeight: "212px",
+        boxSizing: "border-box",
+      }}
+    >
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "22px",
+        }}
+      >
+        <div
+          style={{
+            width: "86px",
+            height: "86px",
+            borderRadius: "999px",
+            background: iconBg,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: "40px",
+            color: iconFg,
+            flexShrink: 0,
+          }}
+        >
+          {emoji}
+        </div>
+
+        <div style={{ minWidth: 0 }}>
+          <div
+            style={{
+              fontSize: "25px",
+              fontWeight: 900,
+              letterSpacing: "0.12em",
+              color: chipFg,
+              textTransform: "uppercase",
+              marginBottom: "10px",
+            }}
+          >
+            {eyebrow}
+          </div>
+
+          <div
+            style={{
+              fontSize: "30px",
+              fontWeight: 900,
+              color: "#18214d",
+              lineHeight: 1.15,
+            }}
+          >
+            {title}
+          </div>
+
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              marginTop: "16px",
+              padding: "10px 18px",
+              borderRadius: "999px",
+              background: chipBg,
+              color: chipFg,
+              fontSize: "18px",
+              fontWeight: 800,
+            }}
+          >
+            {subtitle}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ShareCard({
   toolTitle,
   message,
@@ -112,29 +399,33 @@ export default function ShareCard({
   hiddenSignal,
   showSignalChip = true,
 }) {
-  const shareMode = getShareMode({ risk, hiddenSignal, tone });
+  const toneCard = getToneConfig(tone, risk);
+  const outcomeCard = getOutcomeConfig(risk, tone);
+  const signalCard = getSignalConfig(showSignalChip ? hiddenSignal : "None detected");
+  const decisionCard = getDecisionConfig(risk, tone);
   const punchLine = getPunchLine({ risk, hiddenSignal, tone });
+
   return (
     <div
       id="tone-share-card"
       style={{
-        width: "1080px",
-        background:
-          "linear-gradient(180deg, #f8fafc 0%, #eef2ff 52%, #f5f3ff 100%)",
-        padding: "40px",
+        width: "1600px",
+        background: "linear-gradient(180deg, #f7f2ff 0%, #ffffff 100%)",
+        borderRadius: "42px",
+        padding: "30px",
+        boxSizing: "border-box",
         fontFamily:
-          "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        color: "#0f172a",
+          "Inter, ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+        color: "#18214d",
       }}
     >
       <div
         style={{
-          background: "rgba(255,255,255,0.92)",
-          border: "1px solid rgba(255,255,255,0.82)",
-          borderRadius: "32px",
-          padding: "32px",
-          boxShadow:
-            "0 18px 46px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+          background: "#ffffff",
+          borderRadius: "38px",
+          padding: "44px 46px 34px",
+          boxShadow: "0 10px 30px rgba(80,70,160,0.08)",
+          border: "1px solid rgba(129,140,248,0.12)",
         }}
       >
         <div
@@ -142,76 +433,74 @@ export default function ShareCard({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
-            gap: "24px",
+            marginBottom: "22px",
           }}
         >
-          <div style={{ maxWidth: "760px" }}>
+          <div>
             <div
               style={{
-                fontSize: "14px",
+                fontSize: "22px",
                 fontWeight: 900,
-                letterSpacing: "0.18em",
+                color: "#e11d48",
+                letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                color: shareMode.accent,
+                marginBottom: "10px",
               }}
             >
-              {shareMode.eyebrow}
+              YOU ALMOST SENT THIS
             </div>
 
             <div
               style={{
-                marginTop: "10px",
-                fontSize: "44px",
+                fontSize: "74px",
                 lineHeight: 1,
-                fontWeight: 900,
-                letterSpacing: "-0.06em",
-                background:
-                  "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
-                backgroundSize: "200% 200%",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                fontWeight: 1000,
+                letterSpacing: "-0.05em",
+                color: "#172554",
               }}
             >
-              {toolTitle || "ToneCheck"}
+              Tone
+              <span
+                style={{
+                  background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}
+              >
+                Check
+              </span>
             </div>
           </div>
 
-          {showSignalChip && hiddenSignal ? (
-            <div
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "10px 14px",
-                borderRadius: "999px",
-                background: "rgba(255,255,255,0.92)",
-                border: "1px solid rgba(15,23,42,0.08)",
-                color: "#334155",
-                fontWeight: 800,
-                fontSize: "14px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              {hiddenSignal}
-            </div>
-          ) : null}
+          <div
+            style={{
+              fontSize: "72px",
+              lineHeight: 1,
+              opacity: 0.8,
+            }}
+          >
+            ✨
+          </div>
         </div>
 
         <div
           style={{
-            marginTop: "26px",
-            borderRadius: "24px",
-            padding: "22px",
-            background: "rgba(255,255,255,0.84)",
-            border: "1px solid rgba(15,23,42,0.06)",
+            borderRadius: "34px",
+            border: "2px solid #e5e7eb",
+            padding: "34px 36px",
+            background: "#ffffff",
+            marginTop: "8px",
           }}
         >
           <div
             style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              letterSpacing: "0.08em",
-              color: "#64748b",
+              fontSize: "24px",
+              fontWeight: 900,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color: "#60708f",
+              marginBottom: "18px",
             }}
           >
             MESSAGE
@@ -219,149 +508,237 @@ export default function ShareCard({
 
           <div
             style={{
-              marginTop: "10px",
               fontSize: "28px",
-              lineHeight: 1.6,
-              color: "#111827",
+              lineHeight: 1.75,
+              color: "#1f2a5b",
               whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
             }}
           >
-            {message}
+            {message || "No message provided."}
           </div>
         </div>
 
         <div
           style={{
-            marginTop: "18px",
-            display: "flex",
-            gap: "14px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "28px",
+            marginTop: "34px",
           }}
         >
-          <div
-            style={{
-              flex: 1,
-              borderRadius: "20px",
-              padding: "18px 20px",
-              background: "rgba(248,250,252,0.9)",
-              border: "1px solid rgba(15,23,42,0.06)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "12px",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-                color: "#64748b",
-              }}
-            >
-              TONE
-            </div>
-            <div
-              style={{
-                marginTop: "8px",
-                fontSize: "22px",
-                fontWeight: 850,
-                color: "#111827",
-              }}
-            >
-              {tone || "Neutral"}
-            </div>
-          </div>
+          <InfoCard
+            eyebrow="TONE"
+            title={toneCard.title}
+            subtitle={toneCard.subtitle}
+            emoji={toneCard.emoji}
+            bg={toneCard.bg}
+            border={toneCard.border}
+            iconBg={toneCard.iconBg}
+            iconFg={toneCard.iconFg}
+            chipBg={toneCard.chipBg}
+            chipFg={toneCard.chipFg}
+          />
 
-          <div
-            style={{
-              flex: 1.3,
-              borderRadius: "20px",
-              padding: "18px 20px",
-              background: "rgba(248,250,252,0.9)",
-              border: "1px solid rgba(15,23,42,0.06)",
-            }}
-          >
-            <div
-              style={{
-                fontSize: "12px",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-                color: "#64748b",
-              }}
-            >
-              {shareMode.outcomeLabel}
-            </div>
-            <div
-              style={{
-                marginTop: "8px",
-                fontSize: "22px",
-                fontWeight: 850,
-                color: "#111827",
-              }}
-            >
-              {shareMode.outcomeValue}
-            </div>
-          </div>
+          <InfoCard
+            eyebrow="LIKELY OUTCOME"
+            title={outcomeCard.title}
+            subtitle={outcomeCard.subtitle}
+            emoji={outcomeCard.emoji}
+            bg={outcomeCard.bg}
+            border={outcomeCard.border}
+            iconBg={outcomeCard.iconBg}
+            iconFg={outcomeCard.iconFg}
+            chipBg={outcomeCard.chipBg}
+            chipFg={outcomeCard.chipFg}
+          />
+
+          <InfoCard
+            eyebrow="HIDDEN SIGNAL"
+            title={signalCard.title}
+            subtitle={signalCard.subtitle}
+            emoji={signalCard.emoji}
+            bg={signalCard.bg}
+            border={signalCard.border}
+            iconBg={signalCard.iconBg}
+            iconFg={signalCard.iconFg}
+            chipBg={signalCard.chipBg}
+            chipFg={signalCard.chipFg}
+          />
+
+          <InfoCard
+            eyebrow="SHOULD SEND OR NOT?"
+            title={decisionCard.title}
+            subtitle={decisionCard.subtitle}
+            emoji={decisionCard.emoji}
+            bg={decisionCard.bg}
+            border={decisionCard.border}
+            iconBg={decisionCard.iconBg}
+            iconFg={decisionCard.iconFg}
+            chipBg={decisionCard.chipBg}
+            chipFg={decisionCard.chipFg}
+          />
         </div>
 
-        {rewrite ? (
+        {!!rewrite && (
           <div
             style={{
-              marginTop: "22px",
-              borderRadius: "24px",
-              padding: "22px",
-              background: shareMode.rewriteBg,
-              border: `1px solid ${shareMode.rewriteBorder}`,
+              marginTop: "34px",
+              borderRadius: "34px",
+              border: "2px solid #bfdbfe",
+              background: "linear-gradient(180deg, #eff6ff 0%, #ffffff 100%)",
+              padding: "28px 30px 30px",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
             <div
               style={{
-                fontSize: "12px",
-                fontWeight: 800,
-                letterSpacing: "0.08em",
-                color: "#9a3412",
+                display: "flex",
+                alignItems: "center",
+                gap: "14px",
+                marginBottom: "18px",
               }}
             >
-              {shareMode.rewriteLabel}
+              <div
+                style={{
+                  width: "54px",
+                  height: "54px",
+                  borderRadius: "999px",
+                  background: "#dbeafe",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "28px",
+                }}
+              >
+                ✨
+              </div>
+
+              <div
+                style={{
+                  fontSize: "24px",
+                  fontWeight: 900,
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                  color: "#2563eb",
+                }}
+              >
+                BETTER VERSION
+              </div>
             </div>
 
             <div
               style={{
-                marginTop: "10px",
                 fontSize: "26px",
-                lineHeight: 1.7,
-                color: "#111827",
+                lineHeight: 1.8,
+                color: "#21356b",
+                maxWidth: "1050px",
                 whiteSpace: "pre-wrap",
+                wordBreak: "break-word",
               }}
             >
               {rewrite}
             </div>
+
+            <div
+              style={{
+                position: "absolute",
+                right: "34px",
+                bottom: "18px",
+                fontSize: "158px",
+                lineHeight: 1,
+                opacity: 0.96,
+              }}
+            >
+              🪄
+            </div>
+
+            <div
+              style={{
+                position: "absolute",
+                right: "185px",
+                top: "34px",
+                fontSize: "34px",
+                opacity: 0.75,
+              }}
+            >
+              ✨
+            </div>
+
+            <div
+              style={{
+                position: "absolute",
+                right: "120px",
+                top: "78px",
+                fontSize: "44px",
+                opacity: 0.75,
+              }}
+            >
+              ✨
+            </div>
+
+            <div
+              style={{
+                position: "absolute",
+                right: "52px",
+                top: "56px",
+                fontSize: "24px",
+                opacity: 0.65,
+              }}
+            >
+              ✦
+            </div>
           </div>
-        ) : null}
-      <div
-        style={{
-          marginTop: "18px",
-          fontSize: "18px",
-          fontWeight: 700,
-          color: "#475569",
-        }}
-      >
-        {punchLine}
-      </div>
+        )}
 
         <div
           style={{
-            marginTop: "28px",
+            marginTop: "26px",
+            borderRadius: "22px",
+            background: "#eef4ff",
+            padding: "20px 24px",
+            color: "#365fc9",
+            fontSize: "22px",
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
+          }}
+        >
+          <span style={{ fontSize: "30px" }}>💡</span>
+          <span>
+            <strong>{punchLine}</strong> Consider how the other person may feel before sending.
+          </span>
+        </div>
+
+        <div
+          style={{
+            marginTop: "30px",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            gap: "16px",
+            color: "#4169e1",
           }}
         >
-          <div style={{ color: "#64748b", fontSize: "18px" }}>
-            Check yours at trytonecheck.com
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+              fontSize: "21px",
+              color: "#3b82f6",
+            }}
+          >
+            <span style={{ fontSize: "28px" }}>🌐</span>
+            <span>
+              Check yours at <span style={{ textDecoration: "underline" }}>trytonecheck.com</span>
+            </span>
           </div>
 
           <div
             style={{
-              fontSize: "22px",
-              fontWeight: 900,
+              fontSize: "34px",
+              fontWeight: 1000,
               letterSpacing: "-0.04em",
               color: "#312e81",
             }}
