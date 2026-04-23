@@ -10,7 +10,7 @@ function getToneConfig(tone = "", risk = 0) {
       subtitle: "Severe intensity",
       bg: "linear-gradient(180deg, #fff1f2 0%, #ffffff 100%)",
       border: "#fecdd3",
-      iconBg: "#fecdd3",
+      iconBg: "#fda4af",
       iconFg: "#b91c1c",
       chipBg: "#ffe4e6",
       chipFg: "#be123c",
@@ -24,7 +24,7 @@ function getToneConfig(tone = "", risk = 0) {
       subtitle: "High intensity",
       bg: "linear-gradient(180deg, #fff1f2 0%, #ffffff 100%)",
       border: "#fecdd3",
-      iconBg: "#fecdd3",
+      iconBg: "#fbcfe8",
       iconFg: "#dc2626",
       chipBg: "#ffe4e6",
       chipFg: "#e11d48",
@@ -34,7 +34,7 @@ function getToneConfig(tone = "", risk = 0) {
   if (t.includes("passive")) {
     return {
       emoji: "😒",
-      title: "Passive Aggressive",
+      title: "Passive aggressive",
       subtitle: "Indirect tension",
       bg: "linear-gradient(180deg, #faf5ff 0%, #ffffff 100%)",
       border: "#e9d5ff",
@@ -53,9 +53,9 @@ function getToneConfig(tone = "", risk = 0) {
       bg: "linear-gradient(180deg, #fffbeb 0%, #ffffff 100%)",
       border: "#fde68a",
       iconBg: "#fde68a",
-      iconFg: "#b45309",
+      iconFg: "#d97706",
       chipBg: "#fef3c7",
-      chipFg: "#a16207",
+      chipFg: "#b45309",
     };
   }
 
@@ -119,7 +119,7 @@ function getOutcomeConfig(risk = 0, tone = "") {
 
   return {
     title: "Likely to land well",
-    subtitle: "Low chance",
+    subtitle: "Low chance of conflict",
     bg: "linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%)",
     border: "#bbf7d0",
     iconBg: "#bbf7d0",
@@ -247,57 +247,7 @@ function getDecisionConfig(risk = 0, tone = "") {
   };
 }
 
-function getPunchLine({ risk, hiddenSignal, tone }) {
-  const hidden = String(hiddenSignal || "").toLowerCase();
-  const toneLabel = String(tone || "").toLowerCase();
-
-  if (
-    risk >= 75 ||
-    hidden.includes("threat") ||
-    hidden.includes("hostile") ||
-    hidden.includes("insult") ||
-    hidden.includes("profanity") ||
-    toneLabel.includes("threat")
-  ) {
-    return "This could escalate fast.";
-  }
-
-  if (
-    hidden.includes("accus") ||
-    toneLabel.includes("accusatory") ||
-    hidden.includes("blame")
-  ) {
-    return "Most arguments start like this.";
-  }
-
-  if (
-    hidden.includes("passive") ||
-    hidden.includes("pressure") ||
-    hidden.includes("guilt")
-  ) {
-    return "This can create pressure without sounding obvious.";
-  }
-
-  if (
-    toneLabel.includes("frustrated") ||
-    toneLabel.includes("tense") ||
-    risk >= 40
-  ) {
-    return "A small wording change can change the whole outcome.";
-  }
-
-  if (
-    toneLabel.includes("friendly") ||
-    toneLabel.includes("polite") ||
-    risk <= 20
-  ) {
-    return "Clear messages build better conversations.";
-  }
-
-  return "How you say it changes what happens next.";
-}
-
-function InfoCard({
+function cardBlock({
   eyebrow,
   title,
   subtitle,
@@ -312,11 +262,11 @@ function InfoCard({
   return (
     <div
       style={{
-        borderRadius: "30px",
+        borderRadius: 30,
         border: `2px solid ${border}`,
         background: bg,
         padding: "28px 30px",
-        minHeight: "212px",
+        minHeight: 212,
         boxSizing: "border-box",
       }}
     >
@@ -324,19 +274,19 @@ function InfoCard({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "22px",
+          gap: 22,
         }}
       >
         <div
           style={{
-            width: "86px",
-            height: "86px",
+            width: 86,
+            height: 86,
             borderRadius: "999px",
             background: iconBg,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "40px",
+            fontSize: 40,
             color: iconFg,
             flexShrink: 0,
           }}
@@ -347,12 +297,12 @@ function InfoCard({
         <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: "25px",
+              fontSize: 25,
               fontWeight: 900,
               letterSpacing: "0.12em",
               color: chipFg,
               textTransform: "uppercase",
-              marginBottom: "10px",
+              marginBottom: 10,
             }}
           >
             {eyebrow}
@@ -360,7 +310,7 @@ function InfoCard({
 
           <div
             style={{
-              fontSize: "30px",
+              fontSize: 30,
               fontWeight: 900,
               color: "#18214d",
               lineHeight: 1.15,
@@ -373,12 +323,12 @@ function InfoCard({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              marginTop: "16px",
+              marginTop: 16,
               padding: "10px 18px",
-              borderRadius: "999px",
+              borderRadius: 999,
               background: chipBg,
               color: chipFg,
-              fontSize: "18px",
+              fontSize: 18,
               fontWeight: 800,
             }}
           >
@@ -391,28 +341,27 @@ function InfoCard({
 }
 
 export default function ShareCard({
-  toolTitle,
-  message,
-  rewrite,
-  tone,
-  risk,
-  hiddenSignal,
+  toolTitle = "ToneCheck",
+  message = "",
+  rewrite = "",
+  tone = "Neutral",
+  risk = 0,
+  hiddenSignal = "",
   showSignalChip = true,
 }) {
   const toneCard = getToneConfig(tone, risk);
   const outcomeCard = getOutcomeConfig(risk, tone);
   const signalCard = getSignalConfig(showSignalChip ? hiddenSignal : "None detected");
   const decisionCard = getDecisionConfig(risk, tone);
-  const punchLine = getPunchLine({ risk, hiddenSignal, tone });
 
   return (
     <div
       id="tone-share-card"
       style={{
-        width: "1600px",
+        width: 1600,
         background: "linear-gradient(180deg, #f7f2ff 0%, #ffffff 100%)",
-        borderRadius: "42px",
-        padding: "30px",
+        borderRadius: 42,
+        padding: 30,
         boxSizing: "border-box",
         fontFamily:
           "Inter, ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
@@ -422,7 +371,7 @@ export default function ShareCard({
       <div
         style={{
           background: "#ffffff",
-          borderRadius: "38px",
+          borderRadius: 38,
           padding: "44px 46px 34px",
           boxShadow: "0 10px 30px rgba(80,70,160,0.08)",
           border: "1px solid rgba(129,140,248,0.12)",
@@ -433,26 +382,26 @@ export default function ShareCard({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
-            marginBottom: "22px",
+            marginBottom: 22,
           }}
         >
           <div>
             <div
               style={{
-                fontSize: "22px",
+                fontSize: 22,
                 fontWeight: 900,
                 color: "#e11d48",
                 letterSpacing: "0.14em",
                 textTransform: "uppercase",
-                marginBottom: "10px",
+                marginBottom: 10,
               }}
             >
-              YOU ALMOST SENT THIS
+              You almost sent this
             </div>
 
             <div
               style={{
-                fontSize: "74px",
+                fontSize: 74,
                 lineHeight: 1,
                 fontWeight: 1000,
                 letterSpacing: "-0.05em",
@@ -475,7 +424,7 @@ export default function ShareCard({
 
           <div
             style={{
-              fontSize: "72px",
+              fontSize: 72,
               lineHeight: 1,
               opacity: 0.8,
             }}
@@ -486,29 +435,29 @@ export default function ShareCard({
 
         <div
           style={{
-            borderRadius: "34px",
+            borderRadius: 34,
             border: "2px solid #e5e7eb",
             padding: "34px 36px",
             background: "#ffffff",
-            marginTop: "8px",
+            marginTop: 8,
           }}
         >
           <div
             style={{
-              fontSize: "24px",
+              fontSize: 24,
               fontWeight: 900,
               letterSpacing: "0.12em",
               textTransform: "uppercase",
               color: "#60708f",
-              marginBottom: "18px",
+              marginBottom: 18,
             }}
           >
-            MESSAGE
+            Message
           </div>
 
           <div
             style={{
-              fontSize: "28px",
+              fontSize: 28,
               lineHeight: 1.75,
               color: "#1f2a5b",
               whiteSpace: "pre-wrap",
@@ -523,68 +472,68 @@ export default function ShareCard({
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "28px",
-            marginTop: "34px",
+            gap: 28,
+            marginTop: 34,
           }}
         >
-          <InfoCard
-            eyebrow="TONE"
-            title={toneCard.title}
-            subtitle={toneCard.subtitle}
-            emoji={toneCard.emoji}
-            bg={toneCard.bg}
-            border={toneCard.border}
-            iconBg={toneCard.iconBg}
-            iconFg={toneCard.iconFg}
-            chipBg={toneCard.chipBg}
-            chipFg={toneCard.chipFg}
-          />
+          {cardBlock({
+            eyebrow: "Tone",
+            title: toneCard.title,
+            subtitle: toneCard.subtitle,
+            emoji: toneCard.emoji,
+            bg: toneCard.bg,
+            border: toneCard.border,
+            iconBg: toneCard.iconBg,
+            iconFg: toneCard.iconFg,
+            chipBg: toneCard.chipBg,
+            chipFg: toneCard.chipFg,
+          })}
 
-          <InfoCard
-            eyebrow="LIKELY OUTCOME"
-            title={outcomeCard.title}
-            subtitle={outcomeCard.subtitle}
-            emoji={outcomeCard.emoji}
-            bg={outcomeCard.bg}
-            border={outcomeCard.border}
-            iconBg={outcomeCard.iconBg}
-            iconFg={outcomeCard.iconFg}
-            chipBg={outcomeCard.chipBg}
-            chipFg={outcomeCard.chipFg}
-          />
+          {cardBlock({
+            eyebrow: "Likely outcome",
+            title: outcomeCard.title,
+            subtitle: outcomeCard.subtitle,
+            emoji: outcomeCard.emoji,
+            bg: outcomeCard.bg,
+            border: outcomeCard.border,
+            iconBg: outcomeCard.iconBg,
+            iconFg: outcomeCard.iconFg,
+            chipBg: outcomeCard.chipBg,
+            chipFg: outcomeCard.chipFg,
+          })}
 
-          <InfoCard
-            eyebrow="HIDDEN SIGNAL"
-            title={signalCard.title}
-            subtitle={signalCard.subtitle}
-            emoji={signalCard.emoji}
-            bg={signalCard.bg}
-            border={signalCard.border}
-            iconBg={signalCard.iconBg}
-            iconFg={signalCard.iconFg}
-            chipBg={signalCard.chipBg}
-            chipFg={signalCard.chipFg}
-          />
+          {cardBlock({
+            eyebrow: "Hidden signal",
+            title: signalCard.title,
+            subtitle: signalCard.subtitle,
+            emoji: signalCard.emoji,
+            bg: signalCard.bg,
+            border: signalCard.border,
+            iconBg: signalCard.iconBg,
+            iconFg: signalCard.iconFg,
+            chipBg: signalCard.chipBg,
+            chipFg: signalCard.chipFg,
+          })}
 
-          <InfoCard
-            eyebrow="SHOULD SEND OR NOT?"
-            title={decisionCard.title}
-            subtitle={decisionCard.subtitle}
-            emoji={decisionCard.emoji}
-            bg={decisionCard.bg}
-            border={decisionCard.border}
-            iconBg={decisionCard.iconBg}
-            iconFg={decisionCard.iconFg}
-            chipBg={decisionCard.chipBg}
-            chipFg={decisionCard.chipFg}
-          />
+          {cardBlock({
+            eyebrow: "Should send or not?",
+            title: decisionCard.title,
+            subtitle: decisionCard.subtitle,
+            emoji: decisionCard.emoji,
+            bg: decisionCard.bg,
+            border: decisionCard.border,
+            iconBg: decisionCard.iconBg,
+            iconFg: decisionCard.iconFg,
+            chipBg: decisionCard.chipBg,
+            chipFg: decisionCard.chipFg,
+          })}
         </div>
 
         {!!rewrite && (
           <div
             style={{
-              marginTop: "34px",
-              borderRadius: "34px",
+              marginTop: 34,
+              borderRadius: 34,
               border: "2px solid #bfdbfe",
               background: "linear-gradient(180deg, #eff6ff 0%, #ffffff 100%)",
               padding: "28px 30px 30px",
@@ -596,20 +545,20 @@ export default function ShareCard({
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: "14px",
-                marginBottom: "18px",
+                gap: 14,
+                marginBottom: 18,
               }}
             >
               <div
                 style={{
-                  width: "54px",
-                  height: "54px",
+                  width: 54,
+                  height: 54,
                   borderRadius: "999px",
                   background: "#dbeafe",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "28px",
+                  fontSize: 28,
                 }}
               >
                 ✨
@@ -617,23 +566,23 @@ export default function ShareCard({
 
               <div
                 style={{
-                  fontSize: "24px",
+                  fontSize: 24,
                   fontWeight: 900,
                   letterSpacing: "0.12em",
                   textTransform: "uppercase",
                   color: "#2563eb",
                 }}
               >
-                BETTER VERSION
+                Better version
               </div>
             </div>
 
             <div
               style={{
-                fontSize: "26px",
+                fontSize: 26,
                 lineHeight: 1.8,
                 color: "#21356b",
-                maxWidth: "1050px",
+                maxWidth: 1050,
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
               }}
@@ -644,9 +593,9 @@ export default function ShareCard({
             <div
               style={{
                 position: "absolute",
-                right: "34px",
-                bottom: "18px",
-                fontSize: "158px",
+                right: 34,
+                bottom: 18,
+                fontSize: 158,
                 lineHeight: 1,
                 opacity: 0.96,
               }}
@@ -657,9 +606,9 @@ export default function ShareCard({
             <div
               style={{
                 position: "absolute",
-                right: "185px",
-                top: "34px",
-                fontSize: "34px",
+                right: 185,
+                top: 34,
+                fontSize: 34,
                 opacity: 0.75,
               }}
             >
@@ -669,9 +618,9 @@ export default function ShareCard({
             <div
               style={{
                 position: "absolute",
-                right: "120px",
-                top: "78px",
-                fontSize: "44px",
+                right: 120,
+                top: 78,
+                fontSize: 44,
                 opacity: 0.75,
               }}
             >
@@ -681,9 +630,9 @@ export default function ShareCard({
             <div
               style={{
                 position: "absolute",
-                right: "52px",
-                top: "56px",
-                fontSize: "24px",
+                right: 52,
+                top: 56,
+                fontSize: 24,
                 opacity: 0.65,
               }}
             >
@@ -694,26 +643,26 @@ export default function ShareCard({
 
         <div
           style={{
-            marginTop: "26px",
-            borderRadius: "22px",
+            marginTop: 26,
+            borderRadius: 22,
             background: "#eef4ff",
             padding: "20px 24px",
             color: "#365fc9",
-            fontSize: "22px",
+            fontSize: 22,
             display: "flex",
             alignItems: "center",
-            gap: "14px",
+            gap: 14,
           }}
         >
-          <span style={{ fontSize: "30px" }}>💡</span>
+          <span style={{ fontSize: 30 }}>💡</span>
           <span>
-            <strong>{punchLine}</strong> Consider how the other person may feel before sending.
+            <strong>This could escalate fast.</strong> Consider how the other person may feel before sending.
           </span>
         </div>
 
         <div
           style={{
-            marginTop: "30px",
+            marginTop: 30,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -724,12 +673,12 @@ export default function ShareCard({
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "12px",
-              fontSize: "21px",
+              gap: 12,
+              fontSize: 21,
               color: "#3b82f6",
             }}
           >
-            <span style={{ fontSize: "28px" }}>🌐</span>
+            <span style={{ fontSize: 28 }}>🌐</span>
             <span>
               Check yours at <span style={{ textDecoration: "underline" }}>trytonecheck.com</span>
             </span>
@@ -737,13 +686,13 @@ export default function ShareCard({
 
           <div
             style={{
-              fontSize: "34px",
+              fontSize: 34,
               fontWeight: 1000,
               letterSpacing: "-0.04em",
               color: "#312e81",
             }}
           >
-            T✓ ToneCheck
+            TV ToneCheck
           </div>
         </div>
       </div>
