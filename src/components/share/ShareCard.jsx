@@ -641,55 +641,54 @@ export default function ShareCard({
               {rewrite}
             </div>
 
-          <div
-  style={{
-    position: "absolute",
-    right: "40px",
-    bottom: "20px",
-    width: "180px",
-    height: "120px",
-    background: "radial-gradient(circle, rgba(59,130,246,0.15), transparent)",
-    filter: "blur(18px)",
-  }}
-/>
+            <div
+              style={{
+                position: "absolute",
+                right: "34px",
+                bottom: "18px",
+                fontSize: "158px",
+                lineHeight: 1,
+                opacity: 0.96,
+              }}
+            >
+              🪄
+            </div>
 
-       <img
-  src="/share-pen.png"
-  alt=""
-  style={{
-    position: "absolute",
-    right: "28px",
-    bottom: "12px",
-    width: "180px",
-    height: "auto",
-    opacity: 0.95,
-    pointerEvents: "none",
-  }}
-/>
+            <div
+              style={{
+                position: "absolute",
+                right: "185px",
+                top: "34px",
+                fontSize: "34px",
+                opacity: 0.75,
+              }}
+            >
+              ✨
+            </div>
 
-           <div
-  style={{
-    position: "absolute",
-    right: "170px",
-    top: "40px",
-    fontSize: "28px",
-    opacity: 0.7,
-  }}
->
-  ✨
-</div>
+            <div
+              style={{
+                position: "absolute",
+                right: "120px",
+                top: "78px",
+                fontSize: "44px",
+                opacity: 0.75,
+              }}
+            >
+              ✨
+            </div>
 
-           <div
-  style={{
-    position: "absolute",
-    right: "120px",
-    top: "80px",
-    fontSize: "18px",
-    opacity: 0.5,
-  }}
->
-  ✦
-</div>
+            <div
+              style={{
+                position: "absolute",
+                right: "52px",
+                top: "56px",
+                fontSize: "24px",
+                opacity: 0.65,
+              }}
+            >
+              ✦
+            </div>
           </div>
         )}
 
