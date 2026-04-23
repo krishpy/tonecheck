@@ -139,6 +139,11 @@ function AppContent() {
       polite_request_signal: "Polite request",
       constructive_disagreement_signal: "Constructive disagreement",
       neutral_information: "Neutral",
+      boundary_signal: "Boundary",
+      boundary_setting_signal: "Boundary",
+      workplace_frustration_signal: "Workplace frustration",
+      relational_hurt_signal: "Relational hurt",
+      repair_intent: "Repair intent",
       none: "None detected",
     };
 
@@ -817,6 +822,7 @@ Try yours: trytonecheck.com`;
               setResult={setResult}
               setCopyState={setCopyState}
               setMessage={setMessage}
+              setConsentToSaveText={setConsentToSaveText}
               resultBadge={resultBadge}
             />
           </div>

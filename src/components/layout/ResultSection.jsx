@@ -4,7 +4,6 @@ import SeoContentBlock from "./SeoContentBlock";
 import ShareButton from "../common/ShareButton";
 import useIsMobile from "../../hooks/useIsMobile";
 import { submitFeedback } from "../../lib/api";
-import ShareCard from "../share/ShareCard";
 
 function buildSendVerdict(result) {
   const apiVerdict = String(
@@ -21,7 +20,7 @@ function buildSendVerdict(result) {
 
   const isSafeHidden = ["", "none", "none detected"].includes(hidden);
 
-  if (apiVerdict === "do_not_send") {
+  if (apiVerdict === "do_not_send" || apiVerdict === "dont_send") {
     return {
       tone: "danger",
       emoji: "⛔",
@@ -135,7 +134,7 @@ function getAdaptiveVerdict({ sendVerdict, hiddenSignalLabel, riskScore }) {
     };
   }
 
-  if (verdictLabel.includes("rethink")) {
+  if (verdictLabel.includes("rethink") || verdictLabel.includes("don’t")) {
     return {
       title: "Rethink before sending",
       sublabel: "This may create emotional pressure or damage trust.",
@@ -278,6 +277,539 @@ function getVerdictTheme(tone) {
   return map[tone] || map.neutral;
 }
 
+function getToneMeta(tone = "Neutral") {
+  const value = String(tone || "Neutral").toLowerCase();
+
+  if (value.includes("aggressive") || value.includes("threat")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "😡",
+      bg: "#fff1f2",
+      border: "1px solid #fecdd3",
+      accent: "#e11d48",
+      chipBg: "#ffe4e6",
+      chipText: "#be123c",
+      sub: "High intensity",
+    };
+  }
+
+  if (value.includes("passive")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "😒",
+      bg: "#fff7ed",
+      border: "1px solid #fed7aa",
+      accent: "#ea580c",
+      chipBg: "#ffedd5",
+      chipText: "#c2410c",
+      sub: "Indirect friction",
+    };
+  }
+
+  if (value.includes("firm")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "🛡️",
+      bg: "#eff6ff",
+      border: "1px solid #bfdbfe",
+      accent: "#2563eb",
+      chipBg: "#dbeafe",
+      chipText: "#1d4ed8",
+      sub: "Clear boundary",
+    };
+  }
+
+  if (value.includes("professional")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "💼",
+      bg: "#eff6ff",
+      border: "1px solid #bfdbfe",
+      accent: "#2563eb",
+      chipBg: "#dbeafe",
+      chipText: "#1d4ed8",
+      sub: "Clear and composed",
+    };
+  }
+
+  if (value.includes("apolog")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "🙏",
+      bg: "#ecfdf5",
+      border: "1px solid #bbf7d0",
+      accent: "#16a34a",
+      chipBg: "#dcfce7",
+      chipText: "#15803d",
+      sub: "Repair language",
+    };
+  }
+
+  if (value.includes("emotional") || value.includes("frustrated")) {
+    return {
+      title: "Tone",
+      value: tone,
+      icon: "💬",
+      bg: "#faf5ff",
+      border: "1px solid #e9d5ff",
+      accent: "#7c3aed",
+      chipBg: "#f3e8ff",
+      chipText: "#6d28d9",
+      sub: "Emotionally loaded",
+    };
+  }
+
+  return {
+    title: "Tone",
+    value: tone || "Neutral",
+    icon: "💬",
+    bg: "#f8fafc",
+    border: "1px solid #e2e8f0",
+    accent: "#475569",
+    chipBg: "#f1f5f9",
+    chipText: "#475569",
+    sub: "Low intensity",
+  };
+}
+
+function getOutcomeMeta(riskScore = 0) {
+  if (riskScore >= 80) {
+    return {
+      title: "Likely outcome",
+      value: "Conflict or escalation",
+      icon: "⚠️",
+      bg: "#fff7ed",
+      border: "1px solid #fed7aa",
+      accent: "#d97706",
+      chipBg: "#ffedd5",
+      chipText: "#c2410c",
+      sub: "High chance",
+    };
+  }
+
+  if (riskScore >= 45) {
+    return {
+      title: "Likely outcome",
+      value: "May be misunderstood",
+      icon: "🤔",
+      bg: "#fff7ed",
+      border: "1px solid #fed7aa",
+      accent: "#d97706",
+      chipBg: "#ffedd5",
+      chipText: "#c2410c",
+      sub: "Medium chance",
+    };
+  }
+
+  return {
+    title: "Likely outcome",
+    value: "Likely to land okay",
+    icon: "🌿",
+    bg: "#ecfdf5",
+    border: "1px solid #bbf7d0",
+    accent: "#16a34a",
+    chipBg: "#dcfce7",
+    chipText: "#15803d",
+    sub: "Lower risk",
+  };
+}
+
+function getHiddenMeta(hiddenSignal = "None detected") {
+  const value = String(hiddenSignal || "None detected");
+
+  if (/threat|insult|hostile|profanity/i.test(value)) {
+    return {
+      title: "Hidden signal",
+      value,
+      icon: "🔥",
+      bg: "#fff1f2",
+      border: "1px solid #fecdd3",
+      accent: "#e11d48",
+      chipBg: "#ffe4e6",
+      chipText: "#be123c",
+      sub: "Can trigger defensiveness",
+    };
+  }
+
+  if (/pressure|passive|guilt|blame|leverage|accus/i.test(value)) {
+    return {
+      title: "Hidden signal",
+      value,
+      icon: "👁️",
+      bg: "#faf5ff",
+      border: "1px solid #e9d5ff",
+      accent: "#7c3aed",
+      chipBg: "#f3e8ff",
+      chipText: "#7c3aed",
+      sub: "Provokes, not connects",
+    };
+  }
+
+  if (/boundary/i.test(value)) {
+    return {
+      title: "Hidden signal",
+      value,
+      icon: "🛡️",
+      bg: "#eff6ff",
+      border: "1px solid #bfdbfe",
+      accent: "#2563eb",
+      chipBg: "#dbeafe",
+      chipText: "#1d4ed8",
+      sub: "Healthy assertiveness",
+    };
+  }
+
+  return {
+    title: "Hidden signal",
+    value: value || "None detected",
+    icon: "🌿",
+    bg: "#ecfdf5",
+    border: "1px solid #bbf7d0",
+    accent: "#16a34a",
+    chipBg: "#dcfce7",
+    chipText: "#15803d",
+    sub: "No strong hidden risk",
+  };
+}
+
+function getSendMeta(sendDecision = "send") {
+  const value = String(sendDecision || "send").toLowerCase();
+
+  if (value === "dont_send" || value === "do_not_send") {
+    return {
+      title: "Should send or not?",
+      value: "Not recommended",
+      icon: "🚫",
+      bg: "#ecfdf5",
+      border: "1px solid #bbf7d0",
+      accent: "#16a34a",
+      chipBg: "#dcfce7",
+      chipText: "#15803d",
+      sub: "High risk to relationship",
+    };
+  }
+
+  if (value === "review" || value === "review_before_sending") {
+    return {
+      title: "Should send or not?",
+      value: "Review before sending",
+      icon: "✍️",
+      bg: "#eff6ff",
+      border: "1px solid #bfdbfe",
+      accent: "#2563eb",
+      chipBg: "#dbeafe",
+      chipText: "#1d4ed8",
+      sub: "Small edits recommended",
+    };
+  }
+
+  return {
+    title: "Should send or not?",
+    value: "Safe to send",
+    icon: "✅",
+    bg: "#ecfdf5",
+    border: "1px solid #bbf7d0",
+    accent: "#16a34a",
+    chipBg: "#dcfce7",
+    chipText: "#15803d",
+    sub: "Looks okay as-is",
+  };
+}
+
+function StatTile({ item }) {
+  return (
+    <div
+      style={{
+        flex: 1,
+        minWidth: "260px",
+        borderRadius: "24px",
+        padding: "24px",
+        background: item.bg,
+        border: item.border,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <div
+          style={{
+            width: "84px",
+            height: "84px",
+            borderRadius: "999px",
+            display: "grid",
+            placeItems: "center",
+            fontSize: "38px",
+            background: item.chipBg,
+            color: item.accent,
+            flexShrink: 0,
+          }}
+        >
+          {item.icon}
+        </div>
+
+        <div>
+          <div
+            style={{
+              fontSize: "14px",
+              fontWeight: 900,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              color: item.accent,
+              marginBottom: "10px",
+            }}
+          >
+            {item.title}
+          </div>
+
+          <div
+            style={{
+              fontSize: "28px",
+              lineHeight: 1.2,
+              fontWeight: 900,
+              color: "#172033",
+              marginBottom: "14px",
+            }}
+          >
+            {item.value}
+          </div>
+
+          <span
+            style={{
+              display: "inline-block",
+              padding: "10px 16px",
+              borderRadius: "999px",
+              background: item.chipBg,
+              color: item.chipText,
+              fontSize: "14px",
+              fontWeight: 800,
+            }}
+          >
+            {item.sub}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DownloadShareCard({
+  message,
+  result,
+  toneLabel,
+  hiddenSignalLabel,
+  verdictLabel,
+  rewrite,
+}) {
+  const riskScore = Number(
+    result?.risk_score ?? result?.communication_risk_score ?? 0
+  );
+
+  const toneMeta = getToneMeta(toneLabel || "Neutral");
+  const outcomeMeta = getOutcomeMeta(riskScore);
+  const hiddenMeta = getHiddenMeta(hiddenSignalLabel || "None detected");
+  const sendMeta = getSendMeta(
+    result?.send_decision || result?.send_verdict || "send"
+  );
+
+  const footerText =
+    riskScore >= 80
+      ? "This could escalate fast."
+      : riskScore >= 45
+      ? "This may land the wrong way."
+      : "This looks safer, but clarity still matters.";
+
+  return (
+    <div
+      id="tone-share-card"
+      style={{
+        width: "1200px",
+        padding: "36px",
+        borderRadius: "36px",
+        background: "linear-gradient(180deg, #ffffff 0%, #fbfbff 100%)",
+        border: "1px solid #e5e7eb",
+        boxSizing: "border-box",
+        color: "#172033",
+        fontFamily: "Inter, Arial, sans-serif",
+      }}
+    >
+      <div style={{ marginBottom: "22px" }}>
+        <div
+          style={{
+            fontSize: "18px",
+            fontWeight: 900,
+            letterSpacing: "0.22em",
+            textTransform: "uppercase",
+            color: "#dc2626",
+            marginBottom: "12px",
+          }}
+        >
+          You almost sent this
+        </div>
+
+        <div
+          style={{
+            fontSize: "72px",
+            fontWeight: 950,
+            lineHeight: 0.95,
+            letterSpacing: "-0.08em",
+            background:
+              "linear-gradient(135deg, #0f172a 0%, #312e81 32%, #7c3aed 65%, #ec4899 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+          }}
+        >
+          ToneCheck
+        </div>
+      </div>
+
+      <div
+        style={{
+          borderRadius: "28px",
+          border: "1px solid #e5e7eb",
+          padding: "28px",
+          background: "#ffffff",
+          marginBottom: "24px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "16px",
+            fontWeight: 900,
+            letterSpacing: "0.12em",
+            textTransform: "uppercase",
+            color: "#64748b",
+            marginBottom: "18px",
+          }}
+        >
+          Message
+        </div>
+
+        <div
+          style={{
+            fontSize: "28px",
+            lineHeight: 1.6,
+            color: "#172033",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {message}
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "20px",
+        }}
+      >
+        <StatTile item={toneMeta} />
+        <StatTile item={outcomeMeta} />
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          gap: "20px",
+          flexWrap: "wrap",
+          marginBottom: "24px",
+        }}
+      >
+        <StatTile item={hiddenMeta} />
+        <StatTile item={sendMeta} />
+      </div>
+
+      <div
+        style={{
+          borderRadius: "28px",
+          border: "1px solid #bfdbfe",
+          background: "linear-gradient(180deg, #f8fbff 0%, #eff6ff 100%)",
+          padding: "26px 28px",
+          marginBottom: "24px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "18px",
+            fontWeight: 900,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color: "#2563eb",
+            marginBottom: "18px",
+          }}
+        >
+          Better version
+        </div>
+
+        <div
+          style={{
+            fontSize: "25px",
+            lineHeight: 1.7,
+            color: "#1e3a8a",
+            whiteSpace: "pre-wrap",
+            wordBreak: "break-word",
+          }}
+        >
+          {rewrite || "No rewrite suggested."}
+        </div>
+      </div>
+
+      <div
+        style={{
+          borderRadius: "20px",
+          background: "#eff6ff",
+          padding: "18px 20px",
+          color: "#334155",
+          marginBottom: "28px",
+          fontSize: "18px",
+          lineHeight: 1.5,
+        }}
+      >
+        <strong style={{ color: "#2563eb" }}>{footerText}</strong>{" "}
+        Consider how the other person may feel before sending.
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "16px",
+        }}
+      >
+        <a
+          href="https://trytonecheck.com"
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            color: "#2563eb",
+            textDecoration: "underline",
+            fontSize: "18px",
+            fontWeight: 700,
+          }}
+        >
+          Check yours at trytonecheck.com
+        </a>
+
+        <div
+          style={{
+            fontSize: "22px",
+            fontWeight: 900,
+            color: "#312e81",
+          }}
+        >
+          T✓ ToneCheck
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ResultSection({
   result,
   location,
@@ -307,6 +839,7 @@ export default function ResultSection({
   setResult,
   setCopyState,
   setMessage,
+  setConsentToSaveText,
 }) {
   const isMobile = useIsMobile();
 
@@ -457,14 +990,13 @@ export default function ResultSection({
           opacity: 0,
         }}
       >
-        <ShareCard
-          toolTitle={location.pathname === "/" ? "ToneCheck" : currentTool.title}
+        <DownloadShareCard
           message={message}
+          result={result}
+          toneLabel={toneLabel}
+          hiddenSignalLabel={hiddenSignalLabel}
+          verdictLabel={adaptiveVerdict.title}
           rewrite={shouldShowRewriteCard ? safeRewrite : ""}
-          tone={toneLabel}
-          risk={backendRisk}
-          hiddenSignal={shouldShowSignalChip ? hiddenSignalLabel : ""}
-          showSignalChip={shouldShowSignalChip}
         />
       </div>
 
@@ -1018,25 +1550,25 @@ export default function ResultSection({
             Great for texts, emails, Slack messages, and difficult conversations.
           </div>
 
-            <div style={{ marginTop: "16px" }}>
-        <button
-          className="tc-button-hover"
-          onClick={() => {
-            if (setMessage) setMessage("");
-            setResult(null);
-            setCopyState("");
-            setRewriteTone("balanced");
-            setConsentToSaveText(false);
+          <div style={{ marginTop: "16px" }}>
+            <button
+              className="tc-button-hover"
+              onClick={() => {
+                if (setMessage) setMessage("");
+                setResult(null);
+                setCopyState("");
+                setRewriteTone("balanced");
+                if (setConsentToSaveText) setConsentToSaveText(false);
 
-            setTimeout(() => {
-              window.location.reload();
-            }, 100);
-          }}
-          style={primaryButtonStyle}
-        >
-          ✨ Try Another Message
-        </button>
-      </div>
+                setTimeout(() => {
+                  window.location.reload();
+                }, 100);
+              }}
+              style={primaryButtonStyle}
+            >
+              ✨ Try Another Message
+            </button>
+          </div>
         </div>
 
         {location.pathname !== "/" && <SeoContentBlock tool={currentTool} />}
