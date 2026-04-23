@@ -654,20 +654,28 @@ export default function ShareCard({
               }}
             />
 
-            <img
-              src="/share-pen.png"
-              alt=""
-              style={{
-                position: "absolute",
-                right: 28,
-                bottom: 12,
-                width: 180,
-                height: "auto",
-                opacity: 0.95,
-                pointerEvents: "none",
-              }}
-            />
-
+          <div
+          style={{
+            position: "absolute",
+            right: 34,
+            bottom: 16,
+            width: 132,
+            height: 132,
+            borderRadius: "28px",
+            background:
+              "linear-gradient(135deg, rgba(99,102,241,0.20), rgba(59,130,246,0.10))",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontSize: 84,
+            lineHeight: 1,
+            opacity: 0.95,
+            boxShadow: "0 12px 26px rgba(59,130,246,0.12)",
+            pointerEvents: "none",
+          }}
+        >
+          ✨
+        </div>
             <div
               style={{
                 position: "absolute",
