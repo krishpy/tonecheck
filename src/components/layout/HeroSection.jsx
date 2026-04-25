@@ -726,7 +726,7 @@ export default function HeroSection({
             fontWeight: 650,
           }}
         >
-          AI can miss nuance. Use judgment.
+          ToneCheck catches signals, but context still matters.
         </div>
 
         <div
