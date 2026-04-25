@@ -94,7 +94,7 @@ function AppContent() {
 
   const pageTitle =
     location.pathname === "/"
-      ? "ToneCheck — The spellcheck for tone"
+      ? "ToneCheck — Check how your message may land before you send it"
       : `${currentTool.title} | ToneCheck`;
 
   const pageDescription =
@@ -576,12 +576,11 @@ Try yours: trytonecheck.com`;
         return;
       }
 
-const dataUrl = await htmlToImage.toPng(node, {
-  cacheBust: true,
-  pixelRatio: 3,
-  backgroundColor: "#f7f2ff",
-  skipAutoScale: true,
-});
+      const dataUrl = await htmlToImage.toPng(node, {
+        cacheBust: true,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+      });
 
       const link = document.createElement("a");
       link.download = "tonecheck-result.png";
@@ -869,6 +868,4 @@ function getResultBadge(result, riskImprovement) {
     text: "✅ Message already safe",
     color: "#2563eb",
     bg: "rgba(37,99,235,0.10)",
-    border: "1px solid rgba(37,99,235,0.25)",
-  };
-}
+    border: "1px soli
