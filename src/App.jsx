@@ -868,4 +868,6 @@ function getResultBadge(result, riskImprovement) {
     text: "✅ Message already safe",
     color: "#2563eb",
     bg: "rgba(37,99,235,0.10)",
-    border: "1px soli
+    border: "1px solid rgba(37,99,235,0.25)",
+  };
+}
