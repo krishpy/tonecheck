@@ -8,14 +8,6 @@ const TOOLTIP_MAP = {
   "Hidden signal": "Subtle meaning your message may carry beyond what you intended.",
 };
 
-const VIRAL_HOME_EXAMPLES = [
-  { label: "😬 Why are you ignoring me?", text: "Why are you ignoring me?" },
-  { label: "😒 Fine. Do whatever you want.", text: "Fine. Do whatever you want." },
-  { label: "💔 I was there for you every time.", text: "I was there for you every time." },
-  { label: "😤 You always do this.", text: "You always do this." },
-  { label: "🤝 Can we talk about this calmly?", text: "Can we talk about this calmly?" },
-];
-
 function getReplyVibe(score = 0) {
   if (score >= 70) return "Good";
   if (score >= 35) return "Mixed";
@@ -176,7 +168,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
 
   return {
     label: "Hidden signal",
-    value: hiddenSignalLabel || "None detected",
+    value: hiddenSignalLabel || "Neutral",
     emoji: "🌿",
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
@@ -206,8 +198,8 @@ function MiniOutcomeChip({ item }) {
   function updateTooltipPosition(clientX, clientY) {
     const rect = chipRef.current?.getBoundingClientRect();
     if (!rect) return;
-
     setTipPos({
+
       x: clientX - rect.left,
       y: clientY - rect.top,
     });
@@ -270,8 +262,25 @@ function MiniOutcomeChip({ item }) {
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = "translateY(-1px)";
+        e.currentTarget.style.boxShadow =
+          item.shadow || "0 6px 16px rgba(15,23,42,0.10)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = item.shadow || "none";
+      }}
     >
-      <span>{item.emoji}</span>
+      <span
+        style={{
+          display: "inline-block",
+          transition: "transform 180ms ease",
+        }}
+      >
+        {item.emoji}
+      </span>
+
       <span>
         {item.label}: {item.value}
       </span>
@@ -319,6 +328,7 @@ function MiniOutcomeChip({ item }) {
         }}
       >
         {tooltip}
+
         <div
           style={{
             position: "absolute",
@@ -342,10 +352,10 @@ function getLivePreview(message = "") {
   if (!text) {
     return {
       emoji: "🧠",
-      text: "Paste a text and we’ll check tone, hidden pressure, and regret risk.",
+      text: "Live typing analysis will appear here as you type.",
       color: "#64748b",
-      bg: "rgba(255,255,255,0.78)",
-      border: "1px solid rgba(99,102,241,0.14)",
+      bg: "rgba(255,255,255,0.70)",
+      border: "1px solid rgba(15,23,42,0.06)",
     };
   }
 
@@ -440,9 +450,43 @@ export default function HeroSection({
   setConsentToSaveText,
 }) {
   const isMobile = useIsMobile();
-  const isHome = location.pathname === "/";
 
-  const examplesToShow = isHome ? VIRAL_HOME_EXAMPLES : currentTool.examples;
+  const glassOrb1 = {
+    position: "absolute",
+    top: "-90px",
+    right: "-70px",
+    width: "300px",
+    height: "300px",
+    borderRadius: "999px",
+    background: "radial-gradient(circle, rgba(99,102,241,0.24), rgba(99,102,241,0) 70%)",
+    pointerEvents: "none",
+    filter: "blur(6px)",
+  };
+
+  const glassOrb2 = {
+    position: "absolute",
+    bottom: "-110px",
+    left: "-70px",
+    width: "320px",
+    height: "320px",
+    borderRadius: "999px",
+    background: "radial-gradient(circle, rgba(236,72,153,0.20), rgba(236,72,153,0) 70%)",
+    pointerEvents: "none",
+    filter: "blur(8px)",
+  };
+
+  const glassOrb3 = {
+    position: "absolute",
+    top: "35%",
+    left: "42%",
+    transform: "translate(-50%, -50%)",
+    width: "180px",
+    height: "180px",
+    borderRadius: "999px",
+    background: "radial-gradient(circle, rgba(56,189,248,0.15), rgba(56,189,248,0) 72%)",
+    pointerEvents: "none",
+    filter: "blur(8px)",
+  };
 
   const hiddenSignalKey =
     result?.primary_hidden_signal ||
@@ -452,7 +496,7 @@ export default function HeroSection({
 
   const hiddenSignalLabel = getHiddenSignalLabel
     ? getHiddenSignalLabel(hiddenSignalKey)
-    : "None detected";
+    : "Neutral";
 
   const topOutcomes = result
     ? [
@@ -465,142 +509,84 @@ export default function HeroSection({
 
   const livePreview = useMemo(() => getLivePreview(message), [message]);
 
-  const displayDescription = isHome
-    ? "Catch texts you may regret before you send."
-    : currentTool.description;
+  const heroRiskScore = Number(result?.risk_score ?? 0);
 
-  const subDescription = isHome
-    ? "See if your message sounds angry, passive-aggressive, guilt-tripping, or likely to start conflict — before you hit send."
-    : "Get instant feedback before your message lands the wrong way.";
+  const displayDescription =
+    location.pathname === "/"
+      ? heroRiskScore >= 80
+        ? "Pause. This message might escalate."
+        : heroRiskScore >= 50
+        ? "Think before you send this."
+        : "Check how your message may sound before you send"
+      : currentTool.description;
 
-  const heroInnerMaxWidth = "1160px";
-
-  const orbStyle1 = {
-    position: "absolute",
-    top: "-90px",
-    right: "-70px",
-    width: "300px",
-    height: "300px",
-    borderRadius: "999px",
-    background:
-      "radial-gradient(circle, rgba(99,102,241,0.22), rgba(99,102,241,0) 70%)",
-    pointerEvents: "none",
-    filter: "blur(6px)",
-  };
-
-  const orbStyle2 = {
-    position: "absolute",
-    bottom: "-110px",
-    left: "-70px",
-    width: "320px",
-    height: "320px",
-    borderRadius: "999px",
-    background:
-      "radial-gradient(circle, rgba(236,72,153,0.18), rgba(236,72,153,0) 70%)",
-    pointerEvents: "none",
-    filter: "blur(8px)",
-  };
-
-  const strongChipStyle = {
-    ...chipStyle,
-    background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92))",
-    border: "1px solid rgba(79,70,229,0.18)",
-    color: "#1f2937",
-    boxShadow: "0 8px 22px rgba(79,70,229,0.08)",
-  };
-
-  const valueChipStyle = {
-    ...chipStyle,
-    cursor: "default",
-    background: "linear-gradient(135deg, rgba(238,242,255,0.98), rgba(250,245,255,0.95))",
-    color: "#3730a3",
-    border: "1px solid rgba(99,102,241,0.22)",
-    boxShadow: "0 8px 22px rgba(99,102,241,0.10)",
-  };
-
-  const trustChipStyle = {
-    ...chipStyle,
-    cursor: "default",
-    background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.94))",
-    color: "#5b21b6",
-    border: "1px solid rgba(124,58,237,0.20)",
-    boxShadow: "0 8px 22px rgba(124,58,237,0.08)",
-  };
+  const subDescription =
+    location.pathname === "/"
+      ? heroRiskScore >= 80
+        ? "This wording may trigger conflict, defensiveness, or regret."
+        : heroRiskScore >= 50
+        ? "Check tone, emotional pressure, and hidden signals before you hit send."
+        : "Get quick feedback on tone, clarity, and hidden meaning before you send."
+      : "Get instant feedback before your message lands the wrong way.";
 
   return (
     <div
       className="tc-hero"
       style={{
         ...heroCardStyle,
-        position: "relative",
         background:
-          "radial-gradient(circle at top right, rgba(99,102,241,0.11), rgba(99,102,241,0) 25%), radial-gradient(circle at bottom left, rgba(236,72,153,0.11), rgba(236,72,153,0) 28%), rgba(255,255,255,0.70)",
+          "radial-gradient(circle at top right, rgba(99,102,241,0.10), rgba(99,102,241,0) 24%), radial-gradient(circle at bottom left, rgba(236,72,153,0.10), rgba(236,72,153,0) 28%), rgba(255,255,255,0.68)",
         width: "100%",
         maxWidth: "100%",
         boxSizing: "border-box",
         overflow: "hidden",
-        padding: isMobile ? "20px 16px 24px" : "28px 36px 34px",
+        padding: isMobile ? "20px 16px 24px" : heroCardStyle?.padding,
       }}
     >
       <div className="tc-light-sweep" />
-      <div style={orbStyle1} />
-      <div style={orbStyle2} />
+      <div style={glassOrb1} />
+      <div style={glassOrb2} />
+      <div style={glassOrb3} />
 
-      <div style={{ position: "relative", maxWidth: heroInnerMaxWidth }}>
-        {!isHome && (
-          <div style={{ marginBottom: "14px" }}>
-            <div
-              style={{
-                ...valueChipStyle,
-                display: "inline-flex",
-              }}
-            >
-              {currentTool.title}
-            </div>
+      <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        {location.pathname !== "/" && (
+          <div
+            style={{
+              ...chipStyle,
+              background: "rgba(99,102,241,0.10)",
+              color: "#4338ca",
+              cursor: "default",
+            }}
+          >
+            {currentTool.title}
           </div>
         )}
+      </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setMessage("");
-            setResult(null);
-            setCopyState("");
-            setConsentToSaveText(false);
-
-            if (location.pathname !== "/") {
-              window.location.href = "/";
-            } else {
-              window.location.reload();
-            }
-          }}
-          aria-label="Go to ToneCheck home"
+      <div style={{ position: "relative" }}>
+        <div
           style={{
-            border: "none",
-            background: "transparent",
-            padding: 0,
-            margin: 0,
-            cursor: "pointer",
             display: "inline-flex",
             alignItems: "center",
             gap: isMobile ? "12px" : "16px",
-            textAlign: "left",
+            marginBottom: "14px",
+            flexWrap: "wrap",
           }}
         >
           <div
             className="tc-logo-glow"
             style={{
               position: "relative",
-              width: isMobile ? "58px" : "70px",
-              height: isMobile ? "58px" : "70px",
-              borderRadius: "22px",
+              width: isMobile ? "62px" : "74px",
+              height: isMobile ? "62px" : "74px",
+              borderRadius: "24px",
               display: "grid",
               placeItems: "center",
               background:
                 "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
               boxShadow:
-                "0 14px 34px rgba(99,102,241,0.26), inset 0 1px 0 rgba(255,255,255,0.36)",
-              border: "1px solid rgba(255,255,255,0.32)",
+                "0 14px 38px rgba(99,102,241,0.28), inset 0 1px 0 rgba(255,255,255,0.36)",
+              border: "1px solid rgba(255,255,255,0.28)",
               overflow: "hidden",
               flexShrink: 0,
             }}
@@ -609,8 +595,8 @@ export default function HeroSection({
               style={{
                 position: "absolute",
                 inset: "8px",
-                borderRadius: "16px",
-                border: "1px solid rgba(255,255,255,0.24)",
+                borderRadius: "18px",
+                border: "1px solid rgba(255,255,255,0.22)",
               }}
             />
             <div
@@ -625,20 +611,16 @@ export default function HeroSection({
                 textShadow: "0 2px 10px rgba(0,0,0,0.16)",
               }}
             >
-              <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>
-                T
-              </span>
-              <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>
-                ✓
-              </span>
+              <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>T</span>
+              <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>✓</span>
             </div>
           </div>
 
           <div style={{ minWidth: 0 }}>
             <div
               style={{
-                fontSize: isMobile ? "10px" : "12px",
-                fontWeight: 850,
+                fontSize: "12px",
+                fontWeight: 800,
                 letterSpacing: "0.22em",
                 color: "#6366f1",
                 textTransform: "uppercase",
@@ -652,54 +634,32 @@ export default function HeroSection({
               className="tc-title tc-shimmer"
               style={{
                 margin: 0,
-                fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "70px",
+                fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "76px",
                 lineHeight: 0.92,
                 letterSpacing: "-0.09em",
                 fontWeight: 950,
                 background:
-                  "linear-gradient(135deg, #0f172a 0%, #312e81 32%, #7c3aed 68%, #ec4899 100%)",
+                  "linear-gradient(135deg, #0f172a 0%, #312e81 30%, #7c3aed 62%, #ec4899 100%)",
                 backgroundSize: "200% 200%",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 wordBreak: "break-word",
               }}
             >
-              {isHome ? "ToneCheck" : currentTool.title}
+              {location.pathname === "/" ? "ToneCheck" : currentTool.title}
             </h1>
           </div>
-        </button>
-
-        {isHome && (
-          <div
-            style={{
-              marginTop: "10px",
-              marginLeft: isMobile ? "0" : "86px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "9px 15px",
-              borderRadius: "999px",
-              background: "linear-gradient(135deg,#eef2ff,#fdf2f8)",
-              fontWeight: 850,
-              fontSize: "14px",
-              color: "#4338ca",
-              boxShadow: "0 8px 22px rgba(99,102,241,0.12)",
-              border: "1px solid rgba(99,102,241,0.18)",
-            }}
-          >
-            ✨ The spellcheck for tone
-          </div>
-        )}
+        </div>
 
         <p
           style={{
-            margin: isMobile ? "28px 0 0 0" : "32px 0 0 0",
-            maxWidth: "760px",
+            margin: "10px 0 0 0",
+            maxWidth: "720px",
             color: "#334155",
-            fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "38px",
-            lineHeight: isMobile ? 1.1 : 1.15,
-            fontWeight: 900,
-            letterSpacing: "-0.055em",
+            fontSize: isMobile ? "clamp(24px, 8vw, 34px)" : "34px",
+            lineHeight: isMobile ? 1.12 : 1.18,
+            fontWeight: 850,
+            letterSpacing: "-0.04em",
           }}
         >
           {displayDescription}
@@ -708,11 +668,11 @@ export default function HeroSection({
         <p
           style={{
             margin: "12px 0 0 0",
-            maxWidth: "800px",
+            maxWidth: "760px",
             color: "#475569",
-            fontSize: isMobile ? "16px" : "18px",
-            lineHeight: 1.62,
-            fontWeight: 560,
+            fontSize: isMobile ? "16px" : "19px",
+            lineHeight: 1.65,
+            fontWeight: 550,
           }}
         >
           {subDescription}
@@ -721,258 +681,241 @@ export default function HeroSection({
         <div
           style={{
             marginTop: "12px",
-            fontSize: "12px",
-            color: "#64748b",
-            fontWeight: 650,
+            padding: isMobile ? "10px 12px" : "6px 10px",
+            background: "#fff3cd",
+            color: "#856404",
+            borderRadius: "10px",
+            fontSize: isMobile ? "13px" : "12px",
+            lineHeight: 1.4,
+            fontWeight: 700,
+            display: "inline-block",
+            maxWidth: isMobile ? "100%" : "fit-content",
           }}
         >
-          ToneCheck catches signals, but context still matters.
+          Beta — results may occasionally miss context. Review before relying on it.
         </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: "22px",
+          display: "flex",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
+        {currentTool.examples.map((example) => (
+          <button
+            type="button"
+            key={example.label}
+            className="tc-chip-hover"
+            style={{
+              ...chipStyle,
+              background: "rgba(255,255,255,0.82)",
+              border: "1px solid rgba(15,23,42,0.06)",
+              fontWeight: 750,
+              width: isMobile ? "100%" : "auto",
+              justifyContent: "flex-start",
+              textAlign: "left",
+              padding: isMobile ? "14px 16px" : chipStyle?.padding,
+              lineHeight: 1.35,
+            }}
+            onClick={() => setExample(example.text)}
+          >
+            {example.label}
+          </button>
+        ))}
+      </div>
+
+      {!result && (
+        <div
+          style={{
+            marginTop: "12px",
+            padding: isMobile ? "16px" : "10px 14px",
+            borderRadius: "16px",
+            background: livePreview.bg,
+            border: livePreview.border,
+            color: livePreview.color,
+            fontSize: isMobile ? "14px" : "13px",
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            width: isMobile ? "100%" : "inline-flex",
+            boxSizing: "border-box",
+          }}
+        >
+          <span>{livePreview.emoji}</span>
+          <span>{livePreview.text}</span>
+        </div>
+      )}
+
+      <div style={{ marginTop: "24px" }}>
+        <textarea
+          className="tc-textarea"
+          value={message}
+          onChange={(e) => {
+            setMessage(e.target.value);
+            setResult(null);
+            setCopyState("");
+          }}
+          placeholder={currentTool.placeholder}
+          style={{
+            width: "100%",
+            minHeight: isMobile ? "180px" : "240px",
+            padding: isMobile ? "18px" : "24px 24px 72px",
+            fontSize: isMobile ? "18px" : "24px",
+            lineHeight: 1.6,
+            borderRadius: "28px",
+            background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
+            color: "#0f172a",
+            border: "1px solid rgba(99,102,241,0.18)",
+            boxSizing: "border-box",
+            outline: "none",
+            resize: "vertical",
+            boxShadow:
+              "inset 0 1px 0 rgba(255,255,255,0.86), 0 16px 38px rgba(15,23,42,0.06)",
+          }}
+        />
 
         <div
           style={{
-            marginTop: "24px",
-            marginBottom: "10px",
-            fontWeight: 850,
-            fontSize: "14px",
-            color: "#64748b",
-          }}
-        >
-          Try an example:
-        </div>
-
-        <div
-          style={{
+            marginTop: "12px",
             display: "flex",
             gap: "10px",
-            flexWrap: "wrap",
+            flexWrap: isMobile ? "nowrap" : "wrap",
+            flexDirection: isMobile ? "row" : "row",
+            alignItems: "stretch",
           }}
         >
-          {examplesToShow.map((example) => (
-            <button
-              type="button"
-              key={example.label}
-              className="tc-chip-hover"
-              style={{
-                ...strongChipStyle,
-                fontWeight: 800,
-                width: isMobile ? "100%" : "auto",
-                justifyContent: "flex-start",
-                textAlign: "left",
-                padding: isMobile ? "14px 16px" : "11px 16px",
-                lineHeight: 1.35,
-              }}
-              onClick={() => setExample(example.text)}
-            >
-              {example.label}
-            </button>
-          ))}
-        </div>
-
-        {!result && (
-          <div
-            style={{
-              marginTop: "14px",
-              padding: isMobile ? "16px" : "11px 14px",
-              borderRadius: "16px",
-              background: livePreview.bg,
-              border: livePreview.border,
-              color: livePreview.color,
-              fontSize: isMobile ? "14px" : "13px",
-              fontWeight: 750,
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              width: isMobile ? "100%" : "100%",
-              boxSizing: "border-box",
-            }}
-          >
-            <span>{livePreview.emoji}</span>
-            <span>{livePreview.text}</span>
-          </div>
-        )}
-
-        <div style={{ marginTop: "24px" }}>
-          <textarea
-            className="tc-textarea"
-            value={message}
-            onChange={(e) => {
-              setMessage(e.target.value);
+          <button
+            type="button"
+            className="tc-button-hover"
+            onClick={() => {
+              setMessage("");
               setResult(null);
               setCopyState("");
+              setConsentToSaveText(false);
             }}
-            placeholder={
-              isHome
-                ? "Paste the message you're about to send..."
-                : currentTool.placeholder
-            }
             style={{
-              width: "100%",
-              minHeight: isMobile ? "180px" : "235px",
-              padding: isMobile ? "18px" : "24px 24px 72px",
-              fontSize: isMobile ? "18px" : "23px",
-              lineHeight: 1.6,
-              borderRadius: "28px",
-              background:
-                "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.88))",
-              color: "#0f172a",
-              border: "1px solid rgba(99,102,241,0.20)",
-              boxSizing: "border-box",
-              outline: "none",
-              resize: "vertical",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.88), 0 16px 38px rgba(15,23,42,0.06)",
-            }}
-          />
-
-          <div
-            style={{
-              marginTop: "12px",
-              display: "flex",
-              gap: "10px",
-              flexWrap: isMobile ? "nowrap" : "wrap",
-              flexDirection: "row",
-              alignItems: "stretch",
-            }}
-          >
-            <button
-              type="button"
-              className="tc-button-hover"
-              onClick={() => {
-                setMessage("");
-                setResult(null);
-                setCopyState("");
-                setConsentToSaveText(false);
-              }}
-              style={{
-                ...actionButtonStyle,
-                minWidth: isMobile ? "96px" : actionButtonStyle?.minWidth,
-                width: isMobile ? "auto" : actionButtonStyle?.width,
-                padding: isMobile ? "0 18px" : actionButtonStyle?.padding,
-                minHeight: isMobile ? "54px" : actionButtonStyle?.minHeight,
-                flexShrink: 0,
-              }}
-            >
-              Clear
-            </button>
-
-            <button
-              type="button"
-              className="tc-button-hover"
-              onClick={() => analyze()}
-              disabled={loading || !message.trim()}
-              style={{
-                ...primaryButtonStyle,
-                opacity: loading || !message.trim() ? 0.7 : 1,
-                minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
-                width: isMobile ? "100%" : primaryButtonStyle?.width,
-                flex: isMobile ? 1 : "unset",
-              }}
-            >
-              {loading
-                ? "Checking..."
-                : isHome
-                ? "Should I Send This?"
-                : currentTool.analyzeLabel}
-            </button>
-          </div>
-        </div>
-
-        <div
-          style={{
-            marginTop: "14px",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-          }}
-        >
-          <div style={valueChipStyle}>✓ Detect hidden tone</div>
-          <div style={valueChipStyle}>✓ Spot pressure or blame</div>
-          <div style={valueChipStyle}>✓ Get calmer rewrites</div>
-        </div>
-
-        <div
-          style={{
-            marginTop: "14px",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "10px",
-            color: "#475569",
-            fontSize: "13px",
-            lineHeight: 1.5,
-          }}
-        >
-          <input
-            id="consent-to-save-text"
-            type="checkbox"
-            checked={consentToSaveText}
-            onChange={(e) => setConsentToSaveText(e.target.checked)}
-            style={{
-              marginTop: "2px",
-              width: "16px",
-              height: "16px",
-              accentColor: "#6366f1",
+              ...actionButtonStyle,
+              minWidth: isMobile ? "96px" : actionButtonStyle?.minWidth,
+              width: isMobile ? "auto" : actionButtonStyle?.width,
+              padding: isMobile ? "0 18px" : actionButtonStyle?.padding,
+              minHeight: isMobile ? "54px" : actionButtonStyle?.minHeight,
               flexShrink: 0,
             }}
-          />
-          <label htmlFor="consent-to-save-text" style={{ cursor: "pointer" }}>
-            Allow saving this message to improve ToneCheck.
-          </label>
-        </div>
+          >
+            Clear
+          </button>
 
-        <div
-          style={{
-            marginTop: "18px",
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={trustChipStyle}>Used for difficult texts</div>
-          <div style={trustChipStyle}>Family conflict</div>
-          <div style={trustChipStyle}>Sensitive work replies</div>
-          <div style={trustChipStyle}>Apology messages</div>
-        </div>
-
-        {result && (
-          <div
+          <button
+            type="button"
+            className="tc-button-hover"
+            onClick={() => analyze()}
+            disabled={loading || !message.trim()}
             style={{
-              marginTop: "14px",
-              padding: isMobile ? "14px" : "16px",
-              borderRadius: "24px",
-              background:
-                "linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,250,252,0.94))",
-              border: "1px solid rgba(99,102,241,0.12)",
-              boxShadow: "0 10px 26px rgba(15,23,42,0.04)",
+              ...primaryButtonStyle,
+              opacity: loading || !message.trim() ? 0.7 : 1,
+              minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
+              width: isMobile ? "100%" : primaryButtonStyle?.width,
+              flex: isMobile ? 1 : "unset",
             }}
           >
-            <div
-              style={{
-                fontSize: "12px",
-                fontWeight: 900,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: "#6366f1",
-                marginBottom: "12px",
-              }}
-            >
-              How this may land
-            </div>
+            {loading ? "Analyzing..." : currentTool.analyzeLabel}
+          </button>
+        </div>
+      </div>
+
+
 
             <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-              }}
-            >
-              {topOutcomes.map((item) => (
-                <MiniOutcomeChip key={`${item.label}-${item.value}`} item={item} />
-              ))}
-            </div>
-          </div>
-        )}
+        style={{
+          marginTop: "12px",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
+          color: "#475569",
+          fontSize: "13px",
+          lineHeight: 1.5,
+        }}
+      >
+        <input
+          id="consent-to-save-text"
+          type="checkbox"
+          checked={consentToSaveText}
+          onChange={(e) => setConsentToSaveText(e.target.checked)}
+          style={{
+            marginTop: "2px",
+            width: "16px",
+            height: "16px",
+            accentColor: "#6366f1",
+            flexShrink: 0,
+          }}
+        />
+        <label htmlFor="consent-to-save-text" style={{ cursor: "pointer" }}>
+          Allow saving this message to improve ToneCheck.
+        </label>
       </div>
+
+      <div
+        style={{
+          marginTop: "12px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+          color: "#64748b",
+          fontSize: isMobile ? "13px" : "12px",
+          fontWeight: 700,
+          lineHeight: 1.5,
+        }}
+      >
+        <span>🧠 Live tone check</span>
+        <span style={{ opacity: 0.45 }}>•</span>
+        <span>⚡ Instant feedback</span>
+        <span style={{ opacity: 0.45 }}>•</span>
+        <span>🔒 No signup</span>
+      </div>
+
+      {result && (
+        <div
+          style={{
+            marginTop: "14px",
+            padding: isMobile ? "14px" : "16px",
+            borderRadius: "24px",
+            background:
+              "linear-gradient(135deg, rgba(255,255,255,0.86), rgba(248,250,252,0.92))",
+            border: "1px solid rgba(99,102,241,0.10)",
+            boxShadow: "0 10px 26px rgba(15,23,42,0.04)",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "12px",
+              fontWeight: 900,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+              color: "#6366f1",
+              marginBottom: "12px",
+            }}
+          >
+            What could happen
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "10px",
+              flexWrap: "wrap",
+            }}
+          >
+            {topOutcomes.map((item) => (
+              <MiniOutcomeChip key={`${item.label}-${item.value}`} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
