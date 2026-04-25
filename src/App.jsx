@@ -94,7 +94,7 @@ function AppContent() {
 
   const pageTitle =
     location.pathname === "/"
-      ? "ToneCheck — Check how your message may land before you send it"
+      ? "ToneCheck — The spellcheck for tone"
       : `${currentTool.title} | ToneCheck`;
 
   const pageDescription =

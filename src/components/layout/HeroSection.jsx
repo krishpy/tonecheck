@@ -8,6 +8,29 @@ const TOOLTIP_MAP = {
   "Hidden signal": "Subtle meaning your message may carry beyond what you intended.",
 };
 
+const VIRAL_HOME_EXAMPLES = [
+  {
+    label: "😬 Why are you ignoring me?",
+    text: "Why are you ignoring me?",
+  },
+  {
+    label: "😒 Fine. Do whatever you want.",
+    text: "Fine. Do whatever you want.",
+  },
+  {
+    label: "💔 I was there for you every time.",
+    text: "I was there for you every time.",
+  },
+  {
+    label: "😤 You always do this.",
+    text: "You always do this.",
+  },
+  {
+    label: "🤝 Can we talk about this calmly?",
+    text: "Can we talk about this calmly?",
+  },
+];
+
 function getReplyVibe(score = 0) {
   if (score >= 70) return "Good";
   if (score >= 35) return "Mixed";
@@ -168,7 +191,7 @@ function getHiddenSignalMeta(hiddenSignalLabel = "Neutral") {
 
   return {
     label: "Hidden signal",
-    value: hiddenSignalLabel || "Neutral",
+    value: hiddenSignalLabel || "None detected",
     emoji: "🌿",
     bg: "rgba(34,197,94,0.10)",
     border: "1px solid rgba(34,197,94,0.20)",
@@ -272,14 +295,7 @@ function MiniOutcomeChip({ item }) {
         e.currentTarget.style.boxShadow = item.shadow || "none";
       }}
     >
-      <span
-        style={{
-          display: "inline-block",
-          transition: "transform 180ms ease",
-        }}
-      >
-        {item.emoji}
-      </span>
+      <span>{item.emoji}</span>
 
       <span>
         {item.label}: {item.value}
@@ -328,7 +344,6 @@ function MiniOutcomeChip({ item }) {
         }}
       >
         {tooltip}
-
         <div
           style={{
             position: "absolute",
@@ -352,7 +367,7 @@ function getLivePreview(message = "") {
   if (!text) {
     return {
       emoji: "🧠",
-      text: "Live typing analysis will appear here as you type.",
+      text: "Paste a text and we’ll check tone, hidden pressure, and regret risk.",
       color: "#64748b",
       bg: "rgba(255,255,255,0.70)",
       border: "1px solid rgba(15,23,42,0.06)",
@@ -451,6 +466,8 @@ export default function HeroSection({
 }) {
   const isMobile = useIsMobile();
 
+  const isHome = location.pathname === "/";
+
   const glassOrb1 = {
     position: "absolute",
     top: "-90px",
@@ -458,7 +475,8 @@ export default function HeroSection({
     width: "300px",
     height: "300px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(99,102,241,0.24), rgba(99,102,241,0) 70%)",
+    background:
+      "radial-gradient(circle, rgba(99,102,241,0.24), rgba(99,102,241,0) 70%)",
     pointerEvents: "none",
     filter: "blur(6px)",
   };
@@ -470,7 +488,8 @@ export default function HeroSection({
     width: "320px",
     height: "320px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(236,72,153,0.20), rgba(236,72,153,0) 70%)",
+    background:
+      "radial-gradient(circle, rgba(236,72,153,0.20), rgba(236,72,153,0) 70%)",
     pointerEvents: "none",
     filter: "blur(8px)",
   };
@@ -483,7 +502,8 @@ export default function HeroSection({
     width: "180px",
     height: "180px",
     borderRadius: "999px",
-    background: "radial-gradient(circle, rgba(56,189,248,0.15), rgba(56,189,248,0) 72%)",
+    background:
+      "radial-gradient(circle, rgba(56,189,248,0.15), rgba(56,189,248,0) 72%)",
     pointerEvents: "none",
     filter: "blur(8px)",
   };
@@ -496,7 +516,7 @@ export default function HeroSection({
 
   const hiddenSignalLabel = getHiddenSignalLabel
     ? getHiddenSignalLabel(hiddenSignalKey)
-    : "Neutral";
+    : "None detected";
 
   const topOutcomes = result
     ? [
@@ -509,25 +529,15 @@ export default function HeroSection({
 
   const livePreview = useMemo(() => getLivePreview(message), [message]);
 
-  const heroRiskScore = Number(result?.risk_score ?? 0);
+  const displayDescription = isHome
+    ? "Catch texts you may regret before you send."
+    : currentTool.description;
 
-  const displayDescription =
-    location.pathname === "/"
-      ? heroRiskScore >= 80
-        ? "Pause. This message might escalate."
-        : heroRiskScore >= 50
-        ? "Think before you send this."
-        : "Check how your message may sound before you send"
-      : currentTool.description;
+  const subDescription = isHome
+    ? "See if your message sounds angry, passive-aggressive, guilt-tripping, or likely to start conflict — before you hit send."
+    : "Get instant feedback before your message lands the wrong way.";
 
-  const subDescription =
-    location.pathname === "/"
-      ? heroRiskScore >= 80
-        ? "This wording may trigger conflict, defensiveness, or regret."
-        : heroRiskScore >= 50
-        ? "Check tone, emotional pressure, and hidden signals before you hit send."
-        : "Get quick feedback on tone, clarity, and hidden meaning before you send."
-      : "Get instant feedback before your message lands the wrong way.";
+  const examplesToShow = isHome ? VIRAL_HOME_EXAMPLES : currentTool.examples;
 
   return (
     <div
@@ -549,7 +559,7 @@ export default function HeroSection({
       <div style={glassOrb3} />
 
       <div style={{ marginBottom: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-        {location.pathname !== "/" && (
+        {!isHome && (
           <div
             style={{
               ...chipStyle,
@@ -611,8 +621,12 @@ export default function HeroSection({
                 textShadow: "0 2px 10px rgba(0,0,0,0.16)",
               }}
             >
-              <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>T</span>
-              <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>✓</span>
+              <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>
+                T
+              </span>
+              <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>
+                ✓
+              </span>
             </div>
           </div>
 
@@ -646,20 +660,41 @@ export default function HeroSection({
                 wordBreak: "break-word",
               }}
             >
-              {location.pathname === "/" ? "ToneCheck" : currentTool.title}
+              {isHome ? "ToneCheck" : currentTool.title}
             </h1>
+
+            {isHome && (
+              <div
+                style={{
+                  marginTop: "10px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "10px 16px",
+                  borderRadius: "999px",
+                  background: "linear-gradient(135deg,#eef2ff,#fdf2f8)",
+                  fontWeight: 850,
+                  fontSize: "14px",
+                  color: "#4338ca",
+                  boxShadow: "0 8px 22px rgba(99,102,241,0.10)",
+                  border: "1px solid rgba(99,102,241,0.12)",
+                }}
+              >
+                ✨ The spellcheck for tone
+              </div>
+            )}
           </div>
         </div>
 
         <p
           style={{
             margin: "10px 0 0 0",
-            maxWidth: "720px",
+            maxWidth: "760px",
             color: "#334155",
-            fontSize: isMobile ? "clamp(24px, 8vw, 34px)" : "34px",
-            lineHeight: isMobile ? 1.12 : 1.18,
-            fontWeight: 850,
-            letterSpacing: "-0.04em",
+            fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "42px",
+            lineHeight: isMobile ? 1.1 : 1.12,
+            fontWeight: 900,
+            letterSpacing: "-0.055em",
           }}
         >
           {displayDescription}
@@ -667,12 +702,12 @@ export default function HeroSection({
 
         <p
           style={{
-            margin: "12px 0 0 0",
-            maxWidth: "760px",
+            margin: "14px 0 0 0",
+            maxWidth: "800px",
             color: "#475569",
             fontSize: isMobile ? "16px" : "19px",
             lineHeight: 1.65,
-            fontWeight: 550,
+            fontWeight: 560,
           }}
         >
           {subDescription}
@@ -681,30 +716,35 @@ export default function HeroSection({
         <div
           style={{
             marginTop: "12px",
-            padding: isMobile ? "10px 12px" : "6px 10px",
-            background: "#fff3cd",
-            color: "#856404",
-            borderRadius: "10px",
-            fontSize: isMobile ? "13px" : "12px",
-            lineHeight: 1.4,
-            fontWeight: 700,
-            display: "inline-block",
-            maxWidth: isMobile ? "100%" : "fit-content",
+            fontSize: "12px",
+            color: "#64748b",
+            fontWeight: 650,
           }}
         >
-          Beta — results may occasionally miss context. Review before relying on it.
+          AI can miss nuance. Use judgment.
         </div>
       </div>
 
       <div
         style={{
-          marginTop: "22px",
+          marginTop: "24px",
+          marginBottom: "10px",
+          fontWeight: 850,
+          fontSize: "14px",
+          color: "#64748b",
+        }}
+      >
+        Try an example:
+      </div>
+
+      <div
+        style={{
           display: "flex",
           gap: "10px",
           flexWrap: "wrap",
         }}
       >
-        {currentTool.examples.map((example) => (
+        {examplesToShow.map((example) => (
           <button
             type="button"
             key={example.label}
@@ -759,7 +799,11 @@ export default function HeroSection({
             setResult(null);
             setCopyState("");
           }}
-          placeholder={currentTool.placeholder}
+          placeholder={
+            isHome
+              ? "Paste the message you're about to send..."
+              : currentTool.placeholder
+          }
           style={{
             width: "100%",
             minHeight: isMobile ? "180px" : "240px",
@@ -767,7 +811,8 @@ export default function HeroSection({
             fontSize: isMobile ? "18px" : "24px",
             lineHeight: 1.6,
             borderRadius: "28px",
-            background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.86))",
             color: "#0f172a",
             border: "1px solid rgba(99,102,241,0.18)",
             boxSizing: "border-box",
@@ -784,7 +829,7 @@ export default function HeroSection({
             display: "flex",
             gap: "10px",
             flexWrap: isMobile ? "nowrap" : "wrap",
-            flexDirection: isMobile ? "row" : "row",
+            flexDirection: "row",
             alignItems: "stretch",
           }}
         >
@@ -822,16 +867,55 @@ export default function HeroSection({
               flex: isMobile ? 1 : "unset",
             }}
           >
-            {loading ? "Analyzing..." : currentTool.analyzeLabel}
+            {loading
+              ? "Checking..."
+              : isHome
+              ? "Should I Send This?"
+              : currentTool.analyzeLabel}
           </button>
         </div>
       </div>
 
-
-
-            <div
+      <div
         style={{
-          marginTop: "12px",
+          marginTop: "14px",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "10px",
+        }}
+      >
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(255,255,255,0.72)",
+          }}
+        >
+          ✓ Detect hidden tone
+        </div>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(255,255,255,0.72)",
+          }}
+        >
+          ✓ Spot pressure or blame
+        </div>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(255,255,255,0.72)",
+          }}
+        >
+          ✓ Get calmer rewrites
+        </div>
+      </div>
+
+      <div
+        style={{
+          marginTop: "14px",
           display: "flex",
           alignItems: "flex-start",
           gap: "10px",
@@ -860,22 +944,52 @@ export default function HeroSection({
 
       <div
         style={{
-          marginTop: "12px",
+          marginTop: "18px",
           display: "flex",
-          alignItems: "center",
           gap: "10px",
           flexWrap: "wrap",
-          color: "#64748b",
-          fontSize: isMobile ? "13px" : "12px",
-          fontWeight: 700,
-          lineHeight: 1.5,
         }}
       >
-        <span>🧠 Live tone check</span>
-        <span style={{ opacity: 0.45 }}>•</span>
-        <span>⚡ Instant feedback</span>
-        <span style={{ opacity: 0.45 }}>•</span>
-        <span>🔒 No signup</span>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(238,242,255,0.70)",
+            color: "#4338ca",
+          }}
+        >
+          Used for difficult texts
+        </div>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(238,242,255,0.70)",
+            color: "#4338ca",
+          }}
+        >
+          Family conflict
+        </div>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(238,242,255,0.70)",
+            color: "#4338ca",
+          }}
+        >
+          Sensitive work replies
+        </div>
+        <div
+          style={{
+            ...chipStyle,
+            cursor: "default",
+            background: "rgba(238,242,255,0.70)",
+            color: "#4338ca",
+          }}
+        >
+          Apology messages
+        </div>
       </div>
 
       {result && (
