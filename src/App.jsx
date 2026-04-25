@@ -94,7 +94,7 @@ function AppContent() {
 
   const pageTitle =
     location.pathname === "/"
-      ? "ToneCheck — Check how your message may land before you send it"
+      ? "ToneCheck — The spellcheck for tone"
       : `${currentTool.title} | ToneCheck`;
 
   const pageDescription =
@@ -576,11 +576,12 @@ Try yours: trytonecheck.com`;
         return;
       }
 
-      const dataUrl = await htmlToImage.toPng(node, {
-        cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-      });
+const dataUrl = await htmlToImage.toPng(node, {
+  cacheBust: true,
+  pixelRatio: 3,
+  backgroundColor: "#f7f2ff",
+  skipAutoScale: true,
+});
 
       const link = document.createElement("a");
       link.download = "tonecheck-result.png";
