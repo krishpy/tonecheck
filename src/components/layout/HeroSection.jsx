@@ -875,6 +875,33 @@ export default function HeroSection({
                 ? "Should I Send This?"
                 : currentTool.analyzeLabel}
             </button>
+
+            {/* Product Hunt Badge */}
+<div
+  style={{
+    marginTop: 18,
+    display: "flex",
+    justifyContent: "center",
+  }}
+>
+  <a
+    href="https://www.producthunt.com/products/tonecheck-spellcheck-for-tone"
+    target="_blank"
+    rel="noreferrer"
+  >
+    <img
+      src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=YOUR_POST_ID&theme=light"
+      alt="Support us on Product Hunt"
+      width="250"
+      style={{
+        borderRadius: 12,
+        transition: "transform .2s ease",
+        boxShadow: "0 8px 22px rgba(0,0,0,.08)",
+      }}
+    />
+  </a>
+</div>
+
           </div>
         </div>
 
