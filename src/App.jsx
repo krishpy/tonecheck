@@ -8,7 +8,7 @@ import HeroSection from "./components/layout/HeroSection";
 import ResultSection from "./components/layout/ResultSection";
 import TestLab from "./pages/TestLab";
 import AdminDashboard from "./pages/AdminDashboard";
-import { trackEvent } from "./utils/analytics";
+import { trackEvent, trackCustomEvent } from "./utils/analytics";
 
 function getSessionId() {
   let sessionId = localStorage.getItem("tonecheck_session_id");
@@ -388,6 +388,7 @@ Try yours: trytonecheck.com`;
       setCopyState("Copy failed");
       setTimeout(() => setCopyState(""), 1800);
     }
+    trackCustomEvent("Copy Result");
   }
 
   async function copyRewriteOnly() {
@@ -410,8 +411,8 @@ Try yours: trytonecheck.com`;
   }
 
   function useRewriteMessage() {
+    trackCustomEvent("Rewrite Used");
     if (!finalRewrite) return;
-
     trackEvent({
       event_type: "rewrite_used",
       session_id: sessionId,
@@ -446,7 +447,9 @@ Try yours: trytonecheck.com`;
   }
 
   function shareWhatsApp() {
+    trackCustomEvent("WhatsApp Share");
     openShare(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, "whatsapp");
+
   }
 
   function shareFacebook() {
@@ -475,6 +478,13 @@ Try yours: trytonecheck.com`;
   }
 
   async function analyze(selectedStyleArg = rewriteTone, options = {}) {
+
+    if (!options?.isRewriteOnly) {
+  trackCustomEvent("Analyze Clicked", {
+    page: location.pathname,
+    rewrite_tone: selectedStyleArg || rewriteTone || "balanced",
+  });
+}
     const startedAt = Date.now();
     const selectedStyle =
       typeof selectedStyleArg === "string" ? selectedStyleArg : rewriteTone;
@@ -545,8 +555,20 @@ Try yours: trytonecheck.com`;
         hasTrackedAbandonRef.current = false;
       }
 
+      if (!options?.isRewriteOnly) {
+  trackCustomEvent("Analysis Completed", {
+    tone: data?.tone || data?.label || "unknown",
+    verdict: data?.send_verdict || data?.send_decision || "unknown",
+    risk_level: data?.risk_level || "unknown",
+  });
+}
+
       setResult(data);
-    } catch (error) {
+    } 
+
+    
+    
+    catch (error) {
       console.error("Analyze failed:", error);
       setResult({
         error: "Something went wrong while analyzing the message. Please try again.",
@@ -569,6 +591,7 @@ Try yours: trytonecheck.com`;
 
   async function downloadCard() {
     try {
+      trackCustomEvent("Download Card");
       const node = document.getElementById("tone-share-card");
       if (!node) {
         setCopyState("Card not found");

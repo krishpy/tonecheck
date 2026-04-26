@@ -14,3 +14,11 @@ export async function trackEvent(event) {
     console.warn("analytics failed", e);
   }
 }
+
+export function trackCustomEvent(name, props = {}) {
+  try {
+    window.plausible?.(name, { props });
+  } catch (e) {
+    console.warn("plausible event failed", e);
+  }
+}
