@@ -589,43 +589,113 @@ Try yours: trytonecheck.com`;
     }
   }
 
-  async function downloadCard() {
-    try {
-      trackCustomEvent("Download Card");
-      const node = document.getElementById("tone-share-card");
-      if (!node) {
-        setCopyState("Card not found");
-        setTimeout(() => setCopyState(""), 1800);
-        return;
+async function downloadCard() {
+
+  try {
+    trackCustomEvent("Download Card", {
+  method: isMobile ? "mobile-open" : "direct-download"
+});
+    const node = document.getElementById("tone-share-card");
+    if (!node) {
+      setCopyState("Card not found");
+      setTimeout(() => setCopyState(""), 1800);
+      return;
+    }
+
+    const dataUrl = await htmlToImage.toPng(node, {
+      cacheBust: true,
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+    });
+
+    const isMobile =
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    // Mobile fallback: open image in new tab
+    // User can long-press/save/share from there.
+    if (isMobile) {
+      const newTab = window.open();
+      if (newTab) {
+        newTab.document.write(`
+          <html>
+            <head>
+              <title>ToneCheck Result</title>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <style>
+                body {
+                  margin: 0;
+                  min-height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  background: #f8fafc;
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+                  padding: 16px;
+                  box-sizing: border-box;
+                }
+                img {
+                  max-width: 100%;
+                  height: auto;
+                  border-radius: 18px;
+                  box-shadow: 0 16px 40px rgba(15,23,42,0.18);
+                }
+                .hint {
+                  position: fixed;
+                  bottom: 14px;
+                  left: 14px;
+                  right: 14px;
+                  background: #2563eb;
+                  color: white;
+                  padding: 12px 14px;
+                  border-radius: 14px;
+                  font-size: 14px;
+                  font-weight: 700;
+                  text-align: center;
+                }
+              </style>
+            </head>
+            <body>
+              <img src="${dataUrl}" alt="ToneCheck result" />
+              <div class="hint">Long-press the image to save or share</div>
+            </body>
+          </html>
+        `);
+        newTab.document.close();
       }
 
-const dataUrl = await htmlToImage.toPng(node, {
-  cacheBust: true,
-  pixelRatio: 3,
-  backgroundColor: "#f7f2ff",
-  skipAutoScale: true,
-});
-
-      const link = document.createElement("a");
-      link.download = "tonecheck-result.png";
-      link.href = dataUrl;
-      link.click();
-
       trackEvent({
-        event_type: "download_card",
+        event_type: "download_card_mobile_opened",
         session_id: sessionId,
         page_slug: location.pathname,
       });
 
-      setCopyState("Card downloaded");
+      setCopyState("Opened card");
       setTimeout(() => setCopyState(""), 1800);
-    } catch (err) {
-      console.error("Download card failed:", err);
-      setCopyState("Download failed");
-      setTimeout(() => setCopyState(""), 1800);
+      return;
     }
-  }
 
+    // Desktop download
+    const link = document.createElement("a");
+    link.download = "tonecheck-result.png";
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    trackEvent({
+      event_type: "download_card",
+      session_id: sessionId,
+      page_slug: location.pathname,
+    });
+
+    setCopyState("Card downloaded");
+    setTimeout(() => setCopyState(""), 1800);
+  } catch (err) {
+    console.error("Download card failed:", err);
+    setCopyState("Download failed");
+    setTimeout(() => setCopyState(""), 1800);
+  }
+}
   function setExample(text) {
     setMessage(text);
     setCopyState("");
