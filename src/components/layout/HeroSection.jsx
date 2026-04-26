@@ -856,51 +856,49 @@ export default function HeroSection({
               Clear
             </button>
 
-            <button
-              type="button"
-              className="tc-button-hover"
-              onClick={() => analyze()}
-              disabled={loading || !message.trim()}
-              style={{
-                ...primaryButtonStyle,
-                opacity: loading || !message.trim() ? 0.7 : 1,
-                minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
-                width: isMobile ? "100%" : primaryButtonStyle?.width,
-                flex: isMobile ? 1 : "unset",
-              }}
-            >
-              {loading
-                ? "Checking..."
-                : isHome
-                ? "Should I Send This?"
-                : currentTool.analyzeLabel}
-            </button>
-
-            {/* Product Hunt Badge */}
-<div
+<button
+  type="button"
+  className="tc-button-hover"
+  onClick={() => analyze()}
+  disabled={loading || !message.trim()}
   style={{
-    marginTop: 18,
-    display: "flex",
-    justifyContent: "center",
+    ...primaryButtonStyle,
+    opacity: loading || !message.trim() ? 0.7 : 1,
+    minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
+    width: isMobile ? "100%" : primaryButtonStyle?.width,
+    flex: isMobile ? 1 : "unset",
   }}
 >
+  {loading
+    ? "Checking..."
+    : isHome
+    ? "Should I Send This?"
+    : currentTool.analyzeLabel}
+</button>
+
+{isHome && (
   <a
     href="https://www.producthunt.com/products/tonecheck-spellcheck-for-tone"
     target="_blank"
     rel="noreferrer"
+    style={{
+      display: "inline-flex",
+      alignItems: "center",
+      gap: "8px",
+      padding: "14px 18px",
+      borderRadius: "16px",
+      background: "#ff6154",
+      color: "#ffffff",
+      fontWeight: 850,
+      fontSize: "14px",
+      textDecoration: "none",
+      boxShadow: "0 10px 24px rgba(255,97,84,0.22)",
+      whiteSpace: "nowrap",
+    }}
   >
-    <img
-      src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=YOUR_POST_ID&theme=light"
-      alt="Support us on Product Hunt"
-      width="250"
-      style={{
-        borderRadius: 12,
-        transition: "transform .2s ease",
-        boxShadow: "0 8px 22px rgba(0,0,0,.08)",
-      }}
-    />
+    🚀 Support us on Product Hunt
   </a>
-</div>
+)}
 
           </div>
         </div>
