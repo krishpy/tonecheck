@@ -881,22 +881,23 @@ export default function HeroSection({
     href="https://www.producthunt.com/products/tonecheck-spellcheck-for-tone"
     target="_blank"
     rel="noreferrer"
-    style={{
-      display: "inline-flex",
-      alignItems: "center",
-      gap: "8px",
-      padding: "14px 18px",
-      borderRadius: "16px",
-      background: "#ff6154",
-      color: "#ffffff",
-      fontWeight: 850,
-      fontSize: "14px",
-      textDecoration: "none",
-      boxShadow: "0 10px 24px rgba(255,97,84,0.22)",
-      whiteSpace: "nowrap",
-    }}
+style={{
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "6px",
+  padding: "10px 14px",
+  borderRadius: "999px",
+  background: "#fff7ed",
+  border: "1px solid #fdba74",
+  color: "#c2410c",
+  fontWeight: 700,
+  fontSize: "13px",
+  textDecoration: "none",
+  whiteSpace: "nowrap",
+  marginLeft: "10px"
+}}
   >
-    🚀 Support us on Product Hunt
+    🚀 PH Launch
   </a>
 )}
 
