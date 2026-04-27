@@ -590,10 +590,15 @@ Try yours: trytonecheck.com`;
   }
 
 async function downloadCard() {
-
   try {
-    trackCustomEvent("Download Card", {
-  method: isMobile ? "mobile-open" : "direct-download"
+    const isMobile =
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+trackEvent({
+  event_type: "download_card_click",
+  method: isMobile ? "mobile-open" : "direct-download",
+  session_id: sessionId,
+  page_slug: location.pathname,
 });
     const node = document.getElementById("tone-share-card");
     if (!node) {
@@ -607,9 +612,6 @@ async function downloadCard() {
       pixelRatio: 2,
       backgroundColor: "#ffffff",
     });
-
-    const isMobile =
-      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     // Mobile fallback: open image in new tab
     // User can long-press/save/share from there.
