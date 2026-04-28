@@ -559,29 +559,44 @@ const betaCard = isHome && !result && (
     }}
   >
     <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: "7px",
-        padding: "7px 11px",
-        borderRadius: "999px",
-        background: "#ffffff",
-        color: "#16a34a",
-        border: "1px solid rgba(34,197,94,0.24)",
-        fontWeight: 850,
-        fontSize: "11px",
-        marginBottom: "18px",
-      }}
-    >
-      <span style={{ fontSize: "14px" }}>🟢</span>
-      <span>WhatsApp Beta</span>
-    </div>
+  style={{
+    display:"inline-flex",
+    alignItems:"center",
+    gap:"10px",
+    padding:"8px 14px",
+    borderRadius:"999px",
+    background:"#ffffff",
+    color:"#16a34a",
+    border:"1px solid rgba(34,197,94,.24)",
+    fontWeight:900,
+    fontSize:"14px",
+    marginBottom:"18px",
+    boxShadow:"0 6px 18px rgba(34,197,94,.08)"
+  }}
+>
+  <img
+    src="/whatsapp.svg"
+    alt="WhatsApp"
+    style={{
+      width:"18px",
+      height:"18px"
+    }}
+  />
+
+  <span
+    style={{
+      letterSpacing:"-.02em"
+    }}
+  >
+    WhatsApp Beta
+  </span>
+</div>
 
     <div
       style={{
-        fontSize: isMobile ? "30px" : "38px",
+        fontSize: isMobile ? "34px" : "44px",
         lineHeight: 1.04,
-        fontWeight: 850,
+        fontWeight: 800,
         letterSpacing: "-0.055em",
         marginBottom: "12px",
         color: "#0f172a",
@@ -692,7 +707,7 @@ const betaCard = isHome && !result && (
           "0 16px 34px rgba(37,211,102,0.34), inset 0 1px 0 rgba(255,255,255,0.24)",
       }}
     >
-      {waitlistLoading ? "Joining..." : "Join WhatsApp Beta →"}
+      {waitlistLoading ? "Joining..." : "Get Beta Access →"}
     </button>
 
     {waitlistStatus && (
