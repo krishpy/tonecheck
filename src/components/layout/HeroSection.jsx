@@ -544,185 +544,197 @@ export default function HeroSection({
     boxShadow: "0 8px 22px rgba(124,58,237,0.08)",
   };
 
-  const betaCard = isHome && !result && (
+const betaCard = isHome && !result && (
+  <div
+    style={{
+      padding: isMobile ? "18px" : "26px",
+      borderRadius: "30px",
+      background:
+        "linear-gradient(135deg, #f0fdf4 0%, #ecfeff 48%, #eef2ff 100%)",
+      color: "#111827",
+      boxShadow:
+        "0 20px 55px rgba(16,185,129,0.14), 0 10px 28px rgba(99,102,241,0.08)",
+      border: "1px solid rgba(34,197,94,0.20)",
+      minHeight: isMobile ? "auto" : "420px",
+    }}
+  >
     <div
       style={{
-        position: "sticky",
-        top: "18px",
-        padding: isMobile ? "22px" : "34px",
-        borderRadius: "34px",
-        background:
-          "linear-gradient(145deg, #111827 0%, #312e81 35%, #7c3aed 66%, #ec4899 100%)",
-        color: "#ffffff",
-        boxShadow:
-          "0 32px 80px rgba(79,70,229,0.30), 0 16px 46px rgba(236,72,153,0.20)",
-        border: "1px solid rgba(255,255,255,0.24)",
-        minHeight: isMobile ? "auto" : "520px",
-        boxSizing: "border-box",
-        overflow: "hidden",
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "8px 12px",
+        borderRadius: "999px",
+        background: "#ffffff",
+        color: "#16a34a",
+        border: "1px solid rgba(34,197,94,0.24)",
+        fontWeight: 850,
+        fontSize: "12px",
+        marginBottom: "18px",
+      }}
+    >
+      <span>💬</span>
+      <span>WhatsApp Beta</span>
+    </div>
+
+    <div
+      style={{
+        fontSize: isMobile ? "26px" : "32px",
+        lineHeight: 1.08,
+        fontWeight: 820,
+        letterSpacing: "-0.045em",
+        marginBottom: "10px",
+        color: "#0f172a",
+      }}
+    >
+      Text me before you text them.
+    </div>
+
+    <div
+      style={{
+        fontSize: "15px",
+        lineHeight: 1.55,
+        color: "#334155",
+        fontWeight: 520,
+        marginBottom: "18px",
+      }}
+    >
+      Forward a risky draft to ToneCheck on WhatsApp and get instant tone feedback before sending.
+    </div>
+
+    <div
+      style={{
+        background: "#ffffff",
+        border: "1px solid rgba(34,197,94,0.18)",
+        borderRadius: "22px",
+        padding: "14px",
+        marginBottom: "18px",
+        boxShadow: "0 10px 24px rgba(15,23,42,0.05)",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          right: "-90px",
-          top: "-90px",
-          width: "220px",
-          height: "220px",
-          borderRadius: "999px",
-          background: "rgba(255,255,255,0.14)",
-          filter: "blur(2px)",
+          background: "#dcfce7",
+          color: "#14532d",
+          padding: "11px 13px",
+          borderRadius: "16px 16px 16px 4px",
+          fontSize: "14px",
+          fontWeight: 650,
+          lineHeight: 1.45,
+          marginBottom: "10px",
+          maxWidth: "92%",
         }}
-      />
+      >
+        check: Fine. Do whatever you want.
+      </div>
 
-      <div style={{ position: "relative" }}>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "8px",
-            padding: "9px 12px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.12)",
-            border: "1px solid rgba(255,255,255,0.20)",
-            fontSize: "12px",
-            fontWeight: 950,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            marginBottom: "18px",
-          }}
-        >
-          📲 WhatsApp Beta
-        </div>
-
-        <div
-          style={{
-            fontSize: isMobile ? "34px" : "46px",
-            lineHeight: 0.96,
-            fontWeight: 950,
-            letterSpacing: "-0.07em",
-            marginBottom: "14px",
-          }}
-        >
-          Text me before you text them.
-        </div>
-
-        <div
-          style={{
-            fontSize: isMobile ? "15px" : "17px",
-            lineHeight: 1.55,
-            opacity: 0.94,
-            fontWeight: 650,
-            marginBottom: "24px",
-          }}
-        >
-          Forward a risky draft to ToneCheck on WhatsApp and get instant tone feedback before you send it.
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gap: "12px",
-            marginBottom: "16px",
-          }}
-        >
-          <input
-            value={waitlistName}
-            onChange={(e) => setWaitlistName(e.target.value)}
-            placeholder="Your name"
-            style={{
-              width: "100%",
-              padding: "18px 18px",
-              borderRadius: "18px",
-              border: "1px solid rgba(255,255,255,0.25)",
-              boxSizing: "border-box",
-              fontWeight: 800,
-              fontSize: "16px",
-              outline: "none",
-              background: "rgba(255,255,255,0.96)",
-              color: "#111827",
-            }}
-          />
-
-          <input
-            value={waitlistEmail}
-            onChange={(e) => setWaitlistEmail(e.target.value)}
-            placeholder="Email for invite"
-            type="email"
-            style={{
-              width: "100%",
-              padding: "18px 18px",
-              borderRadius: "18px",
-              border: "1px solid rgba(255,255,255,0.25)",
-              boxSizing: "border-box",
-              fontWeight: 800,
-              fontSize: "16px",
-              outline: "none",
-              background: "rgba(255,255,255,0.96)",
-              color: "#111827",
-            }}
-          />
-
-          <button
-            type="button"
-            onClick={joinWhatsappBeta}
-            disabled={waitlistLoading}
-            style={{
-              width: "100%",
-              padding: "19px 20px",
-              borderRadius: "20px",
-              border: "none",
-              cursor: waitlistLoading ? "not-allowed" : "pointer",
-              fontWeight: 950,
-              fontSize: "16px",
-              color: "#111827",
-              background: "linear-gradient(135deg, #ffffff, #fdf2f8)",
-              boxShadow: "0 18px 36px rgba(0,0,0,0.20)",
-            }}
-          >
-            {waitlistLoading ? "Joining..." : "Join WhatsApp Beta 🚀"}
-          </button>
-        </div>
-
-        {waitlistStatus && (
-          <div
-            style={{
-              marginTop: "8px",
-              marginBottom: "14px",
-              padding: "11px 12px",
-              borderRadius: "14px",
-              fontSize: "14px",
-              fontWeight: 850,
-              color:
-                waitlistStatus.includes("✅") || waitlistStatus.includes("🚀")
-                  ? "#bbf7d0"
-                  : "#fde68a",
-              background: "rgba(255,255,255,0.10)",
-              border: "1px solid rgba(255,255,255,0.16)",
-            }}
-          >
-            {waitlistStatus}
-          </div>
-        )}
-
-        <div
-          style={{
-            marginTop: "18px",
-            display: "grid",
-            gap: "10px",
-            fontSize: "15px",
-            fontWeight: 850,
-            opacity: 0.94,
-          }}
-        >
-          <div>✓ Free during beta</div>
-          <div>✓ Priority invite list</div>
-          <div>✓ Works inside WhatsApp</div>
-          <div>✓ Early users shape the product</div>
-        </div>
+      <div
+        style={{
+          background: "#f8fafc",
+          color: "#334155",
+          padding: "11px 13px",
+          borderRadius: "16px 16px 4px 16px",
+          fontSize: "14px",
+          fontWeight: 650,
+          lineHeight: 1.45,
+          marginLeft: "auto",
+          maxWidth: "92%",
+          border: "1px solid rgba(15,23,42,0.06)",
+        }}
+      >
+        ⚠️ Passive-aggressive tone detected. Try a calmer rewrite before sending.
       </div>
     </div>
-  );
+
+    <input
+      value={waitlistName}
+      onChange={(e) => setWaitlistName(e.target.value)}
+      placeholder="Your name"
+      style={{
+        width: "100%",
+        padding: "16px",
+        borderRadius: "15px",
+        border: "1px solid #bbf7d0",
+        marginBottom: "10px",
+        boxSizing: "border-box",
+        fontWeight: 650,
+        fontSize: "15px",
+        outline: "none",
+        background: "#ffffff",
+      }}
+    />
+
+    <input
+      value={waitlistEmail}
+      onChange={(e) => setWaitlistEmail(e.target.value)}
+      placeholder="Email for invite"
+      type="email"
+      style={{
+        width: "100%",
+        padding: "16px",
+        borderRadius: "15px",
+        border: "1px solid #bbf7d0",
+        marginBottom: "12px",
+        boxSizing: "border-box",
+        fontWeight: 650,
+        fontSize: "15px",
+        outline: "none",
+        background: "#ffffff",
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={joinWhatsappBeta}
+      disabled={waitlistLoading}
+      style={{
+        width: "100%",
+        padding: "16px 18px",
+        borderRadius: "16px",
+        border: "none",
+        cursor: waitlistLoading ? "not-allowed" : "pointer",
+        fontWeight: 850,
+        fontSize: "15px",
+        color: "#ffffff",
+        background: "#25D366",
+        boxShadow: "0 12px 28px rgba(37,211,102,0.28)",
+      }}
+    >
+      {waitlistLoading ? "Joining..." : "Join WhatsApp Beta 💬"}
+    </button>
+
+    {waitlistStatus && (
+      <div
+        style={{
+          marginTop: "11px",
+          fontSize: "13px",
+          fontWeight: 800,
+          color:
+            waitlistStatus.includes("✅") || waitlistStatus.includes("🚀")
+              ? "#15803d"
+              : "#b45309",
+        }}
+      >
+        {waitlistStatus}
+      </div>
+    )}
+
+    <div
+      style={{
+        marginTop: "15px",
+        display: "grid",
+        gap: "7px",
+        fontSize: "13px",
+        fontWeight: 650,
+        color: "#166534",
+      }}
+    >
+      <div>✓ Free beta access</div>
+      <div>✓ WhatsApp forwarding</div>
+      <div>✓ Early invite list</div>
+    </div>
+  </div>
+);
 
   return (
     <div
