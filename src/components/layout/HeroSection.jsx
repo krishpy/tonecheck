@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState  } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
 const TOOLTIP_MAP = {
@@ -441,6 +441,55 @@ export default function HeroSection({
 }) {
   const isMobile = useIsMobile();
   const isHome = location.pathname === "/";
+  const [waitlistName, setWaitlistName] = useState("");
+const [waitlistEmail, setWaitlistEmail] = useState("");
+const [waitlistStatus, setWaitlistStatus] = useState("");
+const [waitlistLoading, setWaitlistLoading] = useState(false);
+
+async function joinWhatsappBeta() {
+  const email = waitlistEmail.trim();
+  const name = waitlistName.trim();
+
+  if (!email || !email.includes("@")) {
+    setWaitlistStatus("Enter a valid email.");
+    return;
+  }
+
+  try {
+    setWaitlistLoading(true);
+    setWaitlistStatus("");
+
+    const res = await fetch(
+      "https://communication-intelligence-api.onrender.com/waitlist/signup",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          source: "tonecheck-homepage",
+          interest: "whatsapp-beta",
+        }),
+      }
+    );
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      throw new Error(data?.detail || "Signup failed");
+    }
+
+    setWaitlistStatus("You’re on the WhatsApp beta list ✅");
+    setWaitlistName("");
+    setWaitlistEmail("");
+  } catch (err) {
+    setWaitlistStatus("Could not join right now. Try again.");
+  } finally {
+    setWaitlistLoading(false);
+  }
+}
 
   const examplesToShow = isHome ? VIRAL_HOME_EXAMPLES : currentTool.examples;
 
@@ -768,6 +817,140 @@ export default function HeroSection({
             </button>
           ))}
         </div>
+
+        {isHome && !result && (
+  <div
+    style={{
+      marginTop: "22px",
+      padding: isMobile ? "18px" : "20px",
+      borderRadius: "26px",
+      background:
+        "linear-gradient(135deg, rgba(99,102,241,0.10), rgba(236,72,153,0.10), rgba(255,255,255,0.88))",
+      border: "1px solid rgba(124,58,237,0.20)",
+      boxShadow: "0 14px 34px rgba(99,102,241,0.10)",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: "14px",
+        alignItems: isMobile ? "stretch" : "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <div>
+        <div
+          style={{
+            fontSize: "13px",
+            fontWeight: 900,
+            letterSpacing: "0.16em",
+            textTransform: "uppercase",
+            color: "#7c3aed",
+            marginBottom: "6px",
+          }}
+        >
+          📲 WhatsApp Beta Opening Soon
+        </div>
+
+        <div
+          style={{
+            fontSize: isMobile ? "22px" : "26px",
+            lineHeight: 1.1,
+            fontWeight: 950,
+            letterSpacing: "-0.045em",
+            color: "#111827",
+          }}
+        >
+          Text me before you text them.
+        </div>
+
+        <div
+          style={{
+            marginTop: "8px",
+            color: "#475569",
+            fontSize: "15px",
+            fontWeight: 600,
+            lineHeight: 1.45,
+          }}
+        >
+          Join early access. Forward a risky draft to ToneCheck on WhatsApp before sending.
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          gap: "10px",
+          minWidth: isMobile ? "100%" : "520px",
+        }}
+      >
+        <input
+          value={waitlistName}
+          onChange={(e) => setWaitlistName(e.target.value)}
+          placeholder="Name"
+          style={{
+            flex: 1,
+            padding: "14px 16px",
+            borderRadius: "16px",
+            border: "1px solid rgba(99,102,241,0.22)",
+            fontWeight: 700,
+            outline: "none",
+          }}
+        />
+
+        <input
+          value={waitlistEmail}
+          onChange={(e) => setWaitlistEmail(e.target.value)}
+          placeholder="Email"
+          type="email"
+          style={{
+            flex: 1.2,
+            padding: "14px 16px",
+            borderRadius: "16px",
+            border: "1px solid rgba(99,102,241,0.22)",
+            fontWeight: 700,
+            outline: "none",
+          }}
+        />
+
+        <button
+          type="button"
+          onClick={joinWhatsappBeta}
+          disabled={waitlistLoading}
+          style={{
+            padding: "14px 18px",
+            borderRadius: "16px",
+            border: "none",
+            cursor: waitlistLoading ? "not-allowed" : "pointer",
+            fontWeight: 900,
+            color: "#fff",
+            background:
+              "linear-gradient(135deg, #111827, #7c3aed, #ec4899)",
+            boxShadow: "0 12px 26px rgba(124,58,237,0.22)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {waitlistLoading ? "Joining..." : "Join Beta"}
+        </button>
+      </div>
+    </div>
+
+    {waitlistStatus && (
+      <div
+        style={{
+          marginTop: "10px",
+          fontSize: "13px",
+          fontWeight: 800,
+          color: waitlistStatus.includes("✅") ? "#15803d" : "#b45309",
+        }}
+      >
+        {waitlistStatus}
+      </div>
+    )}
+  </div>
+)}
 
         {!result && (
           <div
