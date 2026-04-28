@@ -24,7 +24,6 @@ function getReplyVibe(score = 0) {
 
 function getReplyMeta(score = 0) {
   const value = getReplyVibe(score);
-
   if (value === "Good") {
     return {
       label: "Reply vibe",
@@ -36,7 +35,6 @@ function getReplyMeta(score = 0) {
       shadow: "0 4px 12px rgba(34,197,94,0.14)",
     };
   }
-
   if (value === "Mixed") {
     return {
       label: "Reply vibe",
@@ -48,7 +46,6 @@ function getReplyMeta(score = 0) {
       shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
-
   return {
     label: "Reply vibe",
     value,
@@ -62,7 +59,6 @@ function getReplyMeta(score = 0) {
 
 function getRegretMeta(level = "low") {
   const value = String(level || "low").trim().toLowerCase();
-
   if (value === "high") {
     return {
       label: "Chance of regret",
@@ -74,7 +70,6 @@ function getRegretMeta(level = "low") {
       shadow: "0 4px 12px rgba(236,72,153,0.14)",
     };
   }
-
   if (value === "medium") {
     return {
       label: "Chance of regret",
@@ -86,7 +81,6 @@ function getRegretMeta(level = "low") {
       shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
-
   return {
     label: "Chance of regret",
     value: "Low",
@@ -100,7 +94,6 @@ function getRegretMeta(level = "low") {
 
 function getPressureMeta(level = "low") {
   const value = String(level || "low").trim().toLowerCase();
-
   if (value === "high") {
     return {
       label: "Emotional pressure",
@@ -112,7 +105,6 @@ function getPressureMeta(level = "low") {
       shadow: "0 4px 12px rgba(236,72,153,0.14)",
     };
   }
-
   if (value === "medium") {
     return {
       label: "Emotional pressure",
@@ -124,7 +116,6 @@ function getPressureMeta(level = "low") {
       shadow: "0 4px 12px rgba(245,158,11,0.14)",
     };
   }
-
   return {
     label: "Emotional pressure",
     value: "Low",
@@ -194,23 +185,17 @@ function MiniOutcomeChip({ item }) {
 
   React.useEffect(() => {
     if (!tipPinned || !showTip) return;
-
     const timer = setTimeout(() => {
       setShowTip(false);
       setTipPinned(false);
     }, 2200);
-
     return () => clearTimeout(timer);
   }, [tipPinned, showTip]);
 
   function updateTooltipPosition(clientX, clientY) {
     const rect = chipRef.current?.getBoundingClientRect();
     if (!rect) return;
-
-    setTipPos({
-      x: clientX - rect.left,
-      y: clientY - rect.top,
-    });
+    setTipPos({ x: clientX - rect.left, y: clientY - rect.top });
   }
 
   function handleMouseEnter(e) {
@@ -232,15 +217,8 @@ function MiniOutcomeChip({ item }) {
   function handleInfoClick(e) {
     e.stopPropagation();
     if (!tooltip) return;
-
     const rect = chipRef.current?.getBoundingClientRect();
-    if (rect) {
-      setTipPos({
-        x: rect.width / 2,
-        y: 0,
-      });
-    }
-
+    if (rect) setTipPos({ x: rect.width / 2, y: 0 });
     setTipPinned((prev) => {
       const next = !prev;
       setShowTip(next);
@@ -265,7 +243,6 @@ function MiniOutcomeChip({ item }) {
         fontSize: "13px",
         cursor: "default",
         boxShadow: item.shadow || "none",
-        transition: "transform 180ms ease, box-shadow 180ms ease",
       }}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
@@ -275,7 +252,6 @@ function MiniOutcomeChip({ item }) {
       <span>
         {item.label}: {item.value}
       </span>
-
       <button
         type="button"
         onClick={handleInfoClick}
@@ -294,7 +270,6 @@ function MiniOutcomeChip({ item }) {
       >
         ℹ
       </button>
-
       <div
         style={{
           position: "absolute",
@@ -310,12 +285,11 @@ function MiniOutcomeChip({ item }) {
           borderRadius: "10px",
           fontSize: "12px",
           whiteSpace: "nowrap",
-          zIndex: 10,
+          zIndex: 50,
           boxShadow: "0 10px 26px rgba(0,0,0,0.22)",
           opacity: showTip && tooltip ? 1 : 0,
           pointerEvents: "none",
-          transition:
-            "opacity 160ms ease, transform 180ms ease, left 80ms linear, top 80ms linear",
+          transition: "opacity 160ms ease, transform 180ms ease",
         }}
       >
         {tooltip}
@@ -464,9 +438,7 @@ export default function HeroSection({
         "https://communication-intelligence-api.onrender.com/waitlist/signup",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             name,
             email,
@@ -477,15 +449,12 @@ export default function HeroSection({
       );
 
       const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        throw new Error(data?.detail || "Signup failed");
-      }
+      if (!res.ok) throw new Error(data?.detail || "Signup failed");
 
       setWaitlistStatus("You're in early access 🚀");
       setWaitlistName("");
       setWaitlistEmail("");
-    } catch (err) {
+    } catch {
       setWaitlistStatus("Could not join right now. Try again.");
     } finally {
       setWaitlistLoading(false);
@@ -523,8 +492,6 @@ export default function HeroSection({
     ? "See if your message sounds angry, passive-aggressive, guilt-tripping, or likely to start conflict — before you hit send."
     : "Get instant feedback before your message lands the wrong way.";
 
-  const heroInnerMaxWidth = "1160px";
-
   const orbStyle1 = {
     position: "absolute",
     top: "-90px",
@@ -553,9 +520,8 @@ export default function HeroSection({
 
   const strongChipStyle = {
     ...chipStyle,
-    background:
-      "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92))",
-    border: "1px solid rgba(79,70,229,0.18)",
+    background: "linear-gradient(135deg, #ffffff, #f8fafc)",
+    border: "1px solid rgba(79,70,229,0.20)",
     color: "#1f2937",
     boxShadow: "0 8px 22px rgba(79,70,229,0.08)",
   };
@@ -563,155 +529,197 @@ export default function HeroSection({
   const valueChipStyle = {
     ...chipStyle,
     cursor: "default",
-    background:
-      "linear-gradient(135deg, rgba(67,56,202,0.10), rgba(236,72,153,0.10))",
+    background: "linear-gradient(135deg, #eef2ff, #fdf2f8)",
     color: "#312e81",
-    border: "1px solid rgba(99,102,241,0.24)",
+    border: "1px solid rgba(99,102,241,0.28)",
     boxShadow: "0 8px 22px rgba(99,102,241,0.10)",
   };
 
   const trustChipStyle = {
     ...chipStyle,
     cursor: "default",
-    background:
-      "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.94))",
+    background: "linear-gradient(135deg, #ffffff, #f5f3ff)",
     color: "#5b21b6",
-    border: "1px solid rgba(124,58,237,0.20)",
+    border: "1px solid rgba(124,58,237,0.22)",
     boxShadow: "0 8px 22px rgba(124,58,237,0.08)",
   };
 
   const betaCard = isHome && !result && (
     <div
       style={{
-        padding: isMobile ? "18px" : "22px",
-        borderRadius: "28px",
+        position: "sticky",
+        top: "18px",
+        padding: isMobile ? "22px" : "34px",
+        borderRadius: "34px",
         background:
-          "linear-gradient(135deg, rgba(17,24,39,0.97), rgba(67,56,202,0.94), rgba(236,72,153,0.90))",
+          "linear-gradient(145deg, #111827 0%, #312e81 35%, #7c3aed 66%, #ec4899 100%)",
         color: "#ffffff",
         boxShadow:
-          "0 24px 60px rgba(79,70,229,0.24), 0 12px 32px rgba(236,72,153,0.14)",
-        border: "1px solid rgba(255,255,255,0.22)",
-        minHeight: isMobile ? "auto" : "330px",
+          "0 32px 80px rgba(79,70,229,0.30), 0 16px 46px rgba(236,72,153,0.20)",
+        border: "1px solid rgba(255,255,255,0.24)",
+        minHeight: isMobile ? "auto" : "520px",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <div
         style={{
-          fontSize: "12px",
-          fontWeight: 950,
-          letterSpacing: "0.16em",
-          textTransform: "uppercase",
-          opacity: 0.9,
-          marginBottom: "10px",
-        }}
-      >
-        📲 WhatsApp Beta
-      </div>
-
-      <div
-        style={{
-          fontSize: isMobile ? "28px" : "34px",
-          lineHeight: 1.02,
-          fontWeight: 950,
-          letterSpacing: "-0.06em",
-          marginBottom: "10px",
-        }}
-      >
-        Text me before you text them.
-      </div>
-
-      <div
-        style={{
-          fontSize: "14px",
-          lineHeight: 1.5,
-          opacity: 0.92,
-          fontWeight: 650,
-          marginBottom: "16px",
-        }}
-      >
-        Join early access. Forward risky drafts to ToneCheck on WhatsApp before sending.
-      </div>
-
-      <input
-        value={waitlistName}
-        onChange={(e) => setWaitlistName(e.target.value)}
-        placeholder="Name"
-        style={{
-          width: "100%",
-          padding: "14px 15px",
-          borderRadius: "15px",
-          border: "1px solid rgba(255,255,255,0.25)",
-          marginBottom: "10px",
-          boxSizing: "border-box",
-          fontWeight: 750,
-          outline: "none",
+          position: "absolute",
+          right: "-90px",
+          top: "-90px",
+          width: "220px",
+          height: "220px",
+          borderRadius: "999px",
+          background: "rgba(255,255,255,0.14)",
+          filter: "blur(2px)",
         }}
       />
 
-      <input
-        value={waitlistEmail}
-        onChange={(e) => setWaitlistEmail(e.target.value)}
-        placeholder="Email"
-        type="email"
-        style={{
-          width: "100%",
-          padding: "14px 15px",
-          borderRadius: "15px",
-          border: "1px solid rgba(255,255,255,0.25)",
-          marginBottom: "12px",
-          boxSizing: "border-box",
-          fontWeight: 750,
-          outline: "none",
-        }}
-      />
-
-      <button
-        type="button"
-        onClick={joinWhatsappBeta}
-        disabled={waitlistLoading}
-        style={{
-          width: "100%",
-          padding: "15px 18px",
-          borderRadius: "16px",
-          border: "none",
-          cursor: waitlistLoading ? "not-allowed" : "pointer",
-          fontWeight: 950,
-          color: "#111827",
-          background: "#ffffff",
-          boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
-        }}
-      >
-        {waitlistLoading ? "Joining..." : "Join Beta 🚀"}
-      </button>
-
-      {waitlistStatus && (
+      <div style={{ position: "relative" }}>
         <div
           style={{
-            marginTop: "11px",
-            fontSize: "13px",
-            fontWeight: 850,
-            color:
-              waitlistStatus.includes("✅") || waitlistStatus.includes("🚀")
-                ? "#bbf7d0"
-                : "#fde68a",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "9px 12px",
+            borderRadius: "999px",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.20)",
+            fontSize: "12px",
+            fontWeight: 950,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            marginBottom: "18px",
           }}
         >
-          {waitlistStatus}
+          📲 WhatsApp Beta
         </div>
-      )}
 
-      <div
-        style={{
-          marginTop: "14px",
-          display: "grid",
-          gap: "7px",
-          fontSize: "13px",
-          fontWeight: 750,
-          opacity: 0.9,
-        }}
-      >
-        <div>✓ Free during beta</div>
-        <div>✓ Priority invites</div>
-        <div>✓ Early users shape features</div>
+        <div
+          style={{
+            fontSize: isMobile ? "34px" : "46px",
+            lineHeight: 0.96,
+            fontWeight: 950,
+            letterSpacing: "-0.07em",
+            marginBottom: "14px",
+          }}
+        >
+          Text me before you text them.
+        </div>
+
+        <div
+          style={{
+            fontSize: isMobile ? "15px" : "17px",
+            lineHeight: 1.55,
+            opacity: 0.94,
+            fontWeight: 650,
+            marginBottom: "24px",
+          }}
+        >
+          Forward a risky draft to ToneCheck on WhatsApp and get instant tone feedback before you send it.
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gap: "12px",
+            marginBottom: "16px",
+          }}
+        >
+          <input
+            value={waitlistName}
+            onChange={(e) => setWaitlistName(e.target.value)}
+            placeholder="Your name"
+            style={{
+              width: "100%",
+              padding: "18px 18px",
+              borderRadius: "18px",
+              border: "1px solid rgba(255,255,255,0.25)",
+              boxSizing: "border-box",
+              fontWeight: 800,
+              fontSize: "16px",
+              outline: "none",
+              background: "rgba(255,255,255,0.96)",
+              color: "#111827",
+            }}
+          />
+
+          <input
+            value={waitlistEmail}
+            onChange={(e) => setWaitlistEmail(e.target.value)}
+            placeholder="Email for invite"
+            type="email"
+            style={{
+              width: "100%",
+              padding: "18px 18px",
+              borderRadius: "18px",
+              border: "1px solid rgba(255,255,255,0.25)",
+              boxSizing: "border-box",
+              fontWeight: 800,
+              fontSize: "16px",
+              outline: "none",
+              background: "rgba(255,255,255,0.96)",
+              color: "#111827",
+            }}
+          />
+
+          <button
+            type="button"
+            onClick={joinWhatsappBeta}
+            disabled={waitlistLoading}
+            style={{
+              width: "100%",
+              padding: "19px 20px",
+              borderRadius: "20px",
+              border: "none",
+              cursor: waitlistLoading ? "not-allowed" : "pointer",
+              fontWeight: 950,
+              fontSize: "16px",
+              color: "#111827",
+              background: "linear-gradient(135deg, #ffffff, #fdf2f8)",
+              boxShadow: "0 18px 36px rgba(0,0,0,0.20)",
+            }}
+          >
+            {waitlistLoading ? "Joining..." : "Join WhatsApp Beta 🚀"}
+          </button>
+        </div>
+
+        {waitlistStatus && (
+          <div
+            style={{
+              marginTop: "8px",
+              marginBottom: "14px",
+              padding: "11px 12px",
+              borderRadius: "14px",
+              fontSize: "14px",
+              fontWeight: 850,
+              color:
+                waitlistStatus.includes("✅") || waitlistStatus.includes("🚀")
+                  ? "#bbf7d0"
+                  : "#fde68a",
+              background: "rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.16)",
+            }}
+          >
+            {waitlistStatus}
+          </div>
+        )}
+
+        <div
+          style={{
+            marginTop: "18px",
+            display: "grid",
+            gap: "10px",
+            fontSize: "15px",
+            fontWeight: 850,
+            opacity: 0.94,
+          }}
+        >
+          <div>✓ Free during beta</div>
+          <div>✓ Priority invite list</div>
+          <div>✓ Works inside WhatsApp</div>
+          <div>✓ Early users shape the product</div>
+        </div>
       </div>
     </div>
   );
@@ -728,22 +736,17 @@ export default function HeroSection({
         maxWidth: "100%",
         boxSizing: "border-box",
         overflow: "hidden",
-        padding: isMobile ? "20px 16px 24px" : "28px 36px 34px",
+        padding: isMobile ? "20px 16px 24px" : "34px 42px 38px",
       }}
     >
       <div className="tc-light-sweep" />
       <div style={orbStyle1} />
       <div style={orbStyle2} />
 
-      <div style={{ position: "relative", maxWidth: heroInnerMaxWidth }}>
+      <div style={{ position: "relative", width: "100%" }}>
         {!isHome && (
           <div style={{ marginBottom: "14px" }}>
-            <div
-              style={{
-                ...valueChipStyle,
-                display: "inline-flex",
-              }}
-            >
+            <div style={{ ...valueChipStyle, display: "inline-flex" }}>
               {currentTool.title}
             </div>
           </div>
@@ -752,12 +755,16 @@ export default function HeroSection({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: isMobile || !isHome || result ? "1fr" : "1.35fr 0.75fr",
-            gap: isMobile ? "22px" : "30px",
+            gridTemplateColumns:
+              isMobile || !isHome || result
+                ? "1fr"
+                : "minmax(0, 1.55fr) minmax(420px, 0.9fr)",
+            gap: isMobile ? "22px" : "44px",
             alignItems: "start",
+            width: "100%",
           }}
         >
-          <div>
+          <div style={{ minWidth: 0 }}>
             <button
               type="button"
               onClick={() => {
@@ -765,12 +772,8 @@ export default function HeroSection({
                 setResult(null);
                 setCopyState("");
                 setConsentToSaveText(false);
-
-                if (location.pathname !== "/") {
-                  window.location.href = "/";
-                } else {
-                  window.location.reload();
-                }
+                if (location.pathname !== "/") window.location.href = "/";
+                else window.location.reload();
               }}
               aria-label="Go to ToneCheck home"
               style={{
@@ -789,9 +792,9 @@ export default function HeroSection({
                 className="tc-logo-glow"
                 style={{
                   position: "relative",
-                  width: isMobile ? "58px" : "70px",
-                  height: isMobile ? "58px" : "70px",
-                  borderRadius: "22px",
+                  width: isMobile ? "58px" : "76px",
+                  height: isMobile ? "58px" : "76px",
+                  borderRadius: "24px",
                   display: "grid",
                   placeItems: "center",
                   background:
@@ -823,12 +826,8 @@ export default function HeroSection({
                     textShadow: "0 2px 10px rgba(0,0,0,0.16)",
                   }}
                 >
-                  <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>
-                    T
-                  </span>
-                  <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>
-                    ✓
-                  </span>
+                  <span style={{ fontSize: isMobile ? "24px" : "30px", lineHeight: 1 }}>T</span>
+                  <span style={{ fontSize: isMobile ? "26px" : "32px", lineHeight: 1 }}>✓</span>
                 </div>
               </div>
 
@@ -850,7 +849,7 @@ export default function HeroSection({
                   className="tc-title tc-shimmer"
                   style={{
                     margin: 0,
-                    fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "70px",
+                    fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "76px",
                     lineHeight: 0.92,
                     letterSpacing: "-0.09em",
                     fontWeight: 950,
@@ -870,8 +869,8 @@ export default function HeroSection({
             {isHome && (
               <div
                 style={{
-                  marginTop: "10px",
-                  marginLeft: isMobile ? "0" : "86px",
+                  marginTop: "12px",
+                  marginLeft: isMobile ? "0" : "92px",
                   display: "inline-flex",
                   alignItems: "center",
                   gap: "8px",
@@ -891,13 +890,13 @@ export default function HeroSection({
 
             <p
               style={{
-                margin: isMobile ? "28px 0 0 0" : "32px 0 0 0",
-                maxWidth: "760px",
+                margin: isMobile ? "28px 0 0 0" : "36px 0 0 0",
+                maxWidth: "880px",
                 color: "#334155",
-                fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "38px",
-                lineHeight: isMobile ? 1.1 : 1.15,
-                fontWeight: 900,
-                letterSpacing: "-0.055em",
+                fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "46px",
+                lineHeight: isMobile ? 1.1 : 1.08,
+                fontWeight: 950,
+                letterSpacing: "-0.06em",
               }}
             >
               {displayDescription}
@@ -905,12 +904,12 @@ export default function HeroSection({
 
             <p
               style={{
-                margin: "12px 0 0 0",
-                maxWidth: "800px",
+                margin: "14px 0 0 0",
+                maxWidth: "900px",
                 color: "#475569",
-                fontSize: isMobile ? "16px" : "18px",
+                fontSize: isMobile ? "16px" : "19px",
                 lineHeight: 1.62,
-                fontWeight: 560,
+                fontWeight: 580,
               }}
             >
               {subDescription}
@@ -929,7 +928,7 @@ export default function HeroSection({
 
             <div
               style={{
-                marginTop: "24px",
+                marginTop: "26px",
                 marginBottom: "10px",
                 fontWeight: 850,
                 fontSize: "14px",
@@ -939,13 +938,7 @@ export default function HeroSection({
               Try an example:
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-              }}
-            >
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               {examplesToShow.map((example) => (
                 <button
                   type="button"
@@ -957,7 +950,7 @@ export default function HeroSection({
                     width: isMobile ? "100%" : "auto",
                     justifyContent: "flex-start",
                     textAlign: "left",
-                    padding: isMobile ? "14px 16px" : "11px 16px",
+                    padding: isMobile ? "14px 16px" : "12px 17px",
                     lineHeight: 1.35,
                   }}
                   onClick={() => setExample(example.text)}
@@ -974,8 +967,8 @@ export default function HeroSection({
         {!result && (
           <div
             style={{
-              marginTop: "18px",
-              padding: isMobile ? "16px" : "11px 14px",
+              marginTop: "24px",
+              padding: isMobile ? "16px" : "12px 16px",
               borderRadius: "16px",
               background: livePreview.bg,
               border: livePreview.border,
@@ -1003,14 +996,10 @@ export default function HeroSection({
               setResult(null);
               setCopyState("");
             }}
-            placeholder={
-              isHome
-                ? "Paste the message you're about to send..."
-                : currentTool.placeholder
-            }
+            placeholder={isHome ? "Paste the message you're about to send..." : currentTool.placeholder}
             style={{
               width: "100%",
-              minHeight: isMobile ? "180px" : "235px",
+              minHeight: isMobile ? "180px" : "245px",
               padding: isMobile ? "18px" : "24px 24px 72px",
               fontSize: isMobile ? "18px" : "23px",
               lineHeight: 1.6,
@@ -1071,11 +1060,7 @@ export default function HeroSection({
                 flex: isMobile ? 1 : "unset",
               }}
             >
-              {loading
-                ? "Checking..."
-                : isHome
-                ? "Should I Send This?"
-                : currentTool.analyzeLabel}
+              {loading ? "Checking..." : isHome ? "Should I Send This?" : currentTool.analyzeLabel}
             </button>
 
             {isHome && (
@@ -1105,14 +1090,7 @@ export default function HeroSection({
           </div>
         </div>
 
-        <div
-          style={{
-            marginTop: "14px",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "10px",
-          }}
-        >
+        <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
           <div style={valueChipStyle}>✓ Hidden tone</div>
           <div style={valueChipStyle}>✓ Pressure / blame</div>
           <div style={valueChipStyle}>✓ Calmer rewrite</div>
@@ -1147,14 +1125,7 @@ export default function HeroSection({
           </label>
         </div>
 
-        <div
-          style={{
-            marginTop: "18px",
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-          }}
-        >
+        <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <div style={trustChipStyle}>Difficult texts</div>
           <div style={trustChipStyle}>Family conflict</div>
           <div style={trustChipStyle}>Work replies</div>
@@ -1186,13 +1157,7 @@ export default function HeroSection({
               How this may land
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                gap: "10px",
-                flexWrap: "wrap",
-              }}
-            >
+            <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
               {topOutcomes.map((item) => (
                 <MiniOutcomeChip key={`${item.label}-${item.value}`} item={item} />
               ))}
