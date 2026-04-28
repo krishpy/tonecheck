@@ -173,20 +173,60 @@ export default function ShareCard({
             </div>
           </div>
 
-          <div
-            style={{
-              fontSize: 31,
-              fontWeight: 800,
-              color: "#4c1d95",
-              fontStyle: "italic",
-              textAlign: "right",
-              lineHeight: 1.25,
-            }}
-          >
-            Better messages.
-            <br />
-            Stronger connections. 💜💕
-          </div>
+        <div
+  style={{
+    position: "relative",
+    fontSize: 31,
+    fontWeight: 800,
+    color: "#6d28d9",
+    fontStyle: "italic",
+    textAlign: "right",
+    lineHeight: 1.25,
+    paddingRight: 80,
+    minWidth: 430,
+  }}
+>
+  Better messages.
+  <br />
+  Stronger connections.
+
+  <div
+    style={{
+      position: "absolute",
+      left: 78,
+      bottom: -18,
+      width: 210,
+      height: 4,
+      background: "#7c3aed",
+      borderRadius: 999,
+      transform: "rotate(-3deg)",
+    }}
+  />
+
+  <div
+    style={{
+      position: "absolute",
+      right: 0,
+      top: -6,
+      fontSize: 34,
+      letterSpacing: 6,
+    }}
+  >
+    💕💜
+  </div>
+
+  <div
+    style={{
+      position: "absolute",
+      right: 34,
+      top: 34,
+      fontSize: 22,
+      color: "#a855f7",
+    }}
+  >
+    ⤳ · · ·
+  </div>
+</div>
         </div>
 
         {/* Message Hero */}
@@ -415,30 +455,34 @@ export default function ShareCard({
                 textAlign: "left",
               }}
             >
-              <div
-                style={{
-                  position: "absolute",
-                  right: 42,
-                  top: 38,
-                  width: 132,
-                  height: 132,
-                  borderRadius: "50%",
-                  border: "4px solid #16a34a",
-                  color: "#16a34a",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  transform: "rotate(-11deg)",
-                  fontSize: 21,
-                  fontWeight: 1000,
-                  textAlign: "center",
-                  lineHeight: 1.15,
-                }}
-              >
-                SAVED BY
-                <br />
-                T✓
-              </div>
+             <div
+  style={{
+    position: "absolute",
+    right: 34,
+    top: 28,
+    width: 138,
+    height: 138,
+    borderRadius: "50%",
+    border: "5px double #16a34a",
+    color: "#16a34a",
+    background: "rgba(236,253,245,0.92)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    transform: "rotate(-13deg)",
+    fontWeight: 1000,
+    textAlign: "center",
+    lineHeight: 1.1,
+    boxShadow: "0 8px 20px rgba(22,163,74,0.12)",
+    zIndex: 1,
+  }}
+>
+  <div>
+    <div style={{ fontSize: 16, letterSpacing: ".08em" }}>SAVED BY</div>
+    <div style={{ fontSize: 46, lineHeight: 1 }}>T✓</div>
+    <div style={{ fontSize: 13, letterSpacing: ".12em" }}>TONECHECK</div>
+  </div>
+</div>
 
               <div
                 style={{
@@ -452,18 +496,19 @@ export default function ShareCard({
                 ✨ MESSAGE I’D SEND INSTEAD
               </div>
 
-              <div
-                style={{
-                  fontSize: rewrite.length > 180 ? 34 : 43,
-                  fontWeight: 1000,
-                  lineHeight: 1.35,
-                  maxWidth: 900,
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                }}
-              >
-                “{rewrite}”
-              </div>
+           <div
+  style={{
+    fontSize: rewrite.length > 180 ? 34 : 43,
+    fontWeight: 1000,
+    lineHeight: 1.35,
+    maxWidth: 760,
+    paddingRight: 170,
+    whiteSpace: "pre-wrap",
+    wordBreak: "break-word",
+  }}
+>
+  “{rewrite}”
+</div>
 
               <div style={{ display: "flex", gap: 16, marginTop: 28 }}>
                 {["Calmer", "Clearer", "More likely reply"].map((x) => (
