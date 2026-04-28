@@ -481,7 +481,7 @@ async function joinWhatsappBeta() {
       throw new Error(data?.detail || "Signup failed");
     }
 
-    setWaitlistStatus("You’re on the WhatsApp beta list ✅");
+    setWaitlistStatus("You're in early access 🚀");
     setWaitlistName("");
     setWaitlistEmail("");
   } catch (err) {
@@ -850,7 +850,8 @@ async function joinWhatsappBeta() {
             marginBottom: "6px",
           }}
         >
-          📲 WhatsApp Beta Opening Soon
+          📲 WhatsApp Beta Waitlist Open
+          Limited early access spots
         </div>
 
         <div
