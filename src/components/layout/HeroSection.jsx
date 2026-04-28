@@ -1,4 +1,4 @@
-import React, { useMemo, useState  } from "react";
+import React, { useMemo, useState } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 
 const TOOLTIP_MAP = {
@@ -441,55 +441,56 @@ export default function HeroSection({
 }) {
   const isMobile = useIsMobile();
   const isHome = location.pathname === "/";
+
   const [waitlistName, setWaitlistName] = useState("");
-const [waitlistEmail, setWaitlistEmail] = useState("");
-const [waitlistStatus, setWaitlistStatus] = useState("");
-const [waitlistLoading, setWaitlistLoading] = useState(false);
+  const [waitlistEmail, setWaitlistEmail] = useState("");
+  const [waitlistStatus, setWaitlistStatus] = useState("");
+  const [waitlistLoading, setWaitlistLoading] = useState(false);
 
-async function joinWhatsappBeta() {
-  const email = waitlistEmail.trim();
-  const name = waitlistName.trim();
+  async function joinWhatsappBeta() {
+    const email = waitlistEmail.trim();
+    const name = waitlistName.trim();
 
-  if (!email || !email.includes("@")) {
-    setWaitlistStatus("Enter a valid email.");
-    return;
-  }
-
-  try {
-    setWaitlistLoading(true);
-    setWaitlistStatus("");
-
-    const res = await fetch(
-      "https://communication-intelligence-api.onrender.com/waitlist/signup",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          source: "tonecheck-homepage",
-          interest: "whatsapp-beta",
-        }),
-      }
-    );
-
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      throw new Error(data?.detail || "Signup failed");
+    if (!email || !email.includes("@")) {
+      setWaitlistStatus("Enter a valid email.");
+      return;
     }
 
-    setWaitlistStatus("You're in early access 🚀");
-    setWaitlistName("");
-    setWaitlistEmail("");
-  } catch (err) {
-    setWaitlistStatus("Could not join right now. Try again.");
-  } finally {
-    setWaitlistLoading(false);
+    try {
+      setWaitlistLoading(true);
+      setWaitlistStatus("");
+
+      const res = await fetch(
+        "https://communication-intelligence-api.onrender.com/waitlist/signup",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            source: "tonecheck-homepage",
+            interest: "whatsapp-beta",
+          }),
+        }
+      );
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(data?.detail || "Signup failed");
+      }
+
+      setWaitlistStatus("You're in early access 🚀");
+      setWaitlistName("");
+      setWaitlistEmail("");
+    } catch (err) {
+      setWaitlistStatus("Could not join right now. Try again.");
+    } finally {
+      setWaitlistLoading(false);
+    }
   }
-}
 
   const examplesToShow = isHome ? VIRAL_HOME_EXAMPLES : currentTool.examples;
 
@@ -552,7 +553,8 @@ async function joinWhatsappBeta() {
 
   const strongChipStyle = {
     ...chipStyle,
-    background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92))",
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248,250,252,0.92))",
     border: "1px solid rgba(79,70,229,0.18)",
     color: "#1f2937",
     boxShadow: "0 8px 22px rgba(79,70,229,0.08)",
@@ -561,20 +563,158 @@ async function joinWhatsappBeta() {
   const valueChipStyle = {
     ...chipStyle,
     cursor: "default",
-    background: "linear-gradient(135deg, rgba(238,242,255,0.98), rgba(250,245,255,0.95))",
-    color: "#3730a3",
-    border: "1px solid rgba(99,102,241,0.22)",
+    background:
+      "linear-gradient(135deg, rgba(67,56,202,0.10), rgba(236,72,153,0.10))",
+    color: "#312e81",
+    border: "1px solid rgba(99,102,241,0.24)",
     boxShadow: "0 8px 22px rgba(99,102,241,0.10)",
   };
 
   const trustChipStyle = {
     ...chipStyle,
     cursor: "default",
-    background: "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.94))",
+    background:
+      "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(245,243,255,0.94))",
     color: "#5b21b6",
     border: "1px solid rgba(124,58,237,0.20)",
     boxShadow: "0 8px 22px rgba(124,58,237,0.08)",
   };
+
+  const betaCard = isHome && !result && (
+    <div
+      style={{
+        padding: isMobile ? "18px" : "22px",
+        borderRadius: "28px",
+        background:
+          "linear-gradient(135deg, rgba(17,24,39,0.97), rgba(67,56,202,0.94), rgba(236,72,153,0.90))",
+        color: "#ffffff",
+        boxShadow:
+          "0 24px 60px rgba(79,70,229,0.24), 0 12px 32px rgba(236,72,153,0.14)",
+        border: "1px solid rgba(255,255,255,0.22)",
+        minHeight: isMobile ? "auto" : "330px",
+      }}
+    >
+      <div
+        style={{
+          fontSize: "12px",
+          fontWeight: 950,
+          letterSpacing: "0.16em",
+          textTransform: "uppercase",
+          opacity: 0.9,
+          marginBottom: "10px",
+        }}
+      >
+        📲 WhatsApp Beta
+      </div>
+
+      <div
+        style={{
+          fontSize: isMobile ? "28px" : "34px",
+          lineHeight: 1.02,
+          fontWeight: 950,
+          letterSpacing: "-0.06em",
+          marginBottom: "10px",
+        }}
+      >
+        Text me before you text them.
+      </div>
+
+      <div
+        style={{
+          fontSize: "14px",
+          lineHeight: 1.5,
+          opacity: 0.92,
+          fontWeight: 650,
+          marginBottom: "16px",
+        }}
+      >
+        Join early access. Forward risky drafts to ToneCheck on WhatsApp before sending.
+      </div>
+
+      <input
+        value={waitlistName}
+        onChange={(e) => setWaitlistName(e.target.value)}
+        placeholder="Name"
+        style={{
+          width: "100%",
+          padding: "14px 15px",
+          borderRadius: "15px",
+          border: "1px solid rgba(255,255,255,0.25)",
+          marginBottom: "10px",
+          boxSizing: "border-box",
+          fontWeight: 750,
+          outline: "none",
+        }}
+      />
+
+      <input
+        value={waitlistEmail}
+        onChange={(e) => setWaitlistEmail(e.target.value)}
+        placeholder="Email"
+        type="email"
+        style={{
+          width: "100%",
+          padding: "14px 15px",
+          borderRadius: "15px",
+          border: "1px solid rgba(255,255,255,0.25)",
+          marginBottom: "12px",
+          boxSizing: "border-box",
+          fontWeight: 750,
+          outline: "none",
+        }}
+      />
+
+      <button
+        type="button"
+        onClick={joinWhatsappBeta}
+        disabled={waitlistLoading}
+        style={{
+          width: "100%",
+          padding: "15px 18px",
+          borderRadius: "16px",
+          border: "none",
+          cursor: waitlistLoading ? "not-allowed" : "pointer",
+          fontWeight: 950,
+          color: "#111827",
+          background: "#ffffff",
+          boxShadow: "0 14px 30px rgba(0,0,0,0.18)",
+        }}
+      >
+        {waitlistLoading ? "Joining..." : "Join Beta 🚀"}
+      </button>
+
+      {waitlistStatus && (
+        <div
+          style={{
+            marginTop: "11px",
+            fontSize: "13px",
+            fontWeight: 850,
+            color:
+              waitlistStatus.includes("✅") || waitlistStatus.includes("🚀")
+                ? "#bbf7d0"
+                : "#fde68a",
+          }}
+        >
+          {waitlistStatus}
+        </div>
+      )}
+
+      <div
+        style={{
+          marginTop: "14px",
+          display: "grid",
+          gap: "7px",
+          fontSize: "13px",
+          fontWeight: 750,
+          opacity: 0.9,
+        }}
+      >
+        <div>✓ Free during beta</div>
+        <div>✓ Priority invites</div>
+        <div>✓ Early users shape features</div>
+      </div>
+    </div>
+  );
 
   return (
     <div
@@ -609,354 +749,232 @@ async function joinWhatsappBeta() {
           </div>
         )}
 
-        <button
-          type="button"
-        onClick={() => {
-  setMessage("");
-  setResult(null);
-  setCopyState("");
-  setConsentToSaveText(false);
-
-  if (location.pathname !== "/") {
-    window.location.href = "/";
-  } else {
-    window.location.reload();
-  }
-}}
-          aria-label="Go to ToneCheck home"
-          style={{
-            border: "none",
-            background: "transparent",
-            padding: 0,
-            margin: 0,
-            cursor: "pointer",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: isMobile ? "12px" : "16px",
-            textAlign: "left",
-          }}
-        >
-          <div
-            className="tc-logo-glow"
-            style={{
-              position: "relative",
-              width: isMobile ? "58px" : "70px",
-              height: isMobile ? "58px" : "70px",
-              borderRadius: "22px",
-              display: "grid",
-              placeItems: "center",
-              background:
-                "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
-              boxShadow:
-                "0 14px 34px rgba(99,102,241,0.26), inset 0 1px 0 rgba(255,255,255,0.36)",
-              border: "1px solid rgba(255,255,255,0.32)",
-              overflow: "hidden",
-              flexShrink: 0,
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                inset: "8px",
-                borderRadius: "16px",
-                border: "1px solid rgba(255,255,255,0.24)",
-              }}
-            />
-            <div
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "baseline",
-                gap: "1px",
-                color: "#ffffff",
-                fontWeight: 900,
-                letterSpacing: "-0.08em",
-                textShadow: "0 2px 10px rgba(0,0,0,0.16)",
-              }}
-            >
-              <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>
-                T
-              </span>
-              <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>
-                ✓
-              </span>
-            </div>
-          </div>
-
-          <div style={{ minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: isMobile ? "10px" : "12px",
-                fontWeight: 850,
-                letterSpacing: "0.22em",
-                color: "#6366f1",
-                textTransform: "uppercase",
-                marginBottom: "6px",
-              }}
-            >
-              {currentTool.eyebrow}
-            </div>
-
-            <h1
-              className="tc-title tc-shimmer"
-              style={{
-                margin: 0,
-                fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "70px",
-                lineHeight: 0.92,
-                letterSpacing: "-0.09em",
-                fontWeight: 950,
-                background:
-                  "linear-gradient(135deg, #0f172a 0%, #312e81 32%, #7c3aed 68%, #ec4899 100%)",
-                backgroundSize: "200% 200%",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                wordBreak: "break-word",
-              }}
-            >
-              {isHome ? "ToneCheck" : currentTool.title}
-            </h1>
-          </div>
-        </button>
-
-        {isHome && (
-          <div
-            style={{
-              marginTop: "10px",
-              marginLeft: isMobile ? "0" : "86px",
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "9px 15px",
-              borderRadius: "999px",
-              background: "linear-gradient(135deg,#eef2ff,#fdf2f8)",
-              fontWeight: 850,
-              fontSize: "14px",
-              color: "#4338ca",
-              boxShadow: "0 8px 22px rgba(99,102,241,0.12)",
-              border: "1px solid rgba(99,102,241,0.18)",
-            }}
-          >
-            ✨ The spellcheck for tone
-          </div>
-        )}
-
-        <p
-          style={{
-            margin: isMobile ? "28px 0 0 0" : "32px 0 0 0",
-            maxWidth: "760px",
-            color: "#334155",
-            fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "38px",
-            lineHeight: isMobile ? 1.1 : 1.15,
-            fontWeight: 900,
-            letterSpacing: "-0.055em",
-          }}
-        >
-          {displayDescription}
-        </p>
-
-        <p
-          style={{
-            margin: "12px 0 0 0",
-            maxWidth: "800px",
-            color: "#475569",
-            fontSize: isMobile ? "16px" : "18px",
-            lineHeight: 1.62,
-            fontWeight: 560,
-          }}
-        >
-          {subDescription}
-        </p>
-
         <div
           style={{
-            marginTop: "12px",
-            fontSize: "12px",
-            color: "#64748b",
-            fontWeight: 650,
+            display: "grid",
+            gridTemplateColumns: isMobile || !isHome || result ? "1fr" : "1.35fr 0.75fr",
+            gap: isMobile ? "22px" : "30px",
+            alignItems: "start",
           }}
         >
-          Tone signals can miss context. Use judgment before sending.
-        </div>
-
-        <div
-          style={{
-            marginTop: "24px",
-            marginBottom: "10px",
-            fontWeight: 850,
-            fontSize: "14px",
-            color: "#64748b",
-          }}
-        >
-          Try an example:
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            gap: "10px",
-            flexWrap: "wrap",
-          }}
-        >
-          {examplesToShow.map((example) => (
+          <div>
             <button
               type="button"
-              key={example.label}
-              className="tc-chip-hover"
-              style={{
-                ...strongChipStyle,
-                fontWeight: 800,
-                width: isMobile ? "100%" : "auto",
-                justifyContent: "flex-start",
-                textAlign: "left",
-                padding: isMobile ? "14px 16px" : "11px 16px",
-                lineHeight: 1.35,
+              onClick={() => {
+                setMessage("");
+                setResult(null);
+                setCopyState("");
+                setConsentToSaveText(false);
+
+                if (location.pathname !== "/") {
+                  window.location.href = "/";
+                } else {
+                  window.location.reload();
+                }
               }}
-              onClick={() => setExample(example.text)}
+              aria-label="Go to ToneCheck home"
+              style={{
+                border: "none",
+                background: "transparent",
+                padding: 0,
+                margin: 0,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: isMobile ? "12px" : "16px",
+                textAlign: "left",
+              }}
             >
-              {example.label}
+              <div
+                className="tc-logo-glow"
+                style={{
+                  position: "relative",
+                  width: isMobile ? "58px" : "70px",
+                  height: isMobile ? "58px" : "70px",
+                  borderRadius: "22px",
+                  display: "grid",
+                  placeItems: "center",
+                  background:
+                    "linear-gradient(135deg, rgba(99,102,241,0.96), rgba(236,72,153,0.92))",
+                  boxShadow:
+                    "0 14px 34px rgba(99,102,241,0.26), inset 0 1px 0 rgba(255,255,255,0.36)",
+                  border: "1px solid rgba(255,255,255,0.32)",
+                  overflow: "hidden",
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: "8px",
+                    borderRadius: "16px",
+                    border: "1px solid rgba(255,255,255,0.24)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "relative",
+                    display: "flex",
+                    alignItems: "baseline",
+                    gap: "1px",
+                    color: "#ffffff",
+                    fontWeight: 900,
+                    letterSpacing: "-0.08em",
+                    textShadow: "0 2px 10px rgba(0,0,0,0.16)",
+                  }}
+                >
+                  <span style={{ fontSize: isMobile ? "24px" : "28px", lineHeight: 1 }}>
+                    T
+                  </span>
+                  <span style={{ fontSize: isMobile ? "26px" : "30px", lineHeight: 1 }}>
+                    ✓
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: isMobile ? "10px" : "12px",
+                    fontWeight: 850,
+                    letterSpacing: "0.22em",
+                    color: "#6366f1",
+                    textTransform: "uppercase",
+                    marginBottom: "6px",
+                  }}
+                >
+                  {currentTool.eyebrow}
+                </div>
+
+                <h1
+                  className="tc-title tc-shimmer"
+                  style={{
+                    margin: 0,
+                    fontSize: isMobile ? "clamp(42px, 12vw, 56px)" : "70px",
+                    lineHeight: 0.92,
+                    letterSpacing: "-0.09em",
+                    fontWeight: 950,
+                    background:
+                      "linear-gradient(135deg, #0f172a 0%, #312e81 32%, #7c3aed 68%, #ec4899 100%)",
+                    backgroundSize: "200% 200%",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    wordBreak: "break-word",
+                  }}
+                >
+                  {isHome ? "ToneCheck" : currentTool.title}
+                </h1>
+              </div>
             </button>
-          ))}
+
+            {isHome && (
+              <div
+                style={{
+                  marginTop: "10px",
+                  marginLeft: isMobile ? "0" : "86px",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  padding: "9px 15px",
+                  borderRadius: "999px",
+                  background: "linear-gradient(135deg,#eef2ff,#fdf2f8)",
+                  fontWeight: 850,
+                  fontSize: "14px",
+                  color: "#4338ca",
+                  boxShadow: "0 8px 22px rgba(99,102,241,0.12)",
+                  border: "1px solid rgba(99,102,241,0.18)",
+                }}
+              >
+                ✨ The spellcheck for tone
+              </div>
+            )}
+
+            <p
+              style={{
+                margin: isMobile ? "28px 0 0 0" : "32px 0 0 0",
+                maxWidth: "760px",
+                color: "#334155",
+                fontSize: isMobile ? "clamp(28px, 8vw, 38px)" : "38px",
+                lineHeight: isMobile ? 1.1 : 1.15,
+                fontWeight: 900,
+                letterSpacing: "-0.055em",
+              }}
+            >
+              {displayDescription}
+            </p>
+
+            <p
+              style={{
+                margin: "12px 0 0 0",
+                maxWidth: "800px",
+                color: "#475569",
+                fontSize: isMobile ? "16px" : "18px",
+                lineHeight: 1.62,
+                fontWeight: 560,
+              }}
+            >
+              {subDescription}
+            </p>
+
+            <div
+              style={{
+                marginTop: "12px",
+                fontSize: "12px",
+                color: "#64748b",
+                fontWeight: 650,
+              }}
+            >
+              Tone signals can miss context. Use judgment before sending.
+            </div>
+
+            <div
+              style={{
+                marginTop: "24px",
+                marginBottom: "10px",
+                fontWeight: 850,
+                fontSize: "14px",
+                color: "#64748b",
+              }}
+            >
+              Try an example:
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: "10px",
+                flexWrap: "wrap",
+              }}
+            >
+              {examplesToShow.map((example) => (
+                <button
+                  type="button"
+                  key={example.label}
+                  className="tc-chip-hover"
+                  style={{
+                    ...strongChipStyle,
+                    fontWeight: 800,
+                    width: isMobile ? "100%" : "auto",
+                    justifyContent: "flex-start",
+                    textAlign: "left",
+                    padding: isMobile ? "14px 16px" : "11px 16px",
+                    lineHeight: 1.35,
+                  }}
+                  onClick={() => setExample(example.text)}
+                >
+                  {example.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {betaCard}
         </div>
-
-        {isHome && !result && (
-  <div
-    style={{
-      marginTop: "22px",
-      padding: isMobile ? "18px" : "20px",
-      borderRadius: "26px",
-      background:
-        "linear-gradient(135deg, rgba(99,102,241,0.10), rgba(236,72,153,0.10), rgba(255,255,255,0.88))",
-      border: "1px solid rgba(124,58,237,0.20)",
-      boxShadow: "0 14px 34px rgba(99,102,241,0.10)",
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        flexDirection: isMobile ? "column" : "row",
-        gap: "14px",
-        alignItems: isMobile ? "stretch" : "center",
-        justifyContent: "space-between",
-      }}
-    >
-      <div>
-        <div
-          style={{
-            fontSize: "13px",
-            fontWeight: 900,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            color: "#7c3aed",
-            marginBottom: "6px",
-          }}
-        >
-          📲 WhatsApp Beta Waitlist Open
-          Limited early access spots
-        </div>
-
-        <div
-          style={{
-            fontSize: isMobile ? "22px" : "26px",
-            lineHeight: 1.1,
-            fontWeight: 950,
-            letterSpacing: "-0.045em",
-            color: "#111827",
-          }}
-        >
-          Text me before you text them.
-        </div>
-
-        <div
-          style={{
-            marginTop: "8px",
-            color: "#475569",
-            fontSize: "15px",
-            fontWeight: 600,
-            lineHeight: 1.45,
-          }}
-        >
-          Join early access. Forward a risky draft to ToneCheck on WhatsApp before sending.
-        </div>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          flexDirection: isMobile ? "column" : "row",
-          gap: "10px",
-          minWidth: isMobile ? "100%" : "520px",
-        }}
-      >
-        <input
-          value={waitlistName}
-          onChange={(e) => setWaitlistName(e.target.value)}
-          placeholder="Name"
-          style={{
-            flex: 1,
-            padding: "14px 16px",
-            borderRadius: "16px",
-            border: "1px solid rgba(99,102,241,0.22)",
-            fontWeight: 700,
-            outline: "none",
-          }}
-        />
-
-        <input
-          value={waitlistEmail}
-          onChange={(e) => setWaitlistEmail(e.target.value)}
-          placeholder="Email"
-          type="email"
-          style={{
-            flex: 1.2,
-            padding: "14px 16px",
-            borderRadius: "16px",
-            border: "1px solid rgba(99,102,241,0.22)",
-            fontWeight: 700,
-            outline: "none",
-          }}
-        />
-
-        <button
-          type="button"
-          onClick={joinWhatsappBeta}
-          disabled={waitlistLoading}
-          style={{
-            padding: "14px 18px",
-            borderRadius: "16px",
-            border: "none",
-            cursor: waitlistLoading ? "not-allowed" : "pointer",
-            fontWeight: 900,
-            color: "#fff",
-            background:
-              "linear-gradient(135deg, #111827, #7c3aed, #ec4899)",
-            boxShadow: "0 12px 26px rgba(124,58,237,0.22)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {waitlistLoading ? "Joining..." : "Join Beta"}
-        </button>
-      </div>
-    </div>
-
-    {waitlistStatus && (
-      <div
-        style={{
-          marginTop: "10px",
-          fontSize: "13px",
-          fontWeight: 800,
-          color: waitlistStatus.includes("✅") ? "#15803d" : "#b45309",
-        }}
-      >
-        {waitlistStatus}
-      </div>
-    )}
-  </div>
-)}
 
         {!result && (
           <div
             style={{
-              marginTop: "14px",
+              marginTop: "18px",
               padding: isMobile ? "16px" : "11px 14px",
               borderRadius: "16px",
               background: livePreview.bg,
@@ -967,7 +985,7 @@ async function joinWhatsappBeta() {
               display: "flex",
               alignItems: "center",
               gap: "8px",
-              width: isMobile ? "100%" : "100%",
+              width: "100%",
               boxSizing: "border-box",
             }}
           >
@@ -1040,51 +1058,50 @@ async function joinWhatsappBeta() {
               Clear
             </button>
 
-<button
-  type="button"
-  className="tc-button-hover"
-  onClick={() => analyze()}
-  disabled={loading || !message.trim()}
-  style={{
-    ...primaryButtonStyle,
-    opacity: loading || !message.trim() ? 0.7 : 1,
-    minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
-    width: isMobile ? "100%" : primaryButtonStyle?.width,
-    flex: isMobile ? 1 : "unset",
-  }}
->
-  {loading
-    ? "Checking..."
-    : isHome
-    ? "Should I Send This?"
-    : currentTool.analyzeLabel}
-</button>
+            <button
+              type="button"
+              className="tc-button-hover"
+              onClick={() => analyze()}
+              disabled={loading || !message.trim()}
+              style={{
+                ...primaryButtonStyle,
+                opacity: loading || !message.trim() ? 0.7 : 1,
+                minHeight: isMobile ? "54px" : primaryButtonStyle?.minHeight,
+                width: isMobile ? "100%" : primaryButtonStyle?.width,
+                flex: isMobile ? 1 : "unset",
+              }}
+            >
+              {loading
+                ? "Checking..."
+                : isHome
+                ? "Should I Send This?"
+                : currentTool.analyzeLabel}
+            </button>
 
-{isHome && (
-  <a
-    href="https://www.producthunt.com/products/tonecheck-spellcheck-for-tone"
-    target="_blank"
-    rel="noreferrer"
-style={{
-  display: "inline-flex",
-  alignItems: "center",
-  gap: "6px",
-  padding: "10px 14px",
-  borderRadius: "999px",
-  background: "#fff7ed",
-  border: "1px solid #fdba74",
-  color: "#c2410c",
-  fontWeight: 700,
-  fontSize: "13px",
-  textDecoration: "none",
-  whiteSpace: "nowrap",
-  marginLeft: "10px"
-}}
-  >
-    🚀 PH Launch
-  </a>
-)}
-
+            {isHome && (
+              <a
+                href="https://www.producthunt.com/products/tonecheck-spellcheck-for-tone"
+                target="_blank"
+                rel="noreferrer"
+                style={{
+                  display: isMobile ? "none" : "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "10px 14px",
+                  borderRadius: "999px",
+                  background: "#fff7ed",
+                  border: "1px solid #fdba74",
+                  color: "#c2410c",
+                  fontWeight: 700,
+                  fontSize: "13px",
+                  textDecoration: "none",
+                  whiteSpace: "nowrap",
+                  marginLeft: "10px",
+                }}
+              >
+                🚀 PH Launch
+              </a>
+            )}
           </div>
         </div>
 
@@ -1096,9 +1113,9 @@ style={{
             gap: "10px",
           }}
         >
-          <div style={valueChipStyle}>✓ Detect hidden tone</div>
-          <div style={valueChipStyle}>✓ Spot pressure or blame</div>
-          <div style={valueChipStyle}>✓ Get calmer rewrites</div>
+          <div style={valueChipStyle}>✓ Hidden tone</div>
+          <div style={valueChipStyle}>✓ Pressure / blame</div>
+          <div style={valueChipStyle}>✓ Calmer rewrite</div>
         </div>
 
         <div
@@ -1138,10 +1155,10 @@ style={{
             flexWrap: "wrap",
           }}
         >
-          <div style={trustChipStyle}>Used for difficult texts</div>
+          <div style={trustChipStyle}>Difficult texts</div>
           <div style={trustChipStyle}>Family conflict</div>
-          <div style={trustChipStyle}>Sensitive work replies</div>
-          <div style={trustChipStyle}>Apology messages</div>
+          <div style={trustChipStyle}>Work replies</div>
+          <div style={trustChipStyle}>Apologies</div>
         </div>
 
         {result && (
