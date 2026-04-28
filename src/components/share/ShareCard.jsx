@@ -78,6 +78,89 @@ function Pill({ icon, label, safe = false }) {
   );
 }
 
+function RiskMiniBadge({ risk, safe }) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: 26,
+        top: 24,
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "10px 14px",
+        borderRadius: 18,
+        background: "#ffffff",
+        border: `1.5px solid ${safe ? "#bbf7d0" : "#fecdd3"}`,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 20,
+          fontWeight: 1000,
+          color: "#101a44",
+          letterSpacing: ".03em",
+        }}
+      >
+        CONFLICT RISK
+      </span>
+      <span
+        style={{
+          fontSize: 28,
+          fontWeight: 1000,
+          color: safe ? "#16a34a" : "#f43f5e",
+        }}
+      >
+        {risk}%
+      </span>
+      <span
+        style={{
+          padding: "7px 12px",
+          borderRadius: 999,
+          background: safe ? "#16a34a" : "#f59e0b",
+          color: "#fff",
+          fontSize: 16,
+          fontWeight: 1000,
+        }}
+      >
+        {riskLevel(risk)}
+      </span>
+    </div>
+  );
+}
+
+function SavedStamp() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        right: 30,
+        bottom: 30,
+        width: 108,
+        height: 108,
+        borderRadius: "50%",
+        border: "4px double #16a34a",
+        color: "#16a34a",
+        background: "rgba(236,253,245,0.95)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transform: "rotate(-12deg)",
+        fontWeight: 1000,
+        textAlign: "center",
+        lineHeight: 1.05,
+        boxShadow: "0 8px 18px rgba(22,163,74,0.12)",
+      }}
+    >
+      <div>
+        <div style={{ fontSize: 13, letterSpacing: ".08em" }}>SAVED BY</div>
+        <div style={{ fontSize: 38 }}>T✓</div>
+        <div style={{ fontSize: 11, letterSpacing: ".1em" }}>TONECHECK</div>
+      </div>
+    </div>
+  );
+}
+
 export default function ShareCard({
   toolTitle = "ToneCheck",
   message = "",
@@ -102,9 +185,7 @@ export default function ShareCard({
     : "This may not get the reply you want.";
 
   const toneLabel = safe ? cleanLabel(tone, "Polite") : cleanLabel(tone, "Accusatory");
-  const signalLabel = safe
-    ? "Likely safe"
-    : cleanLabel(hiddenSignal, "Accusation Signal");
+  const signalLabel = safe ? "Likely safe" : cleanLabel(hiddenSignal, "Accusation Signal");
 
   return (
     <div
@@ -151,8 +232,7 @@ export default function ShareCard({
                 Tone
                 <span
                   style={{
-                    background:
-                      "linear-gradient(135deg,#4f46e5,#8b5cf6,#ec4899)",
+                    background: "linear-gradient(135deg,#4f46e5,#8b5cf6,#ec4899)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                   }}
@@ -173,60 +253,59 @@ export default function ShareCard({
             </div>
           </div>
 
-        <div
-  style={{
-    position: "relative",
-    fontSize: 31,
-    fontWeight: 800,
-    color: "#6d28d9",
-    fontStyle: "italic",
-    textAlign: "right",
-    lineHeight: 1.25,
-    paddingRight: 80,
-    minWidth: 430,
-  }}
->
-  Better messages.
-  <br />
-  Stronger connections.
+          <div
+            style={{
+              position: "relative",
+              fontSize: 34,
+              fontWeight: 800,
+              color: "#7c3aed",
+              fontStyle: "italic",
+              textAlign: "center",
+              lineHeight: 1.12,
+              minWidth: 500,
+              paddingTop: 4,
+            }}
+          >
+            Better messages.
+            <br />
+            Stronger connections.
 
-  <div
-    style={{
-      position: "absolute",
-      left: 78,
-      bottom: -18,
-      width: 210,
-      height: 4,
-      background: "#7c3aed",
-      borderRadius: 999,
-      transform: "rotate(-3deg)",
-    }}
-  />
+            <div
+              style={{
+                position: "absolute",
+                left: 140,
+                bottom: -14,
+                width: 260,
+                height: 4,
+                background: "#7c3aed",
+                borderRadius: 999,
+                transform: "rotate(-3deg)",
+              }}
+            />
 
-  <div
-    style={{
-      position: "absolute",
-      right: 0,
-      top: -6,
-      fontSize: 34,
-      letterSpacing: 6,
-    }}
-  >
-    💕💜
-  </div>
+            <div
+              style={{
+                position: "absolute",
+                right: 12,
+                top: 14,
+                fontSize: 34,
+              }}
+            >
+              💕💜
+            </div>
 
-  <div
-    style={{
-      position: "absolute",
-      right: 34,
-      top: 34,
-      fontSize: 22,
-      color: "#a855f7",
-    }}
-  >
-    ⤳ · · ·
-  </div>
-</div>
+            <div
+              style={{
+                position: "absolute",
+                right: 52,
+                top: 54,
+                fontSize: 24,
+                color: "#a855f7",
+              }}
+            >
+              ⤳ · · ·
+            </div>
+          </div>
         </div>
 
         {/* Message Hero */}
@@ -238,105 +317,51 @@ export default function ShareCard({
             padding: "34px 38px",
             marginBottom: 28,
             position: "relative",
+            textAlign: "left",
           }}
         >
+          <RiskMiniBadge risk={safeRisk} safe={safe} />
+
+          <div
+            style={{
+              color: primaryColor,
+              fontSize: 30,
+              fontWeight: 1000,
+              letterSpacing: ".04em",
+              marginBottom: 26,
+              paddingRight: 360,
+            }}
+          >
+            {safe ? "✅" : "⚠️"} {titleText}
+          </div>
+
+          <div
+            style={{
+              fontSize: message.length > 160 ? 32 : message.length > 90 ? 40 : 48,
+              fontWeight: 1000,
+              lineHeight: 1.28,
+              letterSpacing: "-.035em",
+              color: "#101a44",
+              whiteSpace: "normal",
+              wordBreak: "normal",
+              overflowWrap: "break-word",
+              paddingRight: 90,
+            }}
+          >
+            “{message || "No message provided."}”
+          </div>
+
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              gap: 28,
+              flexWrap: "wrap",
+              gap: 16,
+              marginTop: 30,
             }}
           >
-            <div style={{ flex: 1, textAlign: "left" }}>
-              <div
-                style={{
-                  color: primaryColor,
-                  fontSize: 30,
-                  fontWeight: 1000,
-                  letterSpacing: ".04em",
-                  marginBottom: 28,
-                }}
-              >
-                {safe ? "✅" : "⚠️"} {titleText}
-              </div>
-
-              <div
-                style={{
-                  fontSize: message.length > 120 ? 38 : 52,
-                  fontWeight: 1000,
-                  lineHeight: 1.22,
-                  letterSpacing: "-.04em",
-                  color: "#101a44",
-                  whiteSpace: "pre-wrap",
-                  wordBreak: "break-word",
-                  maxHeight: 190,
-                  overflow: "hidden",
-                }}
-              >
-                “{message || "No message provided."}”
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 16,
-                  marginTop: 30,
-                }}
-              >
-                <Pill icon={safe ? "😊" : "😡"} label={toneLabel} safe={safe} />
-                <Pill icon={safe ? "✅" : "⚠️"} label={signalLabel} safe={safe} />
-                {!safe && <Pill icon="💬" label="Reply risk" safe={false} />}
-              </div>
-            </div>
-
-            <div
-              style={{
-                minWidth: 230,
-                borderRadius: 26,
-                background: "#fff",
-                border: `2px solid ${borderColor}`,
-                padding: "24px 24px",
-                textAlign: "center",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 24,
-                  fontWeight: 1000,
-                  color: "#101a44",
-                  letterSpacing: ".03em",
-                }}
-              >
-                CONFLICT RISK
-              </div>
-              <div
-                style={{
-                  fontSize: 76,
-                  fontWeight: 1000,
-                  color: primaryColor,
-                  lineHeight: 1,
-                  marginTop: 12,
-                }}
-              >
-                {safeRisk}%
-              </div>
-              <div
-                style={{
-                  display: "inline-block",
-                  marginTop: 12,
-                  padding: "10px 22px",
-                  borderRadius: 999,
-                  background: safe ? "#16a34a" : "#f59e0b",
-                  color: "#fff",
-                  fontSize: 21,
-                  fontWeight: 1000,
-                }}
-              >
-                {riskLevel(safeRisk)}
-              </div>
-            </div>
+            <Pill icon={safe ? "😊" : "😡"} label={toneLabel} safe={safe} />
+            <Pill icon={safe ? "✅" : "⚠️"} label={signalLabel} safe={safe} />
+            {!safe && <Pill icon="💬" label="Reply risk" safe={false} />}
           </div>
 
           <div
@@ -345,7 +370,6 @@ export default function ShareCard({
               color: "#1f2a5b",
               fontSize: 26,
               lineHeight: 1.4,
-              textAlign: "left",
             }}
           >
             {outcomeText}
@@ -382,12 +406,12 @@ export default function ShareCard({
           >
             {[
               {
-                icon: safe ? "🎯" : "🎯",
+                icon: "🎯",
                 title: safe ? "Tone Signal" : signalLabel,
                 body: safe ? "Polite and respectful." : "Blame or criticism may be detected.",
               },
               {
-                icon: safe ? "🛡️" : "🛡️",
+                icon: "🛡️",
                 title: "Defensive Trigger",
                 body: safe ? "Very low chance." : "May make the other person defensive.",
               },
@@ -455,34 +479,27 @@ export default function ShareCard({
                 textAlign: "left",
               }}
             >
-             <div
-  style={{
-    position: "absolute",
-    right: 34,
-    top: 28,
-    width: 138,
-    height: 138,
-    borderRadius: "50%",
-    border: "5px double #16a34a",
-    color: "#16a34a",
-    background: "rgba(236,253,245,0.92)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transform: "rotate(-13deg)",
-    fontWeight: 1000,
-    textAlign: "center",
-    lineHeight: 1.1,
-    boxShadow: "0 8px 20px rgba(22,163,74,0.12)",
-    zIndex: 1,
-  }}
->
-  <div>
-    <div style={{ fontSize: 16, letterSpacing: ".08em" }}>SAVED BY</div>
-    <div style={{ fontSize: 46, lineHeight: 1 }}>T✓</div>
-    <div style={{ fontSize: 13, letterSpacing: ".12em" }}>TONECHECK</div>
-  </div>
-</div>
+              <div
+                style={{
+                  position: "absolute",
+                  right: 26,
+                  top: 22,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "9px 14px",
+                  borderRadius: 16,
+                  background: "#ffffff",
+                  border: "1.5px solid #bbf7d0",
+                  color: "#16a34a",
+                  fontWeight: 1000,
+                  fontSize: 20,
+                }}
+              >
+                CONFLICT RISK <span style={{ fontSize: 27 }}>{afterRisk}%</span>
+              </div>
+
+              <SavedStamp />
 
               <div
                 style={{
@@ -491,24 +508,26 @@ export default function ShareCard({
                   color: "#16a34a",
                   marginBottom: 26,
                   letterSpacing: ".03em",
+                  paddingRight: 260,
                 }}
               >
                 ✨ MESSAGE I’D SEND INSTEAD
               </div>
 
-           <div
-  style={{
-    fontSize: rewrite.length > 180 ? 34 : 43,
-    fontWeight: 1000,
-    lineHeight: 1.35,
-    maxWidth: 760,
-    paddingRight: 170,
-    whiteSpace: "pre-wrap",
-    wordBreak: "break-word",
-  }}
->
-  “{rewrite}”
-</div>
+              <div
+                style={{
+                  fontSize: rewrite.length > 220 ? 30 : rewrite.length > 140 ? 36 : 42,
+                  fontWeight: 1000,
+                  lineHeight: 1.35,
+                  color: "#101a44",
+                  whiteSpace: "normal",
+                  wordBreak: "normal",
+                  overflowWrap: "break-word",
+                  paddingRight: 130,
+                }}
+              >
+                “{rewrite}”
+              </div>
 
               <div style={{ display: "flex", gap: 16, marginTop: 28 }}>
                 {["Calmer", "Clearer", "More likely reply"].map((x) => (
