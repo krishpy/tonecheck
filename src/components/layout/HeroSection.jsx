@@ -547,43 +547,43 @@ export default function HeroSection({
 const betaCard = isHome && !result && (
   <div
     style={{
-      padding: isMobile ? "18px" : "26px",
-      borderRadius: "30px",
+      padding: isMobile ? "20px" : "30px",
+      borderRadius: "32px",
       background:
         "linear-gradient(135deg, #f0fdf4 0%, #ecfeff 48%, #eef2ff 100%)",
       color: "#111827",
       boxShadow:
-        "0 20px 55px rgba(16,185,129,0.14), 0 10px 28px rgba(99,102,241,0.08)",
-      border: "1px solid rgba(34,197,94,0.20)",
-      minHeight: isMobile ? "auto" : "420px",
+        "0 22px 60px rgba(16,185,129,0.14), 0 10px 28px rgba(99,102,241,0.08)",
+      border: "1px solid rgba(34,197,94,0.22)",
+      minHeight: isMobile ? "auto" : "430px",
     }}
   >
     <div
       style={{
         display: "inline-flex",
         alignItems: "center",
-        gap: "8px",
-        padding: "8px 12px",
+        gap: "7px",
+        padding: "7px 11px",
         borderRadius: "999px",
         background: "#ffffff",
         color: "#16a34a",
         border: "1px solid rgba(34,197,94,0.24)",
         fontWeight: 850,
-        fontSize: "12px",
+        fontSize: "11px",
         marginBottom: "18px",
       }}
     >
-      <span>💬</span>
+      <span style={{ fontSize: "14px" }}>🟢</span>
       <span>WhatsApp Beta</span>
     </div>
 
     <div
       style={{
-        fontSize: isMobile ? "26px" : "32px",
-        lineHeight: 1.08,
-        fontWeight: 820,
-        letterSpacing: "-0.045em",
-        marginBottom: "10px",
+        fontSize: isMobile ? "30px" : "38px",
+        lineHeight: 1.04,
+        fontWeight: 850,
+        letterSpacing: "-0.055em",
+        marginBottom: "12px",
         color: "#0f172a",
       }}
     >
@@ -595,8 +595,8 @@ const betaCard = isHome && !result && (
         fontSize: "15px",
         lineHeight: 1.55,
         color: "#334155",
-        fontWeight: 520,
-        marginBottom: "18px",
+        fontWeight: 540,
+        marginBottom: "20px",
       }}
     >
       Forward a risky draft to ToneCheck on WhatsApp and get instant tone feedback before sending.
@@ -607,42 +607,32 @@ const betaCard = isHome && !result && (
         background: "#ffffff",
         border: "1px solid rgba(34,197,94,0.18)",
         borderRadius: "22px",
-        padding: "14px",
+        padding: "16px",
         marginBottom: "18px",
         boxShadow: "0 10px 24px rgba(15,23,42,0.05)",
       }}
     >
       <div
         style={{
-          background: "#dcfce7",
-          color: "#14532d",
-          padding: "11px 13px",
-          borderRadius: "16px 16px 16px 4px",
-          fontSize: "14px",
-          fontWeight: 650,
-          lineHeight: 1.45,
-          marginBottom: "10px",
-          maxWidth: "92%",
-        }}
-      >
-        check: Fine. Do whatever you want.
-      </div>
-
-      <div
-        style={{
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "10px",
           background: "#f8fafc",
           color: "#334155",
-          padding: "11px 13px",
-          borderRadius: "16px 16px 4px 16px",
+          padding: "14px",
+          borderRadius: "16px",
           fontSize: "14px",
           fontWeight: 650,
           lineHeight: 1.45,
-          marginLeft: "auto",
-          maxWidth: "92%",
           border: "1px solid rgba(15,23,42,0.06)",
         }}
       >
-        ⚠️ Passive-aggressive tone detected. Try a calmer rewrite before sending.
+        <span style={{ fontSize: "18px", lineHeight: 1.2 }}>⚠️</span>
+        <span>
+          Passive-aggressive tone detected.
+          <br />
+          Try a calmer rewrite before sending.
+        </span>
       </div>
     </div>
 
@@ -652,8 +642,8 @@ const betaCard = isHome && !result && (
       placeholder="Your name"
       style={{
         width: "100%",
-        padding: "16px",
-        borderRadius: "15px",
+        padding: "17px",
+        borderRadius: "16px",
         border: "1px solid #bbf7d0",
         marginBottom: "10px",
         boxSizing: "border-box",
@@ -671,10 +661,10 @@ const betaCard = isHome && !result && (
       type="email"
       style={{
         width: "100%",
-        padding: "16px",
-        borderRadius: "15px",
+        padding: "17px",
+        borderRadius: "16px",
         border: "1px solid #bbf7d0",
-        marginBottom: "12px",
+        marginBottom: "14px",
         boxSizing: "border-box",
         fontWeight: 650,
         fontSize: "15px",
@@ -689,24 +679,26 @@ const betaCard = isHome && !result && (
       disabled={waitlistLoading}
       style={{
         width: "100%",
-        padding: "16px 18px",
-        borderRadius: "16px",
+        padding: "17px 18px",
+        borderRadius: "18px",
         border: "none",
         cursor: waitlistLoading ? "not-allowed" : "pointer",
-        fontWeight: 850,
-        fontSize: "15px",
+        fontWeight: 900,
+        fontSize: "16px",
         color: "#ffffff",
-        background: "#25D366",
-        boxShadow: "0 12px 28px rgba(37,211,102,0.28)",
+        background:
+          "linear-gradient(135deg, #22c55e 0%, #25D366 52%, #16a34a 100%)",
+        boxShadow:
+          "0 16px 34px rgba(37,211,102,0.34), inset 0 1px 0 rgba(255,255,255,0.24)",
       }}
     >
-      {waitlistLoading ? "Joining..." : "Join WhatsApp Beta 💬"}
+      {waitlistLoading ? "Joining..." : "Join WhatsApp Beta →"}
     </button>
 
     {waitlistStatus && (
       <div
         style={{
-          marginTop: "11px",
+          marginTop: "12px",
           fontSize: "13px",
           fontWeight: 800,
           color:
@@ -721,11 +713,11 @@ const betaCard = isHome && !result && (
 
     <div
       style={{
-        marginTop: "15px",
+        marginTop: "16px",
         display: "grid",
-        gap: "7px",
+        gap: "8px",
         fontSize: "13px",
-        fontWeight: 650,
+        fontWeight: 700,
         color: "#166534",
       }}
     >
