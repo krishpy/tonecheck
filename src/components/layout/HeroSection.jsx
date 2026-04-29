@@ -547,58 +547,43 @@ export default function HeroSection({
 const betaCard = isHome && !result && (
   <div
     style={{
-      padding: isMobile ? "20px" : "30px",
-      borderRadius: "32px",
+      padding: isMobile ? "18px" : "26px",
+      borderRadius: "30px",
       background:
         "linear-gradient(135deg, #f0fdf4 0%, #ecfeff 48%, #eef2ff 100%)",
       color: "#111827",
       boxShadow:
-        "0 22px 60px rgba(16,185,129,0.14), 0 10px 28px rgba(99,102,241,0.08)",
-      border: "1px solid rgba(34,197,94,0.22)",
-      minHeight: isMobile ? "auto" : "430px",
+        "0 20px 55px rgba(16,185,129,0.14), 0 10px 28px rgba(99,102,241,0.08)",
+      border: "1px solid rgba(34,197,94,0.20)",
+      minHeight: isMobile ? "auto" : "420px",
     }}
   >
     <div
-  style={{
-    display:"inline-flex",
-    alignItems:"center",
-    gap:"10px",
-    padding:"8px 14px",
-    borderRadius:"999px",
-    background:"#ffffff",
-    color:"#16a34a",
-    border:"1px solid rgba(34,197,94,.24)",
-    fontWeight:900,
-    fontSize:"14px",
-    marginBottom:"18px",
-    boxShadow:"0 6px 18px rgba(34,197,94,.08)"
-  }}
->
-  <img
-    src="/whatsapp.svg"
-    alt="WhatsApp"
-    style={{
-      width:"18px",
-      height:"18px"
-    }}
-  />
-
-  <span
-    style={{
-      letterSpacing:"-.02em"
-    }}
-  >
-    WhatsApp Beta
-  </span>
-</div>
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        padding: "8px 12px",
+        borderRadius: "999px",
+        background: "#ffffff",
+        color: "#16a34a",
+        border: "1px solid rgba(34,197,94,0.24)",
+        fontWeight: 850,
+        fontSize: "12px",
+        marginBottom: "18px",
+      }}
+    >
+      <span>💬</span>
+      <span>WhatsApp Beta</span>
+    </div>
 
     <div
       style={{
-        fontSize: isMobile ? "34px" : "44px",
-        lineHeight: 1.04,
-        fontWeight: 800,
-        letterSpacing: "-0.055em",
-        marginBottom: "12px",
+        fontSize: isMobile ? "26px" : "32px",
+        lineHeight: 1.08,
+        fontWeight: 820,
+        letterSpacing: "-0.045em",
+        marginBottom: "10px",
         color: "#0f172a",
       }}
     >
@@ -610,8 +595,8 @@ const betaCard = isHome && !result && (
         fontSize: "15px",
         lineHeight: 1.55,
         color: "#334155",
-        fontWeight: 540,
-        marginBottom: "20px",
+        fontWeight: 520,
+        marginBottom: "18px",
       }}
     >
       Forward a risky draft to ToneCheck on WhatsApp and get instant tone feedback before sending.
@@ -622,32 +607,42 @@ const betaCard = isHome && !result && (
         background: "#ffffff",
         border: "1px solid rgba(34,197,94,0.18)",
         borderRadius: "22px",
-        padding: "16px",
+        padding: "14px",
         marginBottom: "18px",
         boxShadow: "0 10px 24px rgba(15,23,42,0.05)",
       }}
     >
       <div
         style={{
-          display: "flex",
-          alignItems: "flex-start",
-          gap: "10px",
-          background: "#f8fafc",
-          color: "#334155",
-          padding: "14px",
-          borderRadius: "16px",
+          background: "#dcfce7",
+          color: "#14532d",
+          padding: "11px 13px",
+          borderRadius: "16px 16px 16px 4px",
           fontSize: "14px",
           fontWeight: 650,
           lineHeight: 1.45,
+          marginBottom: "10px",
+          maxWidth: "92%",
+        }}
+      >
+        check: Fine. Do whatever you want.
+      </div>
+
+      <div
+        style={{
+          background: "#f8fafc",
+          color: "#334155",
+          padding: "11px 13px",
+          borderRadius: "16px 16px 4px 16px",
+          fontSize: "14px",
+          fontWeight: 650,
+          lineHeight: 1.45,
+          marginLeft: "auto",
+          maxWidth: "92%",
           border: "1px solid rgba(15,23,42,0.06)",
         }}
       >
-        <span style={{ fontSize: "18px", lineHeight: 1.2 }}>⚠️</span>
-        <span>
-          Passive-aggressive tone detected.
-          <br />
-          Try a calmer rewrite before sending.
-        </span>
+        ⚠️ Passive-aggressive tone detected. Try a calmer rewrite before sending.
       </div>
     </div>
 
@@ -657,8 +652,8 @@ const betaCard = isHome && !result && (
       placeholder="Your name"
       style={{
         width: "100%",
-        padding: "17px",
-        borderRadius: "16px",
+        padding: "16px",
+        borderRadius: "15px",
         border: "1px solid #bbf7d0",
         marginBottom: "10px",
         boxSizing: "border-box",
@@ -676,10 +671,10 @@ const betaCard = isHome && !result && (
       type="email"
       style={{
         width: "100%",
-        padding: "17px",
-        borderRadius: "16px",
+        padding: "16px",
+        borderRadius: "15px",
         border: "1px solid #bbf7d0",
-        marginBottom: "14px",
+        marginBottom: "12px",
         boxSizing: "border-box",
         fontWeight: 650,
         fontSize: "15px",
@@ -694,26 +689,24 @@ const betaCard = isHome && !result && (
       disabled={waitlistLoading}
       style={{
         width: "100%",
-        padding: "17px 18px",
-        borderRadius: "18px",
+        padding: "16px 18px",
+        borderRadius: "16px",
         border: "none",
         cursor: waitlistLoading ? "not-allowed" : "pointer",
-        fontWeight: 900,
-        fontSize: "16px",
+        fontWeight: 850,
+        fontSize: "15px",
         color: "#ffffff",
-        background:
-          "linear-gradient(135deg, #22c55e 0%, #25D366 52%, #16a34a 100%)",
-        boxShadow:
-          "0 16px 34px rgba(37,211,102,0.34), inset 0 1px 0 rgba(255,255,255,0.24)",
+        background: "#25D366",
+        boxShadow: "0 12px 28px rgba(37,211,102,0.28)",
       }}
     >
-      {waitlistLoading ? "Joining..." : "Get Beta Access →"}
+      {waitlistLoading ? "Joining..." : "Join WhatsApp Beta 💬"}
     </button>
 
     {waitlistStatus && (
       <div
         style={{
-          marginTop: "12px",
+          marginTop: "11px",
           fontSize: "13px",
           fontWeight: 800,
           color:
@@ -728,11 +721,11 @@ const betaCard = isHome && !result && (
 
     <div
       style={{
-        marginTop: "16px",
+        marginTop: "15px",
         display: "grid",
-        gap: "8px",
+        gap: "7px",
         fontSize: "13px",
-        fontWeight: 700,
+        fontWeight: 650,
         color: "#166534",
       }}
     >
@@ -980,7 +973,7 @@ const betaCard = isHome && !result && (
             </div>
           </div>
 
-          {!isMobile && betaCard}
+          {betaCard}
         </div>
 
         {!result && (
@@ -1109,101 +1102,13 @@ const betaCard = isHome && !result && (
           </div>
         </div>
 
-        {isMobile && isHome && !result && (
-  <div
-    style={{
-      marginTop: "16px",
-      padding: "16px",
-      borderRadius: "20px",
-      background: "linear-gradient(135deg,#f0fdf4,#ecfeff)",
-      border: "1px solid rgba(34,197,94,0.22)",
-      boxShadow: "0 12px 28px rgba(16,185,129,0.10)",
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        fontWeight: 900,
-        color: "#16a34a",
-        marginBottom: "8px",
-      }}
-    >
-      <img src="/whatsapp.svg" alt="WhatsApp" style={{ width: "20px", height: "20px" }} />
-      WhatsApp Beta
-    </div>
-
-    <div
-      style={{
-        fontSize: "20px",
-        fontWeight: 850,
-        color: "#0f172a",
-        marginBottom: "10px",
-        lineHeight: 1.25,
-      }}
-    >
-      Get early access to ToneCheck inside WhatsApp.
-    </div>
-
-    <input
-      value={waitlistEmail}
-      onChange={(e) => setWaitlistEmail(e.target.value)}
-      placeholder="Email for invite"
-      type="email"
-      style={{
-        width: "100%",
-        padding: "14px",
-        borderRadius: "14px",
-        border: "1px solid #bbf7d0",
-        marginBottom: "10px",
-        boxSizing: "border-box",
-        fontWeight: 650,
-        fontSize: "15px",
-        outline: "none",
-        background: "#ffffff",
-      }}
-    />
-
-    <button
-      type="button"
-      onClick={joinWhatsappBeta}
-      disabled={waitlistLoading}
-      style={{
-        width: "100%",
-        padding: "14px",
-        borderRadius: "14px",
-        border: "none",
-        fontWeight: 900,
-        fontSize: "15px",
-        color: "#ffffff",
-        background: "linear-gradient(135deg,#22c55e,#16a34a)",
-        boxShadow: "0 12px 26px rgba(34,197,94,0.25)",
-      }}
-    >
-      {waitlistLoading ? "Joining..." : "Get Beta Access →"}
-    </button>
-
-    {waitlistStatus && (
-      <div
-        style={{
-          marginTop: "9px",
-          fontSize: "13px",
-          fontWeight: 800,
-          color: waitlistStatus.includes("🚀") ? "#15803d" : "#b45309",
-        }}
-      >
-        {waitlistStatus}
-      </div>
-    )}
-  </div>
-)}
-
-        <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
-          <div style={valueChipStyle}>✓ Hidden tone</div>
-          <div style={valueChipStyle}>✓ Pressure / blame</div>
-          <div style={valueChipStyle}>✓ Calmer rewrite</div>
-        </div>
+        {!isMobile && (
+          <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
+            <div style={valueChipStyle}>✓ Hidden tone</div>
+            <div style={valueChipStyle}>✓ Pressure / blame</div>
+            <div style={valueChipStyle}>✓ Calmer rewrite</div>
+          </div>
+        )}
 
         <div
           style={{
@@ -1212,8 +1117,8 @@ const betaCard = isHome && !result && (
             alignItems: "flex-start",
             gap: "10px",
             color: "#475569",
-            fontSize: "13px",
-            lineHeight: 1.5,
+            fontSize: isMobile ? "13px" : "13px",
+            lineHeight: 1.4,
           }}
         >
           <input
@@ -1234,18 +1139,20 @@ const betaCard = isHome && !result && (
           </label>
         </div>
 
-        <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
-          <div style={trustChipStyle}>Difficult texts</div>
-          <div style={trustChipStyle}>Family conflict</div>
-          <div style={trustChipStyle}>Work replies</div>
-          <div style={trustChipStyle}>Apologies</div>
-        </div>
+        {!isMobile && (
+          <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+            <div style={trustChipStyle}>Difficult texts</div>
+            <div style={trustChipStyle}>Family conflict</div>
+            <div style={trustChipStyle}>Work replies</div>
+            <div style={trustChipStyle}>Apologies</div>
+          </div>
+        )}
 
-        {result && (
+        {result && !isMobile && (
           <div
             style={{
               marginTop: "14px",
-              padding: isMobile ? "14px" : "16px",
+              padding: "16px",
               borderRadius: "24px",
               background:
                 "linear-gradient(135deg, rgba(255,255,255,0.88), rgba(248,250,252,0.94))",
