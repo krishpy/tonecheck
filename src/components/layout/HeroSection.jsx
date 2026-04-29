@@ -980,7 +980,7 @@ const betaCard = isHome && !result && (
             </div>
           </div>
 
-          {betaCard}
+          {!isMobile && betaCard}
         </div>
 
         {!result && (
@@ -1108,6 +1108,96 @@ const betaCard = isHome && !result && (
             )}
           </div>
         </div>
+
+        {isMobile && isHome && !result && (
+  <div
+    style={{
+      marginTop: "16px",
+      padding: "16px",
+      borderRadius: "20px",
+      background: "linear-gradient(135deg,#f0fdf4,#ecfeff)",
+      border: "1px solid rgba(34,197,94,0.22)",
+      boxShadow: "0 12px 28px rgba(16,185,129,0.10)",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        fontWeight: 900,
+        color: "#16a34a",
+        marginBottom: "8px",
+      }}
+    >
+      <img src="/whatsapp.svg" alt="WhatsApp" style={{ width: "20px", height: "20px" }} />
+      WhatsApp Beta
+    </div>
+
+    <div
+      style={{
+        fontSize: "20px",
+        fontWeight: 850,
+        color: "#0f172a",
+        marginBottom: "10px",
+        lineHeight: 1.25,
+      }}
+    >
+      Get early access to ToneCheck inside WhatsApp.
+    </div>
+
+    <input
+      value={waitlistEmail}
+      onChange={(e) => setWaitlistEmail(e.target.value)}
+      placeholder="Email for invite"
+      type="email"
+      style={{
+        width: "100%",
+        padding: "14px",
+        borderRadius: "14px",
+        border: "1px solid #bbf7d0",
+        marginBottom: "10px",
+        boxSizing: "border-box",
+        fontWeight: 650,
+        fontSize: "15px",
+        outline: "none",
+        background: "#ffffff",
+      }}
+    />
+
+    <button
+      type="button"
+      onClick={joinWhatsappBeta}
+      disabled={waitlistLoading}
+      style={{
+        width: "100%",
+        padding: "14px",
+        borderRadius: "14px",
+        border: "none",
+        fontWeight: 900,
+        fontSize: "15px",
+        color: "#ffffff",
+        background: "linear-gradient(135deg,#22c55e,#16a34a)",
+        boxShadow: "0 12px 26px rgba(34,197,94,0.25)",
+      }}
+    >
+      {waitlistLoading ? "Joining..." : "Get Beta Access →"}
+    </button>
+
+    {waitlistStatus && (
+      <div
+        style={{
+          marginTop: "9px",
+          fontSize: "13px",
+          fontWeight: 800,
+          color: waitlistStatus.includes("🚀") ? "#15803d" : "#b45309",
+        }}
+      >
+        {waitlistStatus}
+      </div>
+    )}
+  </div>
+)}
 
         <div style={{ marginTop: "14px", display: "flex", flexWrap: "wrap", gap: "10px" }}>
           <div style={valueChipStyle}>✓ Hidden tone</div>
