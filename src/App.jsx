@@ -509,24 +509,26 @@ Try yours: trytonecheck.com`;
 
       setCopyState("");
 
-      const response = await fetch(
-        "https://communication-intelligence-api.onrender.com/communication-intelligence/analyze",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": "test-default-key",
-          },
-          body: JSON.stringify({
-            message_text: message,
-            rewrite_style: selectedStyle,
-            session_id: sessionId,
-            user_id: null,
-            page_slug: location.pathname,
-            consent_to_save_text: consentToSaveText,
-          }),
-        }
-      );
+     const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+const response = await fetch(
+  `${API_BASE}/communication-intelligence/analyze`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": import.meta.env.VITE_API_KEY,
+    },
+    body: JSON.stringify({
+      message_text: message,
+      rewrite_style: selectedStyle,
+      session_id: sessionId,
+      user_id: null,
+      page_slug: location.pathname,
+      consent_to_save_text: consentToSaveText,
+    }),
+  }
+);
 
       const rawText = await response.text();
       let data = {};
