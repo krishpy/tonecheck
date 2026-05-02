@@ -46,6 +46,8 @@ function AppContent() {
   const [rewriteTone, setRewriteTone] = useState("balanced");
   const [rewriteLoading, setRewriteLoading] = useState(false);
   const [consentToSaveText, setConsentToSaveText] = useState(false);
+  const [showConsentModal, setShowConsentModal] = useState(false);
+  const [pendingAnalyzeRequest, setPendingAnalyzeRequest] = useState(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -477,6 +479,44 @@ Try yours: trytonecheck.com`;
     );
   }
 
+  function requestAnalyze(selectedStyleArg = rewriteTone, options = {}) {
+    const isRewriteOnly = Boolean(options?.isRewriteOnly);
+
+    if (isRewriteOnly) {
+      analyze(selectedStyleArg, options);
+      return;
+    }
+
+    if (!message.trim() || loading) return;
+
+    setPendingAnalyzeRequest({
+      selectedStyleArg,
+      options,
+    });
+    setShowConsentModal(true);
+  }
+
+  function closeConsentModal() {
+    setShowConsentModal(false);
+    setPendingAnalyzeRequest(null);
+  }
+
+  function continueAnalyzeWithConsent(allowSave) {
+    const request = pendingAnalyzeRequest || {
+      selectedStyleArg: rewriteTone,
+      options: {},
+    };
+
+    setConsentToSaveText(Boolean(allowSave));
+    setShowConsentModal(false);
+    setPendingAnalyzeRequest(null);
+
+    analyze(request.selectedStyleArg, {
+      ...(request.options || {}),
+      consentToSaveOverride: Boolean(allowSave),
+    });
+  }
+
   async function analyze(selectedStyleArg = rewriteTone, options = {}) {
 
     if (!options?.isRewriteOnly) {
@@ -525,7 +565,7 @@ const response = await fetch(
       session_id: sessionId,
       user_id: null,
       page_slug: location.pathname,
-      consent_to_save_text: consentToSaveText,
+      consent_to_save_text: options?.consentToSaveOverride ?? consentToSaveText,
     }),
   }
 );
@@ -814,8 +854,176 @@ trackEvent({
       "0 10px 30px rgba(15,23,42,0.05), 0 1px 0 rgba(255,255,255,0.6) inset",
   };
 
+  const consentModal = showConsentModal ? (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="tonecheck-consent-title"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 9999,
+        display: "grid",
+        placeItems: "center",
+        padding: "20px",
+        background: "rgba(15,23,42,0.46)",
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+      }}
+    >
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "520px",
+          borderRadius: "28px",
+          padding: "24px",
+          background: "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+          border: "1px solid rgba(255,255,255,0.78)",
+          boxShadow: "0 28px 90px rgba(15,23,42,0.28)",
+          color: "#0f172a",
+        }}
+      >
+        <div
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            padding: "8px 12px",
+            borderRadius: "999px",
+            background: "linear-gradient(135deg,#eef2ff,#fdf2f8)",
+            color: "#4338ca",
+            fontWeight: 850,
+            fontSize: "13px",
+            marginBottom: "14px",
+          }}
+        >
+          🔒 Optional privacy choice
+        </div>
+
+        <h2
+          id="tonecheck-consent-title"
+          style={{
+            margin: 0,
+            fontSize: "28px",
+            lineHeight: 1.08,
+            letterSpacing: "-0.04em",
+            fontWeight: 950,
+          }}
+        >
+          Help improve ToneCheck?
+        </h2>
+
+        <p
+          style={{
+            margin: "14px 0 0",
+            color: "#475569",
+            fontSize: "15px",
+            lineHeight: 1.65,
+            fontWeight: 560,
+          }}
+        >
+          ToneCheck can store this message and result to improve signal accuracy and fix wrong outputs.
+        </p>
+
+        <div
+          style={{
+            marginTop: "14px",
+            padding: "14px",
+            borderRadius: "18px",
+            background: "rgba(254,249,195,0.72)",
+            border: "1px solid rgba(245,158,11,0.22)",
+            color: "#854d0e",
+            fontSize: "13px",
+            lineHeight: 1.55,
+            fontWeight: 750,
+          }}
+        >
+          Please don’t include passwords, OTPs, financial details, or highly sensitive personal information.
+        </div>
+
+        <p
+          style={{
+            margin: "14px 0 0",
+            color: "#64748b",
+            fontSize: "13px",
+            lineHeight: 1.55,
+            fontWeight: 650,
+          }}
+        >
+          You can still analyze without saving.
+        </p>
+
+        <div
+          style={{
+            marginTop: "22px",
+            display: "flex",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => continueAnalyzeWithConsent(false)}
+            style={{
+              flex: "1 1 190px",
+              padding: "15px 16px",
+              borderRadius: "16px",
+              border: "1px solid rgba(15,23,42,0.10)",
+              background: "#ffffff",
+              color: "#111827",
+              cursor: "pointer",
+              fontWeight: 850,
+              fontSize: "14px",
+              boxShadow: "0 8px 22px rgba(15,23,42,0.06)",
+            }}
+          >
+            Analyze without saving
+          </button>
+
+          <button
+            type="button"
+            onClick={() => continueAnalyzeWithConsent(true)}
+            style={{
+              flex: "1 1 190px",
+              padding: "15px 16px",
+              borderRadius: "16px",
+              border: "1px solid rgba(255,255,255,0.28)",
+              background:
+                "linear-gradient(135deg, #111827 0%, #4338ca 45%, #7c3aed 72%, #ec4899 100%)",
+              color: "#ffffff",
+              cursor: "pointer",
+              fontWeight: 900,
+              fontSize: "14px",
+              boxShadow: "0 16px 34px rgba(79,70,229,0.28)",
+            }}
+          >
+            Allow saving & analyze
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={closeConsentModal}
+          style={{
+            marginTop: "12px",
+            width: "100%",
+            border: "none",
+            background: "transparent",
+            color: "#64748b",
+            cursor: "pointer",
+            fontWeight: 750,
+            fontSize: "13px",
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div style={pageStyle}>
+      {consentModal}
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
@@ -847,7 +1055,7 @@ trackEvent({
               setMessage={handleMessageChange}
               setResult={setResult}
               setCopyState={setCopyState}
-              analyze={analyze}
+              analyze={requestAnalyze}
               loading={loading}
               setExample={setExample}
               heroCardStyle={heroCardStyle}

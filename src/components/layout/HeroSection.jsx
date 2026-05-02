@@ -1208,30 +1208,13 @@ const betaCard = isHome && !result && (
         <div
           style={{
             marginTop: "14px",
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "10px",
-            color: "#475569",
-            fontSize: "13px",
+            color: "#64748b",
+            fontSize: "12px",
             lineHeight: 1.5,
+            fontWeight: 650,
           }}
         >
-          <input
-            id="consent-to-save-text"
-            type="checkbox"
-            checked={consentToSaveText}
-            onChange={(e) => setConsentToSaveText(e.target.checked)}
-            style={{
-              marginTop: "2px",
-              width: "16px",
-              height: "16px",
-              accentColor: "#6366f1",
-              flexShrink: 0,
-            }}
-          />
-          <label htmlFor="consent-to-save-text" style={{ cursor: "pointer" }}>
-            Allow saving this message to improve ToneCheck.
-          </label>
+          You’ll choose whether to save the message before analysis. Saving is optional.
         </div>
 
         <div style={{ marginTop: "18px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
